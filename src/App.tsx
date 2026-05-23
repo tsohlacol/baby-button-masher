@@ -165,11 +165,12 @@ export default function App() {
     }
   }, [voices]);
 
-  // Update Clock
+  // Update Clock — paused in sandbox to avoid re-rendering the hidden dashboard every second
   useEffect(() => {
+    if (appState === "sandbox") return;
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [appState]);
 
   // Physical keyboard bypass listener when passcode popup is open
   useEffect(() => {
