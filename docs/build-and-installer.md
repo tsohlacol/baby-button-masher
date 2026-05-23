@@ -69,6 +69,10 @@ Below is the compilation directive file (`installer.iss`) built dynamically insi
 [Setup]
 AppName=Toddler Screen Defender
 AppVersion=1.0.4
+AppPublisher=tsohlacol
+AppPublisherURL=https://github.com/tsohlacol/toddler-screen-defender
+AppSupportURL=https://github.com/tsohlacol/toddler-screen-defender/issues
+AppUpdatesURL=https://github.com/tsohlacol/toddler-screen-defender/releases
 DefaultDirName={autopf}\ToddlerScreenDefender
 DefaultGroupName=Toddler Screen Defender
 UninstallDisplayIcon={app}\ToddlerScreenDefender.exe
@@ -77,6 +81,8 @@ OutputBaseFilename=TSD_Setup_v1.0.4
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
+; Displays EULA on startup and requires user acceptance to proceed
+LicenseFile=EULA.txt
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"

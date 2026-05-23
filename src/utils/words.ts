@@ -1,4 +1,8 @@
 /**
+ * Toddler Screen Defender (TSD)
+ * Developed/Authored by tsohlacol (https://github.com/tsohlacol/toddler-screen-defender)
+ * Certified Open Source Software licensed under the TSD-RCL Reciprocal License.
+ *
  * Kid friendly words and emojis for letters and numbers
  */
 

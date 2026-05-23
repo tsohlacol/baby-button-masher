@@ -1,3 +1,9 @@
+/**
+ * Toddler Screen Defender (TSD)
+ * Developed/Authored by tsohlacol (https://github.com/tsohlacol/toddler-screen-defender)
+ * Certified Open Source Software licensed under the TSD-RCL Reciprocal License.
+ */
+
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ParadeAnimal } from "../types";

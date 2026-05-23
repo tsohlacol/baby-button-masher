@@ -1,6 +1,9 @@
 /**
- * @license
- * SPDX-License-Identifier: Apache-2.0
+ * Toddler Screen Defender (TSD)
+ * Developed/Authored by tsohlacol (https://github.com/tsohlacol/toddler-screen-defender)
+ * Certified Open Source Software licensed under the TSD-RCL Reciprocal License.
+ *
+ * @license TSD-RCL
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -22,6 +25,8 @@ import {
   HelpCircle,
   Rocket,
   Paintbrush,
+  Heart,
+  Github,
 } from "lucide-react";
 
 import { ScreensaverMode, ParentSettings, KeystrokeEvent } from "./types";
@@ -739,6 +744,41 @@ export default function App() {
                       {t.label}
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* About & Developer Credits */}
+              <div className="mt-6 pt-5 border-t border-slate-500/10 text-xs text-left">
+                <div className="p-3.5 rounded-2xl bg-black/35 border border-white/5 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-pink-400 animate-pulse" />
+                    <span className="font-bold text-white/95">About TSD Defender</span>
+                  </div>
+                  <p className="text-[10px] text-slate-400 leading-normal">
+                    Designed to secure low-level keyboard handlers and shield workspaces when toddlers play & mash keys.
+                  </p>
+                  <div className="pt-2 border-t border-white/5 flex flex-col gap-1 text-[10px]">
+                    <div className="flex justify-between items-center text-slate-400">
+                      <span>Developer / Author:</span>
+                      <strong className="text-white">tsohlacol</strong>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-400">
+                      <span>Source Repository:</span>
+                      <a 
+                        href="https://github.com/tsohlacol/toddler-screen-defender" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-indigo-400 hover:underline flex items-center gap-1 font-mono hover:text-indigo-200"
+                      >
+                        <Github className="w-3 h-3 text-indigo-400 shrink-0" />
+                        <span>github.com/tsohlacol</span>
+                      </a>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-400">
+                      <span>License Model:</span>
+                      <span className="text-purple-300 font-bold font-mono">TSD-RCL (Reciprocal)</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

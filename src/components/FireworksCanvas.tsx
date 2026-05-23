@@ -1,3 +1,9 @@
+/**
+ * Toddler Screen Defender (TSD)
+ * Developed/Authored by tsohlacol (https://github.com/tsohlacol/toddler-screen-defender)
+ * Certified Open Source Software licensed under the TSD-RCL Reciprocal License.
+ */
+
 import { useEffect, useRef, useState } from "react";
 import { Particle } from "../types";
 
