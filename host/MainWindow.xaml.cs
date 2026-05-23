@@ -22,7 +22,6 @@ namespace ToddlerScreenDefender
         private const int VK_RWIN = 0x5C;
         private const int VK_TAB = 0x09;
         private const int VK_ESCAPE = 0x1B;
-        private const int VK_F4 = 0x73;
         private const int VK_F11 = 0x7A;
         private const int VK_SHIFT = 0x10;
         private const int VK_CONTROL = 0x11;
