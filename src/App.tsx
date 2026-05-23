@@ -111,9 +111,8 @@ export default function App() {
   // Current active toddler playroom mode
   const [currentPlayMode, setCurrentPlayMode] = useState<ScreensaverMode>(ScreensaverMode.SPEAK_THE_KEY);
 
-  // Interaction logs & keystroke frequency tracking
-  const [keystrokes, setKeystrokes] = useState<KeystrokeEvent[]>([]);
-  const [mashingSpeed, setMashingSpeed] = useState<number>(0); // keystrokes/minute rolling
+  // Keystroke frequency tracking
+  const [mashingSpeed, setMashingSpeed] = useState<number>(0);
   const [lastKeystroke, setLastKeystroke] = useState<{ key: string; timestamp: number } | null>(null);
 
   // Security Lock Overlay State
