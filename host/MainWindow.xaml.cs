@@ -108,7 +108,7 @@ namespace ToddlerScreenDefender
                     if (args.TryGetWebMessageAsString() == "tsd:ready")
                     {
                         TsdLog.Write("Received tsd:ready from React");
-                        HideSplash();
+                        _readyTcs.TrySetResult();
                     }
                 };
 
