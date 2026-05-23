@@ -15,5 +15,35 @@
         Deactivated="Window_Deactivated">
     <Grid>
         <wv2:WebView2 Name="WebViewControl" />
+        <!-- Splash overlay: visible until NavigationCompleted, then fades out -->
+        <Grid Name="SplashOverlay" Background="#FF000000">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Toddler Screen Defender"
+                           FontSize="52"
+                           FontWeight="Light"
+                           FontFamily="Segoe UI"
+                           Foreground="#FFFFFFFF"
+                           HorizontalAlignment="Center" />
+                <TextBlock Text="by tsohlacol"
+                           FontSize="22"
+                           FontFamily="Segoe UI"
+                           Foreground="#FF888888"
+                           HorizontalAlignment="Center"
+                           Margin="0,16,0,0" />
+                <TextBlock Text="github.com/tsohlacol/toddler-screen-defender"
+                           FontSize="13"
+                           FontFamily="Segoe UI"
+                           Foreground="#FF555555"
+                           HorizontalAlignment="Center"
+                           Margin="0,8,0,0" />
+                <TextBlock Name="SplashStatus"
+                           Text="Starting..."
+                           FontSize="13"
+                           FontFamily="Segoe UI"
+                           Foreground="#FF444444"
+                           HorizontalAlignment="Center"
+                           Margin="0,40,0,0" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
