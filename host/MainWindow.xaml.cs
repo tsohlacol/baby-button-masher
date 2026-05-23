@@ -137,11 +137,16 @@ namespace ToddlerScreenDefender
         private void OnNavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
         {
             TsdLog.Write($"Navigation completed: success={e.IsSuccess}, httpStatus={e.HttpStatusCode}");
-            HideSplash();
+            // Fallback: if React never posts tsd:ready (e.g. remote fallback URL, JS error),
+            // hide the splash after 3 seconds so the user isn't stuck staring at it.
+            Task.Delay(3000).ContinueWith(_ => Dispatcher.Invoke(HideSplash));
         }
 
         private void HideSplash()
         {
+            if (_splashHidden) return;
+            _splashHidden = true;
+            TsdLog.Write("Hiding splash");
             var fade = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(400));
             fade.Completed += (s, e) => SplashOverlay.Visibility = Visibility.Collapsed;
             SplashOverlay.BeginAnimation(OpacityProperty, fade);
