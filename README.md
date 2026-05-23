@@ -3,9 +3,9 @@
 [![License: TSD-RCL](https://img.shields.io/badge/License-TSD--RCL-purple.svg)](./LICENSE)
 [![Build Status](https://img.shields.io/badge/Build-Docker%20%26%20WSL-blue.svg)](#building-your-own-copy-from-source)
 
-**Toddler Screen Defender (TSD)** is an open-source, full-screen interactive gaming container that blocks toddlers from opening system-sensitive folders, deleting document profiles, or writing messy emails when they slam keys on your laptop. 
+**Toddler Screen Defender (TSD)** is an open-source, full-screen interactive gaming container that allows toddlers to play on your keyboard and interact with your computer while preventing any damage (eg. opening system-sensitive folders, deleting document profiles, or writing messy emails). 
 
-By combining an **offline React/Vite sensory sandbox** with a **native Windows host keyboard execution hook**, TSD turns hazardous key-mashing into beautiful rockets, starry fireworks, custom animals zoo speak-back keys, musical standard pianos, and neon sensory drawings!
+TSD is designed for Windows 11 computers.  It comes with no warranty express or implied. Use at your own risk.
 
 ---
 
