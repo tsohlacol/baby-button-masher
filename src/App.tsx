@@ -1368,7 +1368,7 @@ export default function App() {
                   </p>
                 ) : (
                   <p className="text-[10px] text-slate-500 font-mono uppercase tracking-widest">
-                    Default PIN is {settings.parentPin || "1234"}
+                    Enter your parent PIN
                   </p>
                 )}
               </div>
