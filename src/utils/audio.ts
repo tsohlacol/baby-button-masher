@@ -276,23 +276,55 @@ export function cancelSpeech() {
 }
 
 /**
- * Retrieves lists of child-friendly voices.
+ * Plays a shimmery space-chime tone for the Space Explorer mode.
+ */
+export function playSpaceChime(key: string) {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const { freq } = getFrequencyForKey(key);
+    const userVolume = audioVolumeLimit;
+
+    // Two slightly detuned sines produce a chorus shimmer
+    [freq, freq * 2].forEach((f, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(f, ctx.currentTime);
+      // Tiny pitch drift gives that twinkling feel
+      osc.frequency.exponentialRampToValueAtTime(f * 0.98, ctx.currentTime + 1.6);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.12 * userVolume, ctx.currentTime + 0.06 + i * 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.8);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.02);
+      osc.stop(ctx.currentTime + 1.8);
+    });
+  } catch (err) {
+    console.warn("Space chime failed:", err);
+  }
+}
+
+/**
+ * Retrieves child-friendly voices, sorted best-first.
+ * Priority: Microsoft Online Natural (neural TTS) > any Natural/Neural > Google > Premium > plain English > legacy robotic (Zira/David).
  */
 export function getAvailableVoices(): SpeechSynthesisVoice[] {
   if (typeof window === 'undefined' || !("speechSynthesis" in window)) return [];
   const voices = window.speechSynthesis.getVoices();
-  return [...voices].sort((a, b) => {
-    const aLower = a.name.toLowerCase();
-    const bLower = b.name.toLowerCase();
-    
-    // Sort premium or natural sounding voices first
-    const aIsPremium = aLower.includes("natural") || aLower.includes("google") || aLower.includes("neural") || aLower.includes("premium");
-    const bIsPremium = bLower.includes("natural") || bLower.includes("google") || bLower.includes("neural") || bLower.includes("premium");
-    
-    if (aIsPremium && !bIsPremium) return -1;
-    if (!aIsPremium && bIsPremium) return 1;
-    
-    // Fallback to alphabetical sorting
-    return a.name.localeCompare(b.name);
-  });
+
+  const score = (v: SpeechSynthesisVoice): number => {
+    const n = v.name.toLowerCase();
+    if (n.includes("online") && n.includes("natural")) return 6; // e.g. "Microsoft Aria Online (Natural)"
+    if (n.includes("natural") || n.includes("neural"))  return 5;
+    if (n.includes("google"))                            return 4;
+    if (n.includes("premium"))                          return 3;
+    // Deprioritise old robotic desktop voices that ship with Windows
+    if (v.lang.startsWith("en") && !n.includes("zira") && !n.includes("david") && !n.includes(" mark")) return 2;
+    if (v.lang.startsWith("en"))                        return 1;
+    return 0;
+  };
+
+  return [...voices].sort((a, b) => score(b) - score(a) || a.name.localeCompare(b.name));
 }
