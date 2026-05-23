@@ -126,10 +126,16 @@ namespace ToddlerScreenDefender
                     TsdLog.Write("Local assets not found, falling back to remote URL");
                     WebViewControl.Source = new Uri("https://ais-pre-2ojkzky7dd3ixx5xjcj6g3-457582934602.us-east1.run.app");
                 }
+
+                // Hold the splash for at least 2.5 s AND until React signals ready —
+                // whichever finishes last wins, so fast machines still see the splash briefly.
+                await Task.WhenAll(Task.Delay(2500), _readyTcs.Task);
+                HideSplash();
             }
             catch (Exception ex)
             {
                 TsdLog.Write($"ERROR in Window_Loaded: {ex}");
+                HideSplash(); // Always dismiss so the error dialog is reachable
                 MessageBox.Show($"TSD Native WebView2 Boot Error: {ex.Message}\nFalling back to system browser redirect.", "Runtime Warn");
             }
         }
