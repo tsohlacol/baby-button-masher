@@ -539,95 +539,76 @@ export default function App() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
             
             {/* COLUMN 1: INTERACTIVE MODES CONFIG */}
-            <div className={`p-6 rounded-3xl flex flex-col justify-between ${activeTheme.cardBg}`}>
-              <div>
-                <h3 className="text-lg font-bold flex items-center gap-2 mb-4">
-                  <Layers className="w-5 h-5 text-[#a855f7]" />
-                  <span>Choose Startup Play Playroom Mode</span>
-                </h3>
-                <p className={`text-xs ${activeTheme.textMuted} mb-6`}>
-                  Choose the primary mode that boots or configure active auto-adaptation switching rules.
-                </p>
+            <div className={`p-5 rounded-3xl flex flex-col gap-4 ${activeTheme.cardBg} overflow-y-auto`}>
+              <h3 className="text-base font-bold flex items-center gap-2 shrink-0">
+                <Layers className="w-4 h-4 text-[#a855f7]" />
+                <span>Startup Playroom Mode</span>
+              </h3>
 
-                <div className="space-y-3">
-                  {[
-                    {
-                      id: ScreensaverMode.SPEAK_THE_KEY,
-                      icon: <Volume2 className="w-4 h-4 text-emerald-500" />,
-                      title: "🗣️ Speak the Key",
-                      desc: "Speaks letter/number names clearly, spells out corresponding cute animals/objects."
-                    },
-                    {
-                      id: ScreensaverMode.SPACE_ROCKET,
-                      icon: <Rocket className="w-4 h-4 text-blue-400" />,
-                      title: "🚀 Space Rocket Blastoff",
-                      desc: "Keys launch custom pilot-coded rockets, orbit satellites, and spinning UFO space probe entities."
-                    },
-                    {
-                      id: ScreensaverMode.ANIMAL_PARADE,
-                      icon: <Sparkles className="w-4 h-4 text-amber-500" />,
-                      title: "🦖 Animal & Dino Parade",
-                      desc: "Keys summon dinosaurs, puppies, cats running, spinning or floating across screen."
-                    },
-                    {
-                      id: ScreensaverMode.COSMIC_FIREWORKS,
-                      icon: <Tv className="w-4 h-4 text-purple-500" />,
-                      title: "🎆 Cosmic Fireworks",
-                      desc: "High-speed typing shoots bright exploding sparks & gravity-fading firework glows."
-                    },
-                    {
-                      id: ScreensaverMode.KEYBOARD_PIANO,
-                      icon: <Music className="w-4 h-4 text-pink-500" />,
-                      title: "🎹 Keyboard Piano",
-                      desc: "Turn standard keys into physical musical piano. Taps generate harmonic pentatonic sweeps."
-                    },
-                    {
-                      id: ScreensaverMode.MOUSE_DRAWING,
-                      icon: <Paintbrush className="w-4 h-4 text-indigo-400" />,
-                      title: "🎨 Sensory Mouse Drawing",
-                      desc: "Use the mouse/touchscreen to draw glowing rainbow streams; tap keys to stamp cute emojis & hear chimes!"
-                    },
-                    {
-                      id: ScreensaverMode.SPACE_EXPLORER,
-                      icon: <Sparkles className="w-4 h-4 text-cyan-400" />,
-                      title: "🌌 Space Explorer",
-                      desc: "Tour the solar system and constellations! Hover over planets, stars, and constellation shapes to hear their names."
-                    }
-                  ].map((mode) => (
-                    <button
-                      key={mode.id}
-                      onClick={() => setSettings((prev) => ({ ...prev, activeMode: mode.id }))}
-                      className={`w-full text-left p-3 rounded-xl border transition-all text-xs flex items-start gap-3 ${
-                        settings.activeMode === mode.id
-                          ? "bg-indigo-500/10 border-indigo-500 text-indigo-400 font-medium"
-                          : "bg-black/10 hover:bg-black/20 border-slate-500/10"
-                      }`}
-                    >
-                      <span className="p-1 rounded-lg bg-white/5 border border-white/5 mt-0.5">{mode.icon}</span>
-                      <div>
-                        <div className="font-bold flex items-center gap-1.5">{mode.title}</div>
-                        <p className="opacity-70 mt-0.5 font-normal leading-relaxed">{mode.desc}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <select
+                value={settings.activeMode}
+                onChange={(e) => setSettings((prev) => ({ ...prev, activeMode: e.target.value as ScreensaverMode }))}
+                className="w-full bg-black/20 border border-slate-500/20 p-2.5 rounded-xl text-sm font-medium shrink-0"
+              >
+                <option value={ScreensaverMode.SPEAK_THE_KEY}>🗣️ Speak the Key</option>
+                <option value={ScreensaverMode.SPACE_ROCKET}>🚀 Space Rocket Blastoff</option>
+                <option value={ScreensaverMode.ANIMAL_PARADE}>🦖 Animal &amp; Dino Parade</option>
+                <option value={ScreensaverMode.COSMIC_FIREWORKS}>🎆 Cosmic Fireworks</option>
+                <option value={ScreensaverMode.KEYBOARD_PIANO}>🎹 Keyboard Piano</option>
+                <option value={ScreensaverMode.MOUSE_DRAWING}>🎨 Sensory Mouse Drawing</option>
+                <option value={ScreensaverMode.SPACE_EXPLORER}>🌌 Space Explorer</option>
+              </select>
 
               {/* Dynamic Switch Rule toggle */}
-              <div className="mt-6 pt-6 border-t border-slate-500/10 bg-black/15 p-4 rounded-xl">
-                <div className="flex items-center justify-between">
+              <div className="bg-black/15 p-4 rounded-xl border border-slate-500/10 shrink-0">
+                <div className="flex items-center justify-between gap-3">
                   <div>
                     <span className="text-xs font-bold block">🧠 Smart Auto-Switch Mode</span>
                     <span className="text-[11px] opacity-60 block mt-0.5 leading-relaxed">
-                      Changes modes dynamically based on her behavior! Faster slamming switches to Fireworks; slower individual clicks guides her back to word learning.
+                      Changes modes based on their behavior. Faster slamming switches to Fireworks; slower clicks guides them back to word learning.
                     </span>
                   </div>
                   <input
                     type="checkbox"
                     checked={settings.autoModeSwitchEnabled}
                     onChange={(e) => setSettings((p) => ({ ...p, autoModeSwitchEnabled: e.target.checked }))}
-                    className="w-10 h-5 rounded-full accent-indigo-500 cursor-pointer"
+                    className="w-10 h-5 rounded-full accent-indigo-500 cursor-pointer shrink-0"
                   />
+                </div>
+              </div>
+
+              {/* About section */}
+              <div className="mt-auto pt-4 border-t border-slate-500/10 text-xs">
+                <div className="p-3.5 rounded-2xl bg-black/35 border border-white/5 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-pink-400 animate-pulse" />
+                    <span className="font-bold text-white/95">About Baby Button Masher</span>
+                  </div>
+                  <p className="text-[10px] text-slate-400 leading-normal">
+                    Secures low-level keyboard handlers and shields workspaces when toddlers play &amp; mash keys.
+                  </p>
+                  <div className="pt-2 border-t border-white/5 flex flex-col gap-1 text-[10px]">
+                    <div className="flex justify-between items-center text-slate-400">
+                      <span>Developer / Author:</span>
+                      <strong className="text-white">tsohlacol</strong>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-400">
+                      <span>Source Repository:</span>
+                      <a
+                        href="https://github.com/tsohlacol/toddler-screen-defender"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-indigo-400 hover:underline flex items-center gap-1 font-mono hover:text-indigo-200"
+                      >
+                        <Github className="w-3 h-3 text-indigo-400 shrink-0" />
+                        <span>github.com/tsohlacol</span>
+                      </a>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-400">
+                      <span>License:</span>
+                      <span className="text-purple-300 font-bold font-mono">TSD-RCL (Reciprocal)</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
