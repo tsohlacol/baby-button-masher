@@ -123,7 +123,7 @@ function loadSettings(): ParentSettings {
 
 export default function App() {
   // Page states: "dashboard" | "locked_screensaver" | "sandbox"
-  const [appState, setAppState] = useState<"dashboard" | "sandbox">("dashboard");
+  const [appState, setAppState] = useState<"dashboard" | "sandbox" | "dictionary">("dashboard");
 
   // Voice list loaded state
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
