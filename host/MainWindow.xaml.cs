@@ -44,7 +44,10 @@ namespace ToddlerScreenDefender
         {
             InitializeComponent();
             _proc = HookCallback;
-            
+
+            // Prevent the default white WebView2 background from flashing before content loads
+            WebViewControl.DefaultBackgroundColor = System.Drawing.Color.Black;
+
             // Go to full screen across active size
             this.WindowStyle = WindowStyle.None;
             this.WindowState = WindowState.Maximized;
