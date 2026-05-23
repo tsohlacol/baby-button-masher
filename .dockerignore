@@ -1,0 +1,25 @@
+# Build outputs and caches
+node_modules/
+dist/
+build-output/
+coverage/
+logs/
+
+# Git and IDE
+.git/
+.gitignore
+.claude/
+
+# Docs and CI tooling — not needed inside any build stage
+docs/
+scripts/
+Makefile
+build-installer.sh
+*.md
+LICENSE
+metadata.json
+
+# Secrets and logs
+.env*
+*.log
+.DS_Store
