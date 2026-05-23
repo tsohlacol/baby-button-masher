@@ -18,6 +18,7 @@ LicenseFile=EULA.txt
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+Name: "debugdesktopicon"; Description: "Create debug shortcut (writes diagnostic log to %LOCALAPPDATA%\ToddlerScreenDefender\tsd-debug.log)"; GroupDescription: "{cm:AdditionalIcons}"
 Name: "runonstartup"; Description: "Launch Toddler Screen Defender automatically on Windows startup"; GroupDescription: "Additional options:"
 
 [Files]
