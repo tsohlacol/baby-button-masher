@@ -102,6 +102,16 @@ namespace ToddlerScreenDefender
                     TsdLog.Write($"Navigation starting: {args.Uri}");
                 WebViewControl.CoreWebView2.NavigationCompleted += OnNavigationCompleted;
 
+                // Primary signal: React posts 'tsd:ready' after its first paint via setTimeout(0).
+                WebViewControl.CoreWebView2.WebMessageReceived += (s, args) =>
+                {
+                    if (args.TryGetWebMessageAsString() == "tsd:ready")
+                    {
+                        TsdLog.Write("Received tsd:ready from React");
+                        HideSplash();
+                    }
+                };
+
                 string debugFlag = TsdLog.IsEnabled ? "true" : "false";
                 await WebViewControl.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(
                     $"window.TSD_MONITORS = {monitorsJson}; window.TSD_DEBUG = {debugFlag};");
