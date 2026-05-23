@@ -28,6 +28,7 @@ Source: "bin\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs c
 [Icons]
 Name: "{group}\Toddler Screen Defender"; Filename: "{app}\ToddlerScreenDefender.exe"
 Name: "{autodesktop}\Toddler Screen Defender"; Filename: "{app}\ToddlerScreenDefender.exe"; Tasks: desktopicon
+Name: "{autodesktop}\Toddler Screen Defender (Debug)"; Filename: "{app}\ToddlerScreenDefender.exe"; Parameters: "--debug"; Tasks: debugdesktopicon
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "ToddlerScreenDefender"; ValueData: """{app}\ToddlerScreenDefender.exe"""; Flags: uninsdeletevalue; Tasks: runonstartup
