@@ -28,8 +28,14 @@ const PARADE_EMOJIS = [
   { emoji: "🐰", name: "Bouncy Bunny", action: "jumping", color: "#f472b6" },
 ];
 
+// Max animals spawnable within a single rapid-mash burst window
+const BURST_WINDOW_MS = 400;
+const MAX_SPAWNS_PER_BURST = 3;
+const MAX_ANIMALS_ON_SCREEN = 20;
+
 export default function AnimalParadeView({ lastEvent, soundEnabled }: AnimalParadeProps) {
   const [animals, setAnimals] = useState<ParadeAnimal[]>([]);
+  const spawnTimestampsRef = useRef<number[]>([]);
 
   useEffect(() => {
     if (!lastEvent) return;
