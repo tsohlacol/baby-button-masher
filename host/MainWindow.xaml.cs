@@ -260,4 +260,31 @@ namespace ToddlerScreenDefender
 
         private const int MONITORINFOF_PRIMARY = 0x00000001;
     }
+
+    [ComImport]
+    [Guid("C2F03A33-21F5-47FA-B4BB-156362A2F239")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    internal class CImmersiveShell { }
+
+    [ComImport]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    [Guid("6D5140C1-7436-11CE-8034-00AA006009FA")]
+    internal interface IShellServiceProvider
+    {
+        void QueryService(ref Guid guidService, ref Guid riid,
+                          [MarshalAs(UnmanagedType.Interface)] out object ppvObject);
+    }
+
+    [ComImport]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    [Guid("4CE81583-1E4C-4632-A621-07A53543148F")]
+    internal interface IVirtualDesktopPinnedApps
+    {
+        void IsAppIdPinned([MarshalAs(UnmanagedType.LPWStr)] string appId, [MarshalAs(UnmanagedType.Bool)] out bool result);
+        void PinAppID([MarshalAs(UnmanagedType.LPWStr)] string appId);
+        void UnpinAppID([MarshalAs(UnmanagedType.LPWStr)] string appId);
+        void IsWindowPinned(IntPtr hWnd, [MarshalAs(UnmanagedType.Bool)] out bool result);
+        void PinWindow(IntPtr hWnd);
+        void UnpinWindow(IntPtr hWnd);
+    }
 }
