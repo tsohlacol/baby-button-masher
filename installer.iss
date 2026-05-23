@@ -1,5 +1,5 @@
 [Setup]
-AppName=Toddler Screen Defender
+AppName=Baby Button Masher
 AppVersion=1.0.4
 AppPublisher=tsohlacol
 AppPublisherURL=https://github.com/tsohlacol/toddler-screen-defender
