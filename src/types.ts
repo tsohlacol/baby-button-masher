@@ -70,4 +70,21 @@ export interface ParentSettings {
   customWords: Record<string, string>; // custom word assignments e.g., 'A' -> 'Alice'
   volumeLimit: number; // 0.1 to 1.0
   multiMonitorStrategy: "blackout" | "mirror" | "independent";
+  parentPin?: string; // 4-digit PIN for passcode unlock
+  passcodeUnlockEnabled?: boolean; // configuration toggle for PIN passcode unlock
 }
+
+export interface SystemMonitor {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  isPrimary: boolean;
+}
+
+declare global {
+  interface Window {
+    TSD_MONITORS?: SystemMonitor[];
+  }
+}
+

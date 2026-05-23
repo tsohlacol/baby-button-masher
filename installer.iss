@@ -18,6 +18,7 @@ LicenseFile=EULA.txt
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+Name: "runonstartup"; Description: "Launch Toddler Screen Defender automatically on Windows startup"; GroupDescription: "Additional options:"
 
 [Files]
 Source: "bin\publish\ToddlerScreenDefender.exe"; DestDir: "{app}"; Flags: ignoreversion
@@ -27,9 +28,16 @@ Source: "bin\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs c
 Name: "{group}\Toddler Screen Defender"; Filename: "{app}\ToddlerScreenDefender.exe"
 Name: "{autodesktop}\Toddler Screen Defender"; Filename: "{app}\ToddlerScreenDefender.exe"; Tasks: desktopicon
 
+[Registry]
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "ToddlerScreenDefender"; ValueData: """{app}\ToddlerScreenDefender.exe"""; Flags: uninsdeletevalue; Tasks: runonstartup
+
 [Run]
 Filename: "{app}\ToddlerScreenDefender.exe"; Description: "{cm:LaunchProgram,Toddler Screen Defender}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
 ; Kill the running app instance silently prior to removing files
 Filename: "taskkill"; Parameters: "/F /IM ToddlerScreenDefender.exe"; RunOnceId: "KillAppProcess"; Flags: runhidden
+
+[UninstallDelete]
+; Cleanly purge the user's local WebView2 browser data caches on uninstall
+Type: filesandordirs; Name: "{userlocalappdata}\ToddlerScreenDefender"

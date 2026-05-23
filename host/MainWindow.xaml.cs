@@ -27,6 +27,18 @@ namespace ToddlerScreenDefender
         private const int VK_SHIFT = 0x10;
         private const int VK_CONTROL = 0x11;
 
+        private const int VK_LCONTROL = 0xA2;
+        private const int VK_RCONTROL = 0xA3;
+        private const int VK_LMENU = 0xA4;    // Left Alt
+        private const int VK_RMENU = 0xA5;    // Right Alt
+        private const int VK_LSHIFT = 0xA0;
+        private const int VK_RSHIFT = 0xA1;
+
+        private static bool IsModifierKeyDown(int vk)
+        {
+            return (GetKeyState(vk) & 0x8000) != 0;
+        }
+
         public delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
         public MainWindow()
@@ -59,17 +71,23 @@ namespace ToddlerScreenDefender
                 string localAppPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets", "react-app");
                 string indexPath = Path.Combine(localAppPath, "index.html");
 
+                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                string udataFolder = Path.Combine(localAppData, "ToddlerScreenDefender");
+                var env = await CoreWebView2Environment.CreateAsync(null, udataFolder);
+
+                string monitorsJson = GetMonitorsJson();
+
                 if (Directory.Exists(localAppPath) && File.Exists(indexPath))
                 {
-                    var env = await CoreWebView2Environment.CreateAsync(null, null);
                     await WebViewControl.EnsureCoreWebView2Async(env);
+                    await WebViewControl.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync($"window.TSD_MONITORS = {monitorsJson};");
                     WebViewControl.Source = new Uri(indexPath);
                 }
                 else
                 {
                     // Fallback pointing to production staging if assets are omitted
-                    var env = await CoreWebView2Environment.CreateAsync(null, null);
                     await WebViewControl.EnsureCoreWebView2Async(env);
+                    await WebViewControl.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync($"window.TSD_MONITORS = {monitorsJson};");
                     WebViewControl.Source = new Uri("https://ais-pre-2ojkzky7dd3ixx5xjcj6g3-457582934602.us-east1.run.app");
                 }
             }
@@ -77,6 +95,28 @@ namespace ToddlerScreenDefender
             {
                 MessageBox.Show($"TSD Native WebView2 Boot Error: {ex.Message}\nFalling back to system browser redirect.", "Runtime Warn");
             }
+        }
+
+        private string GetMonitorsJson()
+        {
+            var monitors = new System.Collections.Generic.List<string>();
+            EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, delegate (IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData)
+            {
+                MONITORINFOEX mi = new MONITORINFOEX();
+                mi.cbSize = Marshal.SizeOf(mi);
+                if (GetMonitorInfo(hMonitor, ref mi))
+                {
+                    bool isPrimary = (mi.dwFlags & MONITORINFOF_PRIMARY) != 0;
+                    int left = mi.rcMonitor.Left;
+                    int top = mi.rcMonitor.Top;
+                    int width = mi.rcMonitor.Right - mi.rcMonitor.Left;
+                    int height = mi.rcMonitor.Bottom - mi.rcMonitor.Top;
+                    monitors.Add($"{{\"left\":{left},\"top\":{top},\"width\":{width},\"height\":{height},\"isPrimary\":{(isPrimary ? "true" : "false")}}}");
+                }
+                return true;
+            }, IntPtr.Zero);
+
+            return "[" + string.Join(",", monitors) + "]";
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -117,7 +157,8 @@ namespace ToddlerScreenDefender
                 }
 
                 // 2. Block Alt+Tab, Alt+Esc, Alt+F4
-                if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
+                bool altPressed = IsModifierKeyDown(VK_LMENU) || IsModifierKeyDown(VK_RMENU);
+                if (altPressed)
                 {
                     if (vkCode == VK_TAB || vkCode == VK_ESCAPE || vkCode == VK_F4)
                     {
@@ -126,7 +167,8 @@ namespace ToddlerScreenDefender
                 }
 
                 // 3. Block Ctrl+Esc, Ctrl+Shift+Esc
-                if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+                bool ctrlPressed = IsModifierKeyDown(VK_LCONTROL) || IsModifierKeyDown(VK_RCONTROL);
+                if (ctrlPressed)
                 {
                     if (vkCode == VK_ESCAPE || vkCode == VK_SHIFT)
                     {
@@ -160,7 +202,41 @@ namespace ToddlerScreenDefender
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
 
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        private static extern short GetKeyState(int keyCode);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        // --- MULTI-MONITOR SUPPORT PINVOKES & TYPES ---
+        [DllImport("user32.dll")]
+        private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumProc lpfnEnum, IntPtr dwData);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFOEX lpmi);
+
+        private delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        public struct MONITORINFOEX
+        {
+            public int cbSize;
+            public RECT rcMonitor;
+            public RECT rcWork;
+            public int dwFlags;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+            public string szDevice;
+        }
+
+        private const int MONITORINFOF_PRIMARY = 0x00000001;
     }
 }

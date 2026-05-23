@@ -1,9 +1,29 @@
 # Toddler Screen Defender (TSD) Build, Test, and Security Audit Makefile
-.PHONY: install build lint test sast sca dast secrets malware security-audit build-installer clean help
+.PHONY: all setup build lint test sast sca dast secrets malware security-audit build-installer clean help
+
+all: setup test build-installer
+	@echo "==> Packaging local installer and creating a zipped package..."
+	@mkdir -p build-output
+	@EXE_FILE=$$(find build-output -name "*.exe" | head -n 1); \
+	if [ -n "$$EXE_FILE" ]; then \
+		echo "Found installer: $$EXE_FILE. Creating TSD_Setup_v1.0.4.zip..."; \
+		if command -v zip >/dev/null 2>&1; then \
+			zip -j build-output/TSD_Setup_v1.0.4.zip "$$EXE_FILE"; \
+		elif command -v python3 >/dev/null 2>&1; then \
+			python3 -c "import zipfile, os; z = zipfile.ZipFile('build-output/TSD_Setup_v1.0.4.zip', 'w', zipfile.ZIP_DEFLATED); z.write('$$EXE_FILE', os.path.basename('$$EXE_FILE')); z.close()"; \
+		else \
+			echo "Warning: Neither zip nor python3 found in environment. Could not generate zip archive."; \
+		fi; \
+	else \
+		echo "Error: No compiled Windows installer .exe found in build-output/ folder."; \
+		exit 1; \
+	fi
+	@echo "All deliverables (local installer copy and zip package) ready under ./build-output/!"
 
 help:
 	@echo "Toddler Screen Defender - Build, Test, and Security Audit Targets:"
-	@echo "  install          - Install Node.js frontend dependencies"
+	@echo "  all              - Setup, test, build installer, and compile upload zip package"
+	@echo "  setup            - Install Node.js frontend dependencies"
 	@echo "  build            - Build the static React game sandbox folder"
 	@echo "  lint             - Validate TypeScript and JavaScript files for errors"
 	@echo "  test             - Run all code linting, parallelized unit tests, and security scans"
@@ -16,7 +36,7 @@ help:
 	@echo "  build-installer  - Run Docker compilation container to assemble Windows Host and Installer"
 	@echo "  clean            - Clear previous build folders and installer targets"
 
-install:
+setup:
 	npm install && npm run build
 
 build:

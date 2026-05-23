@@ -29,18 +29,38 @@ Hovering over or sliding out the **Parent Control Panel** (by answering a random
 | **Master Volume Cap** | `10%` to `100%` (*Default: 30%*) | restrains dynamic synthesizer gains & speech output volumes. Keeps toddler ear levels comfortable. |
 | **Multi-Monitor Guard**| `Deep Blackout`, `Canvas Mirroring`, `Active Independent Canvases` | Safe-mode for connected external screens (*Default: Blackout to limit mouse leaks*). |
 | **Sound / Voice Options** | Voice Type Dropdown Selector | Chooses premium/natural text-to-speech engine vocals, and configures key speech alerts. |
+| **Custom Words Editor** | Standard Letters A-Z dropdown + list | Lets parents build a custom key-value vocabulary map for spelling learning. |
+
+### Dynamic Daughter Word Vocabulary Editor
+
+The **Special Daughter Words** panel has been redesigned into a fully dynamic and scrollable vocabulary manager:
+1. **Adding Custom Letters**: Choose any upper-case standard alphabet letter (`A` to `Z`) from the dynamic letter dropdown, type in the custom phrase/word you want spoken (e.g. `Alice 💖` or `Mommy Bear 🐻`), and click **Add** to associate it immediately.
+2. **Inline Adjustments**: Parents can directly click inside any input field in the list of active configured words to modify spelling expressions on-the-fly.
+3. **Phonetic Testing**: Clicking the **Speaker** icon next to any configured word will trigger an immediate dry-run text-to-speech preview, letting you check voice synthesis and pronunciation before locking the screen.
+4. **Deleting Associations**: Clicking the **Trash Can** icon next to any active configuration instantly deletes the overridden word association, seamlessly reverting TSD to its default high-quality learning dictionary items.
 
 ---
 
 ## 3. How to Exit (The Parent Override Hatch)
 
-Because children will repeatedly press standard letters (`E`, `X`, `I`, `T`) or escape keys, the default parent exit mechanism relies on cognitive validation.
+Because children will repeatedly press standard letters (`E`, `X`, `I`, `T`) or escape keys, the parent exit mechanism requires cognitive or code-based verification. TSD supports multiple exit options:
 
+### A. Parent Math Challenge (Default)
+By default, the exit hatch uses cognitive validation:
 1. Locate the **Lock Icon / Exit Hatch** positioned in the bottom-right corner of the active primary display.
 2. Click or tap this button.
 3. A security equation modal will appear containing a random addition, subtraction, or multiplication of two single-digit numbers (e.g., `7 * 4 = ?`, `9 - 3 = ?`).
 4. Type the valid solution using the input pad and confirm.
 5. If verified, the locks release immediately, taking you safely back to your desktop.
+
+### B. Numeric PIN Passcode (Configurable & Off by Default)
+For parents who prefer a fixed numeric passcode instead of solving math equations:
+1. Open the **Parent Control Panel**.
+2. Under the **Safety Configuration** section, locate the **Enable passcode PIN lock option** toggle. This option is **off by default** to keep the core setup simple.
+3. Toggle the switch to **on**.
+4. Once enabled, select **4-Digit PIN Passcode Verification** in the **Unlock Safeguard Strategy** dropdown list.
+5. Define your custom 4-digit PIN in the input field below (defaults to `1234`).
+6. When your child is in play mode, clicking the **Exit Hatch** will prompt you with a touch-friendly 3x4 layout PIN Pad. Enter your custom PIN (or type it on your physical keyboard) to unlock. Invalid entries trigger a spring-shake animation of the modal and reset.
 
 ---
 

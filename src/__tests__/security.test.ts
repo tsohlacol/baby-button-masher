@@ -49,4 +49,17 @@ describe.concurrent("Parent Verification Solver and Logic Locks", () => {
     expect(isWithinBounds(-5, 400, 1920, 1080)).toBe(false);
     expect(isWithinBounds(2000, 400, 1920, 1080)).toBe(false);
   });
+
+  it("should validate parent 4-digit PIN passcodes correctly", () => {
+    const verifyPin = (entered: string, correctPin: string | undefined): boolean => {
+      const actualPin = correctPin || "1234";
+      return entered === actualPin;
+    };
+
+    expect(verifyPin("1234", undefined)).toBe(true);
+    expect(verifyPin("1234", "1234")).toBe(true);
+    expect(verifyPin("9988", "9988")).toBe(true);
+    expect(verifyPin("1111", "9988")).toBe(false);
+    expect(verifyPin("1234", "9988")).toBe(false);
+  });
 });

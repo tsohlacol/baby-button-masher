@@ -27,6 +27,8 @@ import {
   Paintbrush,
   Heart,
   Github,
+  Plus,
+  Trash2,
 } from "lucide-react";
 
 import { ScreensaverMode, ParentSettings, KeystrokeEvent } from "./types";
@@ -97,6 +99,8 @@ export default function App() {
     },
     volumeLimit: 0.3,
     multiMonitorStrategy: "blackout",
+    parentPin: "1234",
+    passcodeUnlockEnabled: false,
   });
 
   // Synchronize audio.ts master volume with parent settings volume limit
@@ -118,6 +122,16 @@ export default function App() {
   const [parentAnswerInput, setParentAnswerInput] = useState("");
   const [mathErrorMessage, setMathErrorMessage] = useState("");
   const [longPressProgress, setLongPressProgress] = useState(0);
+
+  // Parent Passcode Lock Overlay State
+  const [isPasscodeOverlayOpen, setIsPasscodeOverlayOpen] = useState(false);
+  const [enteredPasscode, setEnteredPasscode] = useState("");
+  const [passcodeErrorMessage, setPasscodeErrorMessage] = useState("");
+  const [passcodeShake, setPasscodeShake] = useState(false);
+
+  // Dynamic custom word creator states
+  const [newWordChar, setNewWordChar] = useState("B");
+  const [newWordValue, setNewWordValue] = useState("");
 
   // Time logging
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -157,6 +171,26 @@ export default function App() {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Physical keyboard bypass listener when passcode popup is open
+  useEffect(() => {
+    if (!isPasscodeOverlayOpen) return;
+
+    const handlePasscodeKeyboardInput = (e: KeyboardEvent) => {
+      if (e.key >= "0" && e.key <= "9") {
+        handlePasscodeDigitPress(e.key);
+      } else if (e.key === "Backspace") {
+        setEnteredPasscode((prev) => prev.slice(0, -1));
+      } else if (e.key === "Escape") {
+        setIsPasscodeOverlayOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handlePasscodeKeyboardInput);
+    return () => {
+      window.removeEventListener("keydown", handlePasscodeKeyboardInput);
+    };
+  }, [isPasscodeOverlayOpen, settings.parentPin]);
 
   // Calculate keyboard mashing speed rolling average (Keystrokes per minute) in sandbox mode
   useEffect(() => {
@@ -212,6 +246,11 @@ export default function App() {
   // Handler for all toddler play room keystrokes
   const handleSandboxKeystroke = (e: KeyboardEvent) => {
     if (appState !== "sandbox") return;
+
+    if (isExitOverlayOpen || isPasscodeOverlayOpen) {
+      // Allow parent key verification entries without mashing intercepts
+      return;
+    }
 
     // Don't intercept exit key bindings like Ctrl+Alt or developer keys unless standard Toddler key down
     if (e.ctrlKey || e.altKey || (e.key === "f" && (e.metaKey || e.ctrlKey))) {
@@ -306,6 +345,42 @@ export default function App() {
     }
   };
 
+  const startPasscodeUnlockChallenge = () => {
+    setEnteredPasscode("");
+    setPasscodeErrorMessage("");
+    setPasscodeShake(false);
+    setIsPasscodeOverlayOpen(true);
+  };
+
+  const handlePasscodeDigitPress = (digit: string) => {
+    setPasscodeErrorMessage("");
+    setEnteredPasscode((prev) => {
+      if (prev.length >= 4) return prev;
+      const next = prev + digit;
+      // Auto-unlock or verify once we reach 4 digits
+      if (next.length === 4) {
+        const correctPin = settings.parentPin || "1234";
+        if (next === correctPin) {
+          setTimeout(() => {
+            setIsPasscodeOverlayOpen(false);
+            setAppState("dashboard");
+            if (window.speechSynthesis) window.speechSynthesis.cancel();
+          }, 200);
+          return next;
+        } else {
+          setPasscodeShake(true);
+          setPasscodeErrorMessage("Access Denied! Incorrect Parent PIN.");
+          setTimeout(() => {
+            setPasscodeShake(false);
+            setEnteredPasscode("");
+          }, 600);
+          return next;
+        }
+      }
+      return next;
+    });
+  };
+
   // Action to start play sandbox in full height
   const enterPlaySandbox = () => {
     // Lock preset initial playroom mode
@@ -338,6 +413,30 @@ export default function App() {
         [char.toUpperCase()]: value,
       },
     }));
+  };
+
+  const handleAddCustomWord = () => {
+    if (!newWordValue.trim()) return;
+    updateCustomWord(newWordChar, newWordValue.trim());
+    setNewWordValue("");
+    
+    // Choose the next letter A-Z that does not have a custom word
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const nextChar = alphabet.split("").find(c => !settings.customWords[c]);
+    if (nextChar) {
+      setNewWordChar(nextChar);
+    }
+  };
+
+  const handleRemoveCustomWord = (char: string) => {
+    setSettings((prev) => {
+      const nextCustomWords = { ...prev.customWords };
+      delete nextCustomWords[char.toUpperCase()];
+      return {
+        ...prev,
+        customWords: nextCustomWords,
+      };
+    });
   };
 
   const activeTheme = THEME_PRESETS[settings.theme] || THEME_PRESETS.cosmic;
@@ -650,58 +749,162 @@ export default function App() {
                   Make learning personal! Assign custom spelling expressions so the screen speaks family names or private characters.
                 </p>
 
-                <div className="space-y-3.5 text-xs">
-                  <div>
-                    <label className="block mb-1 text-[11px] font-bold text-white/80">
-                      When pressing <code className="bg-slate-800 text-amber-400 px-1 rounded">A</code> say:
-                    </label>
-                    <input
-                      type="text"
-                      value={settings.customWords.A || ""}
-                      onChange={(e) => updateCustomWord("A", e.target.value)}
-                      placeholder="e.g. Alice"
-                      className="w-full bg-black/20 border border-slate-500/25 p-2 rounded-lg text-xs"
-                    />
+                <div className="space-y-4 text-xs">
+                  {/* 1. Creator row to ADD or MODIFY custom word mapping */}
+                <div className="bg-black/25 border border-slate-500/10 p-3 rounded-2xl space-y-2 mb-4">
+                  <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Add Custom Key Word</span>
+                  <div className="flex gap-2 text-xs">
+                    <div className="w-16">
+                      <select
+                        value={newWordChar}
+                        onChange={(e) => setNewWordChar(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-700/60 p-2 rounded-lg text-white font-mono font-bold text-center focus:outline-hidden"
+                      >
+                        {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c) => (
+                          <option key={c} value={c}>
+                            {c}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={newWordValue}
+                        onChange={(e) => setNewWordValue(e.target.value)}
+                        placeholder="e.g. Bear 🐻"
+                        className="w-full bg-slate-900 border border-slate-700/60 p-2 rounded-lg text-white text-xs focus:outline-hidden"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleAddCustomWord();
+                          }
+                        }}
+                      />
+                    </div>
+                    <button
+                      onClick={handleAddCustomWord}
+                      className="p-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-medium transition-all flex items-center justify-center cursor-pointer"
+                      title="Add Word Mapping"
+                    >
+                      <Plus className="w-3.5 h-3.5 mr-1" /> Add
+                    </button>
                   </div>
+                </div>
 
-                  <div>
-                    <label className="block mb-1 text-[11px] font-bold text-white/80">
-                      When pressing <code className="bg-slate-800 text-amber-400 px-1 rounded">M</code> say:
-                    </label>
-                    <input
-                      type="text"
-                      value={settings.customWords.M || ""}
-                      onChange={(e) => updateCustomWord("M", e.target.value)}
-                      placeholder="e.g. Mommy"
-                      className="w-full bg-black/20 border border-slate-500/25 p-2 rounded-lg text-xs"
-                    />
-                  </div>
+                {/* 2. Scrollable keys list */}
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Configured Keys ({Object.keys(settings.customWords).length})</span>
+                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+                  {Object.keys(settings.customWords).length === 0 ? (
+                    <div className="text-center py-6 text-slate-500 border border-dashed border-slate-500/10 rounded-xl">
+                      <p className="text-[11px]">No custom spelling associations yet.</p>
+                      <p className="text-[9px] text-slate-600 mt-0.5">Add some letters above!</p>
+                    </div>
+                  ) : (
+                    Object.keys(settings.customWords)
+                      .sort()
+                      .map((char) => (
+                        <div
+                          key={char}
+                          className="flex items-center gap-2 p-2 rounded-xl bg-black/10 border border-slate-500/5 group hover:border-slate-500/15 transition-all text-xs"
+                        >
+                          {/* Badge Key */}
+                          <div className="w-7 h-7 shrink-0 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-bold font-mono flex items-center justify-center text-sm">
+                            {char}
+                          </div>
 
-                  <div>
-                    <label className="block mb-1 text-[11px] font-bold text-white/80">
-                      When pressing <code className="bg-slate-800 text-amber-400 px-1 rounded">D</code> say:
-                    </label>
-                    <input
-                      type="text"
-                      value={settings.customWords.D || ""}
-                      onChange={(e) => updateCustomWord("D", e.target.value)}
-                      placeholder="e.g. Daddy"
-                      className="w-full bg-black/20 border border-slate-500/25 p-2 rounded-lg text-xs"
-                    />
-                  </div>
+                          {/* Editable word field */}
+                          <input
+                            type="text"
+                            value={settings.customWords[char] || ""}
+                            onChange={(e) => updateCustomWord(char, e.target.value)}
+                            placeholder={`Spelling for ${char}`}
+                            className="flex-1 bg-black/10 hover:bg-black/20 focus:bg-slate-900/90 border border-slate-500/10 focus:border-slate-500/30 p-1.5 rounded-md text-[11px] font-medium text-slate-100 placeholder-slate-500 transition-all focus:outline-hidden"
+                          />
+
+                          {/* Sound test button */}
+                          <button
+                            onClick={() => triggerVoiceTest(char)}
+                            className="p-1 px-1.5 rounded bg-slate-850 hover:bg-slate-700 text-slate-300 transition-all cursor-pointer active:scale-95 flex items-center justify-center"
+                            title="Test Speech"
+                          >
+                            <Volume2 className="w-3.5 h-3.5" />
+                          </button>
+
+                          {/* Delete association button */}
+                          <button
+                            onClick={() => handleRemoveCustomWord(char)}
+                            className="p-1 px-1.5 rounded bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white transition-all cursor-pointer active:scale-95 flex items-center justify-center"
+                            title="Remove Word"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))
+                  )}
+                </div>
 
                   {/* Safety Configuration options */}
-                  <div className="pt-4 border-t border-slate-500/10">
-                    <label className="block mb-1.5 font-semibold text-white/80">Unlock Safeguard Strategy</label>
-                    <select
-                      value={settings.unlockRequirement}
-                      onChange={(e) => setSettings((p) => ({ ...p, unlockRequirement: e.target.value as any }))}
-                      className="w-full bg-black/20 border border-slate-500/20 p-2 rounded-lg text-xs"
-                    >
-                      <option value="math">Parent Math Sum verification (A + B formula)</option>
-                      <option value="long_press">3-Second Lock Button Press (harder for baby)</option>
-                      <option value="click">Simple Click (easy mock test)</option>
-                    </select>
+                  <div className="pt-4 border-t border-slate-500/10 space-y-3">
+                    {/* Toggle to enable/disable PIN passcode unlock feature */}
+                    <div className="flex items-center justify-between text-xs bg-black/10 p-2.5 rounded-xl border border-slate-500/10">
+                      <div className="flex flex-col gap-0.5 max-w-[80%]">
+                        <span className="font-semibold text-white/90">Enable passcode PIN lock option</span>
+                        <span className="text-[10px] text-slate-400">Add backup numeric PIN keypad unlock method to protection modes</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={!!settings.passcodeUnlockEnabled}
+                        onChange={(e) => {
+                          const enabled = e.target.checked;
+                          setSettings((p) => {
+                            let nextRequirement = p.unlockRequirement;
+                            // Reset requirement if disabling active passcode mode
+                            if (!enabled && p.unlockRequirement === "passcode") {
+                              nextRequirement = "math";
+                            }
+                            return {
+                              ...p,
+                              passcodeUnlockEnabled: enabled,
+                              unlockRequirement: nextRequirement,
+                            };
+                          });
+                        }}
+                        className="w-4 h-4 rounded text-blue-500 accent-blue-500 bg-slate-900 border-slate-700 cursor-pointer"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block mb-1.5 font-semibold text-white/80">Unlock Safeguard Strategy</label>
+                      <select
+                        value={settings.unlockRequirement}
+                        onChange={(e) => setSettings((p) => ({ ...p, unlockRequirement: e.target.value as any }))}
+                        className="w-full bg-black/20 border border-slate-500/20 p-2 rounded-lg text-xs font-medium"
+                      >
+                        <option value="math">Parent Math Sum verification (A + B formula)</option>
+                        {settings.passcodeUnlockEnabled && (
+                          <option value="passcode">4-Digit PIN Passcode Verification</option>
+                        )}
+                        <option value="long_press">3-Second Lock Button Press (harder for baby)</option>
+                        <option value="click">Simple Click (easy mock test)</option>
+                      </select>
+                    </div>
+
+                    {settings.passcodeUnlockEnabled && settings.unlockRequirement === "passcode" && (
+                      <div className="mt-2.5 p-2.5 bg-blue-500/5 border border-blue-500/20 rounded-xl">
+                        <label className="block mb-1 text-[10px] font-bold uppercase tracking-wider text-blue-400">Custom 4-Digit Parent PIN</label>
+                        <input
+                          type="text"
+                          maxLength={4}
+                          value={settings.parentPin || ""}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, "").slice(0, 4);
+                            setSettings((p) => ({ ...p, parentPin: val }));
+                          }}
+                          placeholder="e.g. 1234"
+                          className="w-full bg-black/30 border border-blue-500/30 p-1.5 rounded-lg text-xs font-mono text-center tracking-widest text-blue-300 focus:outline-hidden focus:border-blue-400 font-bold"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {/* Multi-Monitor Safeguard configuration */}
@@ -800,183 +1003,249 @@ export default function App() {
       )}
 
       {/* 2. ACTIVE SECURE PLAYROOM SANDBOX PLAY */}
-      {appState === "sandbox" && (
-        <div className="fixed inset-0 w-screen h-screen overflow-hidden select-none z-50">
-          
-          {/* MULTI_MONITOR STATUS PILL FOR PREPARATION ASSURANCE */}
-          <div className="absolute top-8 left-8 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/55 backdrop-blur-md border border-white/10 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-300 select-none pointer-events-none z-30 shadow-lg">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-            <span>Screen Guard: {settings.multiMonitorStrategy === "blackout" ? "🚫 Secondary Blackout Active" : settings.multiMonitorStrategy === "mirror" ? "👥 Canvas Mirror Active" : "🎯 Multi-Canvas Active"}</span>
-          </div>
-          
-          {/* Active playrooms based on selected mode */}
-          {currentPlayMode === ScreensaverMode.SPEAK_THE_KEY && (
-            <SpeakKeyView
-              lastEvent={lastKeystroke}
-              voiceName={settings.speechVoiceName}
-              speechRate={settings.speechRate}
-              speechPitch={settings.speechPitch}
-            />
-          )}
+      {appState === "sandbox" && (() => {
+        // Compute layout divisions based on detected system hardware monitors
+        const list = (window as any).TSD_MONITORS && (window as any).TSD_MONITORS.length > 0 
+          ? (window as any).TSD_MONITORS 
+          : [{ left: 0, top: 0, width: window.innerWidth, height: window.innerHeight, isPrimary: true }];
+        
+        const minLeft = Math.min(...list.map((m: any) => m.left));
+        const minTop = Math.min(...list.map((m: any) => m.top));
+        const maxRight = Math.max(...list.map((m: any) => m.left + m.width));
+        const maxBottom = Math.max(...list.map((m: any) => m.top + m.height));
+        const totalW = maxRight - minLeft || 1;
+        const totalH = maxBottom - minTop || 1;
 
-          {currentPlayMode === ScreensaverMode.ANIMAL_PARADE && (
-            <AnimalParadeView
-              lastEvent={lastKeystroke}
-              soundEnabled={settings.soundEffectsEnabled}
-            />
-          )}
+        const parsedMonitors = list.map((m: any) => ({
+          ...m,
+          normLeft: ((m.left - minLeft) / totalW) * 100,
+          normTop: ((m.top - minTop) / totalH) * 100,
+          normWidth: (m.width / totalW) * 100,
+          normHeight: (m.height / totalH) * 100,
+        }));
 
-          {currentPlayMode === ScreensaverMode.COSMIC_FIREWORKS && (
-            <FireworksCanvas
-              lastEvent={lastKeystroke}
-              theme={settings.theme}
-            />
-          )}
+        return (
+          <div className="fixed inset-0 w-screen h-screen overflow-hidden bg-slate-950 select-none z-50">
+            {parsedMonitors.map((m: any, idx: number) => {
+              const isBlackout = settings.multiMonitorStrategy === "blackout" && !m.isPrimary;
+              const shouldRenderSandbox = m.isPrimary || settings.multiMonitorStrategy === "mirror" || settings.multiMonitorStrategy === "independent";
 
-          {currentPlayMode === ScreensaverMode.KEYBOARD_PIANO && (
-            <KeyboardPianoView
-              lastEvent={lastKeystroke}
-              soundEnabled={settings.soundEffectsEnabled}
-              theme={settings.theme}
-            />
-          )}
-
-          {currentPlayMode === ScreensaverMode.SPACE_ROCKET && (
-            <SpaceRocketView
-              lastEvent={lastKeystroke}
-              soundEnabled={settings.soundEffectsEnabled}
-            />
-          )}
-
-          {currentPlayMode === ScreensaverMode.MOUSE_DRAWING && (
-            <MouseDrawingView
-              lastEvent={lastKeystroke}
-              soundEnabled={settings.soundEffectsEnabled}
-              theme={settings.theme}
-            />
-          )}
-
-          {/* BACKGROUND CONTINUOUS MOUSE-CLICK EMITTER LISTENER FOR SANDBOX */}
-          {currentPlayMode !== ScreensaverMode.MOUSE_DRAWING && (
-            <div 
-              onClick={() => {
-                // Spawns a faux keystroke space trigger if keys are blocked so standard clicks also animate beautifully
-                const timestamp = Date.now();
-                setLastKeystroke({
-                  key: " ",
-                  timestamp,
-                });
-                keyEventsRef.current.push(timestamp);
-                if (currentPlayMode === ScreensaverMode.COSMIC_FIREWORKS && settings.soundEffectsEnabled) {
-                  playFireworkSynth();
-                }
-              }}
-              className="absolute inset-0 block w-full h-full pointer-events-auto z-5 cursor-crosshair opacity-0"
-            />
-          )}
-
-          {/* DYNAMIC PARENT SAFE EXIT CONTROL: BOTTOM-RIGHT CORNER */}
-          <div className="absolute bottom-6 right-6 z-40 pointer-events-auto select-none">
-            {settings.unlockRequirement === "long_press" ? (
-              // Case A: 3-Second steady Hold trigger
-              <button
-                onMouseDown={() => {
-                  longPressTimerRef.current = setInterval(() => {
-                    setLongPressProgress((old) => {
-                      if (old >= 100) {
-                        clearInterval(longPressTimerRef.current);
-                        setLongPressProgress(0);
-                        // Exit play room completely
-                        setAppState("dashboard");
-                        if (window.speechSynthesis) window.speechSynthesis.cancel();
-                        return 0;
-                      }
-                      return old + 4; // increment fast
-                    });
-                  }, 80);
-                }}
-                onMouseUp={() => {
-                  if (longPressTimerRef.current) clearInterval(longPressTimerRef.current);
-                  setLongPressProgress(0);
-                }}
-                onTouchStart={() => {
-                  longPressTimerRef.current = setInterval(() => {
-                    setLongPressProgress((old) => {
-                      if (old >= 100) {
-                        clearInterval(longPressTimerRef.current);
-                        setLongPressProgress(0);
-                        setAppState("dashboard");
-                        if (window.speechSynthesis) window.speechSynthesis.cancel();
-                        return 0;
-                      }
-                      return old + 4;
-                    });
-                  }, 80);
-                }}
-                onTouchEnd={() => {
-                  if (longPressTimerRef.current) clearInterval(longPressTimerRef.current);
-                  setLongPressProgress(0);
-                }}
-                className="group relative flex items-center justify-center p-4 bg-slate-900/90 border border-slate-700/60 rounded-full text-white cursor-pointer hover:bg-slate-950 hover:border-indigo-500 shadow-xl transition-all duration-300"
-              >
-                {/* Circular timer progress meter */}
-                <div 
-                  className="absolute inset-0 rounded-full border-4 border-indigo-500 scale-102 transition-colors duration-100 pointer-events-none" 
+              return (
+                <div
+                  key={idx}
+                  className="absolute overflow-hidden"
                   style={{
-                    clipPath: `inset(${100 - longPressProgress}% 0px 0px 0px)`
+                    left: `${m.normLeft}%`,
+                    top: `${m.normTop}%`,
+                    width: `${m.normWidth}%`,
+                    height: `${m.normHeight}%`,
                   }}
-                />
-                <Lock className="w-5 h-5 text-indigo-400 group-hover:scale-110" />
-                <span className="max-w-0 overflow-hidden group-hover:max-w-28 group-hover:ml-2 text-[10px] font-mono whitespace-nowrap transition-all duration-300">
-                  Hold 3s to Unlock
-                </span>
-              </button>
-            ) : settings.unlockRequirement === "math" ? (
-              // Case B: Math Challenge Popup button trigger
-              <button
-                onClick={startMathUnlockChallenge}
-                className="group flex items-center p-4 bg-slate-900/95 border border-[#fcbbfd]/20 hover:border-[#a855f7]/60 rounded-full text-white cursor-pointer hover:bg-slate-950 shadow-2xl transition-all duration-300 active:scale-95"
-              >
-                <Lock className="w-5 h-5 text-[#a855f7]" />
-                <span className="max-w-0 overflow-hidden group-hover:max-w-32 group-hover:ml-2 text-[11px] font-sans font-medium text-slate-300 whitespace-nowrap transition-all duration-500">
-                  🔐 Parent Unlock
-                </span>
-              </button>
-            ) : (
-              // Case C: Simple button unlock
-              <button
-                onClick={() => {
-                  setAppState("dashboard");
-                  if (window.speechSynthesis) window.speechSynthesis.cancel();
-                }}
-                className="group flex items-center p-4 bg-slate-900/95 border border-slate-700/60 rounded-full text-white hover:bg-red-950/20 hover:border-red-500 max-w-sm transition-all shadow-xl font-mono cursor-pointer"
-              >
-                <Unlock className="w-5 h-5 text-emerald-400 group-hover:rotate-12" />
-                <span className="max-w-0 overflow-hidden group-hover:max-w-24 group-hover:ml-2 text-xs transition-all duration-300">
-                  Exit play
-                </span>
-              </button>
-            )}
-          </div>
+                >
+                  {isBlackout ? (
+                    // Deep Blackout Display for Secondary Screens
+                    <div className="w-full h-full bg-black flex flex-col items-center justify-center border-l border-white/5 selection:bg-transparent">
+                      <span className="text-[10px] uppercase tracking-widest font-mono text-slate-800 pointer-events-none">
+                        TSD Screen Shield Guard Active • Auxiliary Display Cloaked
+                      </span>
+                    </div>
+                  ) : shouldRenderSandbox ? (
+                    <div className="relative w-full h-full bg-slate-950 overflow-hidden">
+                      {/* Active playrooms based on selected mode */}
+                      {currentPlayMode === ScreensaverMode.SPEAK_THE_KEY && (
+                        <SpeakKeyView
+                          lastEvent={lastKeystroke}
+                          voiceName={settings.speechVoiceName}
+                          speechRate={settings.speechRate}
+                          speechPitch={settings.speechPitch}
+                        />
+                      )}
 
-          {/* REAL-TIME ROLL MONITOR RADAR FOR STATS (SUBCONSCIOUS FEEDBACK) */}
-          <div className="absolute bottom-6 left-6 z-40 bg-black/75 border border-white/5 backdrop-blur-md text-white px-4 py-2 rounded-2xl font-mono text-[9px] text-left pointer-events-none flex items-center gap-4 shadow-xl">
-            <div>
-              <span className="text-white/40 block">BEHAVIOR TEMPO</span>
-              <span className="font-bold text-indigo-400">
-                {mashingSpeed} Keystrokes/Min
-              </span>
-            </div>
-            <div className="border-l border-white/10 h-6" />
-            <div>
-              <span className="text-white/40 block">PLAY MODE STATE</span>
-              <span className="font-bold text-pink-400 uppercase">
-                {currentPlayMode.replace("_", " ")}
-              </span>
-            </div>
+                      {currentPlayMode === ScreensaverMode.ANIMAL_PARADE && (
+                        <AnimalParadeView
+                          lastEvent={lastKeystroke}
+                          soundEnabled={settings.soundEffectsEnabled}
+                        />
+                      )}
+
+                      {currentPlayMode === ScreensaverMode.COSMIC_FIREWORKS && (
+                        <FireworksCanvas
+                          lastEvent={lastKeystroke}
+                          theme={settings.theme}
+                        />
+                      )}
+
+                      {currentPlayMode === ScreensaverMode.KEYBOARD_PIANO && (
+                        <KeyboardPianoView
+                          lastEvent={lastKeystroke}
+                          soundEnabled={settings.soundEffectsEnabled}
+                          theme={settings.theme}
+                        />
+                      )}
+
+                      {currentPlayMode === ScreensaverMode.SPACE_ROCKET && (
+                        <SpaceRocketView
+                          lastEvent={lastKeystroke}
+                          soundEnabled={settings.soundEffectsEnabled}
+                        />
+                      )}
+
+                      {currentPlayMode === ScreensaverMode.MOUSE_DRAWING && (
+                        <MouseDrawingView
+                          lastEvent={lastKeystroke}
+                          soundEnabled={settings.soundEffectsEnabled}
+                          theme={settings.theme}
+                        />
+                      )}
+
+                      {/* BACKGROUND CONTINUOUS MOUSE-CLICK EMITTER LISTENER FOR SANDBOX */}
+                      {currentPlayMode !== ScreensaverMode.MOUSE_DRAWING && (
+                        <div 
+                          onClick={() => {
+                            // Spawns a faux keystroke space trigger if keys are blocked so standard clicks also animate beautifully
+                            const timestamp = Date.now();
+                            setLastKeystroke({
+                              key: " ",
+                              timestamp,
+                            });
+                            keyEventsRef.current.push(timestamp);
+                            if (currentPlayMode === ScreensaverMode.COSMIC_FIREWORKS && settings.soundEffectsEnabled) {
+                              playFireworkSynth();
+                            }
+                          }}
+                          className="absolute inset-0 block w-full h-full pointer-events-auto z-5 cursor-crosshair opacity-0"
+                        />
+                      )}
+
+                      {/* Primary Monitor overlays (Pill status, Unlock Hatch, behavior tempo) */}
+                      {m.isPrimary && (
+                        <>
+                          {/* MULTI_MONITOR STATUS PILL FOR PREPARATION ASSURANCE */}
+                          <div className="absolute top-8 left-8 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/55 backdrop-blur-md border border-white/10 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-300 select-none pointer-events-none z-30 shadow-lg">
+                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+                            <span>Screen Guard: {settings.multiMonitorStrategy === "blackout" ? "🚫 Secondary Blackout Active" : settings.multiMonitorStrategy === "mirror" ? "👥 Canvas Mirror Active" : "🎯 Multi-Canvas Active"}</span>
+                          </div>
+
+                          {/* DYNAMIC PARENT SAFE EXIT CONTROL: BOTTOM-RIGHT CORNER */}
+                          <div className="absolute bottom-6 right-6 z-40 pointer-events-auto select-none">
+                            {settings.unlockRequirement === "long_press" ? (
+                              // Case A: 3-Second steady Hold trigger
+                              <button
+                                onMouseDown={() => {
+                                  longPressTimerRef.current = setInterval(() => {
+                                    setLongPressProgress((old) => {
+                                      if (old >= 100) {
+                                        clearInterval(longPressTimerRef.current);
+                                        setLongPressProgress(0);
+                                        // Exit play room completely
+                                        setAppState("dashboard");
+                                        if (window.speechSynthesis) window.speechSynthesis.cancel();
+                                        return 0;
+                                      }
+                                      return old + 4; // increment fast
+                                    });
+                                  }, 80);
+                                }}
+                                onMouseUp={() => {
+                                  if (longPressTimerRef.current) clearInterval(longPressTimerRef.current);
+                                  setLongPressProgress(0);
+                                }}
+                                onTouchStart={() => {
+                                  longPressTimerRef.current = setInterval(() => {
+                                    setLongPressProgress((old) => {
+                                      if (old >= 100) {
+                                        clearInterval(longPressTimerRef.current);
+                                        setLongPressProgress(0);
+                                        setAppState("dashboard");
+                                        if (window.speechSynthesis) window.speechSynthesis.cancel();
+                                        return 0;
+                                      }
+                                      return old + 4;
+                                    });
+                                  }, 80);
+                                }}
+                                onTouchEnd={() => {
+                                  if (longPressTimerRef.current) clearInterval(longPressTimerRef.current);
+                                  setLongPressProgress(0);
+                                }}
+                                className="group relative flex items-center justify-center p-4 bg-slate-900/90 border border-slate-700/60 rounded-full text-white cursor-pointer hover:bg-slate-950 hover:border-indigo-500 shadow-xl transition-all duration-300"
+                              >
+                                {/* Circular timer progress meter */}
+                                <div 
+                                  className="absolute inset-0 rounded-full border-4 border-indigo-500 scale-102 transition-colors duration-100 pointer-events-none" 
+                                  style={{
+                                    clipPath: `inset(${100 - longPressProgress}% 0px 0px 0px)`
+                                  }}
+                                />
+                                <Lock className="w-5 h-5 text-indigo-400 group-hover:scale-110" />
+                                <span className="max-w-0 overflow-hidden group-hover:max-w-28 group-hover:ml-2 text-[10px] font-mono whitespace-nowrap transition-all duration-300">
+                                  Hold 3s to Unlock
+                                </span>
+                              </button>
+                            ) : settings.unlockRequirement === "math" ? (
+                              // Case B: Math Challenge Popup button trigger
+                              <button
+                                onClick={startMathUnlockChallenge}
+                                className="group flex items-center p-4 bg-slate-900/95 border border-[#fcbbfd]/20 hover:border-[#a855f7]/60 rounded-full text-white cursor-pointer hover:bg-slate-950 shadow-2xl transition-all duration-300 active:scale-95"
+                              >
+                                <Lock className="w-5 h-5 text-[#a855f7]" />
+                                <span className="max-w-0 overflow-hidden group-hover:max-w-32 group-hover:ml-2 text-[11px] font-sans font-medium text-slate-300 whitespace-nowrap transition-all duration-500">
+                                  🔐 Parent Unlock
+                                </span>
+                              </button>
+                            ) : (settings.unlockRequirement === "passcode" && settings.passcodeUnlockEnabled) ? (
+                              // Case B.2: Passcode PIN Verification trigger button
+                              <button
+                                onClick={startPasscodeUnlockChallenge}
+                                className="group flex items-center p-4 bg-slate-900/95 border border-[#60a5fa]/20 hover:border-[#3b82f6]/60 rounded-full text-white cursor-pointer hover:bg-slate-950 shadow-2xl transition-all duration-300 active:scale-95"
+                              >
+                                <Lock className="w-5 h-5 text-[#3b82f6]" />
+                                <span className="max-w-0 overflow-hidden group-hover:max-w-32 group-hover:ml-2 text-[11px] font-sans font-medium text-slate-300 whitespace-nowrap transition-all duration-500">
+                                  🔢 Enter PIN Passcode
+                                </span>
+                              </button>
+                            ) : (
+                              // Case C: Simple button unlock
+                              <button
+                                onClick={() => {
+                                  setAppState("dashboard");
+                                  if (window.speechSynthesis) window.speechSynthesis.cancel();
+                                }}
+                                className="group flex items-center p-4 bg-slate-900/95 border border-slate-700/60 rounded-full text-white hover:bg-red-950/20 hover:border-red-500 max-w-sm transition-all shadow-xl font-mono cursor-pointer"
+                              >
+                                <Unlock className="w-5 h-5 text-emerald-400 group-hover:rotate-12" />
+                                <span className="max-w-0 overflow-hidden group-hover:max-w-24 group-hover:ml-2 text-xs transition-all duration-300">
+                                  Exit play
+                                </span>
+                              </button>
+                            )}
+                          </div>
+
+                          {/* REAL-TIME ROLL MONITOR RADAR FOR STATS (SUBCONSCIOUS FEEDBACK) */}
+                          <div className="absolute bottom-6 left-6 z-40 bg-black/75 border border-white/5 backdrop-blur-md text-white px-4 py-2 rounded-2xl font-mono text-[9px] text-left pointer-events-none flex items-center gap-4 shadow-xl">
+                            <div>
+                              <span className="text-white/40 block">BEHAVIOR TEMPO</span>
+                              <span className="font-bold text-indigo-400">
+                                {mashingSpeed} Keystrokes/Min
+                              </span>
+                            </div>
+                            <div className="border-l border-white/10 h-6" />
+                            <div>
+                              <span className="text-white/40 block">PLAY MODE STATE</span>
+                              <span className="font-bold text-pink-400 uppercase">
+                                {currentPlayMode.replace("_", " ")}
+                              </span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* 3. SECURITY POPUP COMPONENT (MATH FORMULA) */}
       {isExitOverlayOpen && (
@@ -987,8 +1256,8 @@ export default function App() {
             className="w-full max-w-md p-8 rounded-3xl bg-white/10 dark:bg-black/45 backdrop-blur-2xl border border-white/20 text-white shadow-[0_25px_60px_rgba(0,0,0,0.4)] relative"
           >
             <button
-              onClick={() => setIsExitOverlayOpen(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-full bg-white/10 hover:bg-white/25 text-white/70 transition-all cursor-pointer"
+               onClick={() => setIsExitOverlayOpen(false)}
+               className="absolute top-4 right-4 p-1.5 rounded-full bg-white/10 hover:bg-white/25 text-white/70 transition-all cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -1037,6 +1306,99 @@ export default function App() {
                   className="flex-1 py-3 bg-pink-500 hover:bg-pink-400 font-bold rounded-xl text-xs text-white transition-all uppercase cursor-pointer shadow-lg active:scale-95"
                 >
                   Submit & Unlock
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* 4. Parent PIN Overlay Modal */}
+      {isPasscodeOverlayOpen && (
+        <div className="fixed inset-0 w-screen h-screen flex justify-center items-center backdrop-blur-3xl bg-black/50 z-100 pointer-events-auto select-auto">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={passcodeShake ? { x: [-10, 10, -8, 8, -5, 5, 0], scale: 1, opacity: 1 } : { x: 0, scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            className="w-full max-w-sm p-8 rounded-3xl bg-slate-900/90 dark:bg-black/80 backdrop-blur-2xl border border-blue-500/20 text-white shadow-[0_25px_60px_rgba(0,0,0,0.6)] relative"
+          >
+            <button
+              onClick={() => setIsPasscodeOverlayOpen(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-full bg-white/15 hover:bg-white/25 text-white/70 transition-all cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex flex-col items-center text-center">
+              <div className="p-3 bg-blue-500/10 rounded-full text-blue-400 mb-3 animate-pulse">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h2 className="text-xl font-bold font-sans tracking-tight">Parent Verification</h2>
+              <p className="text-xs text-slate-400 leading-relaxed mt-1 mb-6">
+                Enter your 4-digit PIN to exit the child lockdown sandbox.
+              </p>
+
+              {/* Passcode indicators */}
+              <div className="flex gap-4 mb-6">
+                {Array.from({ length: 4 }).map((_, index) => {
+                  const hasDigit = enteredPasscode.length > index;
+                  return (
+                    <div
+                      key={index}
+                      className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
+                        hasDigit
+                          ? "bg-blue-400 border-blue-400 scale-110 shadow-[0_0_8px_rgba(96,165,250,0.8)]"
+                          : "border-slate-500 bg-slate-800"
+                      }`}
+                    />
+                  );
+                })}
+              </div>
+
+              {/* Error statement feedback */}
+              <div className="h-6 mb-4 flex items-center justify-center">
+                {passcodeErrorMessage ? (
+                  <p className="text-xs text-red-500 font-medium tracking-tight bg-red-950/40 px-3 py-1 rounded-full border border-red-500/20">
+                    {passcodeErrorMessage}
+                  </p>
+                ) : (
+                  <p className="text-[10px] text-slate-500 font-mono uppercase tracking-widest">
+                    Default PIN is {settings.parentPin || "1234"}
+                  </p>
+                )}
+              </div>
+
+              {/* Grid 3x4 PIN Pad */}
+              <div className="grid grid-cols-3 gap-3 w-full max-w-[280px]">
+                {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit) => (
+                  <button
+                    key={digit}
+                    onClick={() => handlePasscodeDigitPress(digit)}
+                    className="aspect-square flex items-center justify-center text-xl font-semibold font-mono rounded-2xl bg-white/5 hover:bg-white/10 active:bg-blue-500/20 border border-white/5 hover:border-slate-700 dynamic-pin-btn transition-all duration-100 cursor-pointer text-slate-200"
+                  >
+                    {digit}
+                  </button>
+                ))}
+                {/* Clear */}
+                <button
+                  onClick={() => setEnteredPasscode("")}
+                  className="aspect-square flex items-center justify-center text-xs font-bold uppercase rounded-2xl bg-slate-800/40 hover:bg-slate-700/60 active:bg-red-500/20 border border-white/5 transition-all cursor-pointer text-slate-450 hover:text-red-300"
+                >
+                  Clear
+                </button>
+                {/* 0 */}
+                <button
+                  onClick={() => handlePasscodeDigitPress("0")}
+                  className="aspect-square flex items-center justify-center text-xl font-semibold font-mono rounded-2xl bg-white/5 hover:bg-white/10 active:bg-blue-500/20 border border-white/5 hover:border-slate-700 transition-all duration-100 cursor-pointer text-slate-200"
+                >
+                  0
+                </button>
+                {/* Cancel */}
+                <button
+                  onClick={() => setIsPasscodeOverlayOpen(false)}
+                  className="aspect-square flex items-center justify-center text-xs font-bold uppercase rounded-2xl bg-slate-800/40 hover:bg-slate-700/60 active:bg-blue-500/10 border border-white/5 transition-all cursor-pointer text-slate-455 hover:text-slate-200"
+                >
+                  Cancel
                 </button>
               </div>
             </div>

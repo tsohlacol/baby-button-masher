@@ -4,9 +4,11 @@ This document outlines the final design configurations implemented in Toddler Sc
 
 ---
 
-## 1. Verified Parent Exit Hatch (Math Expression Challenge)
-* **Implemented Solution**: Dynamic Single-Digit Math Equations.
-* **Details**: To prevent accidental exit from toddler key mashing, the lock screen uses a parent equation validator. The formula is randomly selected from addition (`+`), subtraction (`-`), or multiplication (`*`) of two single-digit numbers (`1` to `9`). Subtractions are structurally sorted to prevent negative outputs (safely keeping `A >= B`).
+## 1. Verified Parent Exit Hatch (Math & Configurable PIN Options)
+* **Implemented Solution**: Dynamic Single-Digit Math Equations (Default) & Configurable 4-Digit Numeric PIN (Off by default).
+* **Details**: To prevent accidental exit from toddler key mashing, the lock screen uses robust verification.
+  - *Math Sum Challenge (Default)*: Renders a randomly generated equation containing addition (`+`), subtraction (`-`), or multiplication (`*`) of two single-digit numbers (`1` to `9`). Subtractions are sorted dynamically to prevent negative outputs (safely keeping `A >= B`).
+  - *PIN Passcode (Optional)*: Parents can toggle a "PIN Passcode" option switch ON from the settings dashboard. This unlocks a customizable 4-digit PIN verification system (defaults to `1234`). When active, clicking the Exit Hatch triggers a touch-friendly numeric pad modal with clean shake animations for invalid attempts. This is off by default to keep the default interaction simple and cognitive.
 
 ---
 
