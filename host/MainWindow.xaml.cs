@@ -2,8 +2,10 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using Microsoft.Web.WebView2.Core;
 
 namespace ToddlerScreenDefender
@@ -12,6 +14,7 @@ namespace ToddlerScreenDefender
     {
         private static IntPtr _hookID = IntPtr.Zero;
         private LowLevelKeyboardProc _proc;
+        private Task<CoreWebView2Environment>? _webView2EnvTask;
 
         // Win32 API Constants
         private const int WH_KEYBOARD_LL = 13;
@@ -54,51 +57,83 @@ namespace ToddlerScreenDefender
             this.Topmost = true;
             this.ResizeMode = ResizeMode.NoResize;
             this.ShowInTaskbar = false;
+
+            // Kick off WebView2 environment creation immediately so it runs in parallel with window setup
+            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string udataFolder = Path.Combine(localAppData, "ToddlerScreenDefender");
+            _webView2EnvTask = CoreWebView2Environment.CreateAsync(null, udataFolder);
+            TsdLog.Write("WebView2 environment creation started");
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // Activate core keyboard hooks to block Toddler bypass attempts
+            TsdLog.Write("Window_Loaded: registering keyboard hook");
             _hookID = SetHook(_proc);
+            TsdLog.Write($"Keyboard hook: 0x{_hookID:X}");
 
             // Set secure positioning covering screens
             this.Left = SystemParameters.VirtualScreenLeft;
             this.Top = SystemParameters.VirtualScreenTop;
             this.Width = SystemParameters.VirtualScreenWidth;
             this.Height = SystemParameters.VirtualScreenHeight;
+            TsdLog.Write($"Window: {this.Width}x{this.Height} at ({this.Left},{this.Top})");
 
             TryPinToAllVirtualDesktops();
 
+            SplashStatus.Text = "Initializing display engine…";
+
             try
             {
-                // Initialize WebView2 pointing to our bundled React frontend
                 string localAppPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets", "react-app");
                 string indexPath = Path.Combine(localAppPath, "index.html");
 
-                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                string udataFolder = Path.Combine(localAppData, "ToddlerScreenDefender");
-                var env = await CoreWebView2Environment.CreateAsync(null, udataFolder);
+                TsdLog.Write("Awaiting WebView2 environment");
+                var env = await _webView2EnvTask!;
+                TsdLog.Write("WebView2 environment ready");
 
                 string monitorsJson = GetMonitorsJson();
+                TsdLog.Write($"Monitors: {monitorsJson}");
+
+                await WebViewControl.EnsureCoreWebView2Async(env);
+                TsdLog.Write("CoreWebView2 initialized");
+
+                WebViewControl.CoreWebView2.NavigationStarting += (s, args) =>
+                    TsdLog.Write($"Navigation starting: {args.Uri}");
+                WebViewControl.CoreWebView2.NavigationCompleted += OnNavigationCompleted;
+
+                string debugFlag = TsdLog.IsEnabled ? "true" : "false";
+                await WebViewControl.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(
+                    $"window.TSD_MONITORS = {monitorsJson}; window.TSD_DEBUG = {debugFlag};");
 
                 if (Directory.Exists(localAppPath) && File.Exists(indexPath))
                 {
-                    await WebViewControl.EnsureCoreWebView2Async(env);
-                    await WebViewControl.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync($"window.TSD_MONITORS = {monitorsJson};");
+                    TsdLog.Write($"Loading local app: {indexPath}");
                     WebViewControl.Source = new Uri(indexPath);
                 }
                 else
                 {
-                    // Fallback pointing to production staging if assets are omitted
-                    await WebViewControl.EnsureCoreWebView2Async(env);
-                    await WebViewControl.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync($"window.TSD_MONITORS = {monitorsJson};");
+                    TsdLog.Write("Local assets not found, falling back to remote URL");
                     WebViewControl.Source = new Uri("https://ais-pre-2ojkzky7dd3ixx5xjcj6g3-457582934602.us-east1.run.app");
                 }
             }
             catch (Exception ex)
             {
+                TsdLog.Write($"ERROR in Window_Loaded: {ex}");
                 MessageBox.Show($"TSD Native WebView2 Boot Error: {ex.Message}\nFalling back to system browser redirect.", "Runtime Warn");
             }
+        }
+
+        private void OnNavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
+        {
+            TsdLog.Write($"Navigation completed: success={e.IsSuccess}, httpStatus={e.HttpStatusCode}");
+            HideSplash();
+        }
+
+        private void HideSplash()
+        {
+            var fade = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(400));
+            fade.Completed += (s, e) => SplashOverlay.Visibility = Visibility.Collapsed;
+            SplashOverlay.BeginAnimation(OpacityProperty, fade);
         }
 
         private string GetMonitorsJson()
@@ -125,7 +160,7 @@ namespace ToddlerScreenDefender
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            // TSD remains un-closable by keyboard actions unless standard authentication criteria are solved
+            TsdLog.Write("Window_Closing: unhooking keyboard hook");
             UnhookWindowsHookEx(_hookID);
         }
 
@@ -148,10 +183,12 @@ namespace ToddlerScreenDefender
                 var shell = (IShellServiceProvider)(object)new CImmersiveShell();
                 shell.QueryService(ref _clsidVirtualDesktopPinnedApps, ref _iidIVirtualDesktopPinnedApps, out object ppv);
                 ((IVirtualDesktopPinnedApps)ppv).PinWindow(hwnd);
+                TsdLog.Write("Pinned to all virtual desktops");
             }
-            catch
+            catch (Exception ex)
             {
                 // Pinning uses internal Windows shell COM interfaces; silently no-op if unavailable.
+                TsdLog.Write($"Virtual desktop pinning unavailable: {ex.Message}");
             }
         }
 
