@@ -3,8 +3,9 @@
 # =========================================================
 FROM node:18-alpine AS frontend-builder
 WORKDIR /app
+# Copy lockfile first so npm ci is cached until dependencies change
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 COPY . .
 RUN npm run build
 
@@ -13,14 +14,17 @@ RUN npm run build
 # =========================================================
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS native-builder
 WORKDIR /src
-# Copy source files for the C# WPF Wrapper application
-COPY host/ ./host/
-# Copy built static files from Stage 1 into the host resource folder
-COPY --from=frontend-builder /app/dist ./host/assets/react-app/
 
+# Restore NuGet packages in isolation so this layer is cached independently
+# of source changes and can run in parallel with Stage 1 under BuildKit
+COPY host/*.csproj ./host/
+RUN dotnet restore ./host/ToddlerScreenDefender.csproj -r win-x64
+
+# Copy source and React build, then publish (skipping restore — already done above)
+COPY host/ ./host/
+COPY --from=frontend-builder /app/dist ./host/assets/react-app/
 WORKDIR /src/host
-# Publish a self-contained, single-file Windows executable
-RUN dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true -o /publish
+RUN dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true --no-restore -o /publish
 
 # =========================================================
 # STAGE 3: Windows Installer Creation using Wine & Inno Setup
@@ -32,6 +36,8 @@ ENV WINEARCH=win32
 ENV WINEPREFIX=/opt/wine-inno
 
 # Install Wine and Xvfb (virtual framebuffer needed for headless Wine installer)
+# This layer and the Wine/Inno setup below have no dependency on Stage 1 or 2
+# so BuildKit runs them in parallel with the npm and dotnet steps above
 RUN dpkg --add-architecture i386 && apt-get update && apt-get install -y \
     wine \
     wine32 \
