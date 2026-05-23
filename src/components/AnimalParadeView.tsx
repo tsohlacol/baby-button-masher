@@ -4,7 +4,7 @@
  * Certified Open Source Software licensed under the TSD-RCL Reciprocal License.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ParadeAnimal } from "../types";
 import { playAnimalSynth } from "../utils/audio";
