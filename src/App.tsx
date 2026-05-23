@@ -172,17 +172,13 @@ export default function App() {
     };
   }, []);
 
-  // Auto-select a default voice once the voice list is populated
+  // Auto-select the best available voice once the list loads.
+  // getAvailableVoices() already sorts neural/online voices to the front, so the
+  // first English voice in the sorted list is the highest quality available.
   useEffect(() => {
     if (voices.length > 0 && !settings.speechVoiceName) {
-      const fallback = voices.find(
-        (v) =>
-          v.name.includes("Zira") ||
-          v.name.includes("Natural") ||
-          v.name.includes("Google US English") ||
-          v.lang.startsWith("en")
-      ) || voices[0];
-      setSettings((prev) => ({ ...prev, speechVoiceName: fallback.name }));
+      const best = voices.find((v) => v.lang.startsWith("en")) ?? voices[0];
+      setSettings((prev) => ({ ...prev, speechVoiceName: best.name }));
     }
   }, [voices]);
 
