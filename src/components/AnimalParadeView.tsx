@@ -72,7 +72,7 @@ export default function AnimalParadeView({ lastEvent, soundEnabled }: AnimalPara
       playAnimalSynth(selected.name.toLowerCase());
     }
 
-    setAnimals((prev) => [...prev, newAnimal].slice(-15)); // Cap active animal renders for speed
+    setAnimals((prev) => [...prev, newAnimal].slice(-3)); // Cap at 3 simultaneous animals
   }, [lastEvent, soundEnabled]);
 
   // Periodic frame movement simulation for items
