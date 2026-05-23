@@ -246,7 +246,7 @@ export function playAnimalSynth(animalName: string) {
  * Automatically halts previous phrases to keep up with Toddler keyboard mashing speed.
  */
 export function speakToddlerText(text: string, settings: { name?: string; rate?: number; pitch?: number } = {}) {
-  if (!("speechSynthesis" in window)) return;
+  if (typeof window === 'undefined' || !("speechSynthesis" in window)) return;
 
   try {
     // Cancel prior speech immediately for rapid response
