@@ -318,6 +318,11 @@ namespace ToddlerScreenDefender
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFOEX lpmi);
 
+        [DllImport("shcore.dll")]
+        private static extern int GetDpiForMonitor(IntPtr hMonitor, int dpiType, out uint dpiX, out uint dpiY);
+
+        private const int MDT_EFFECTIVE_DPI = 0;
+
         private delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
 
         [StructLayout(LayoutKind.Sequential)]
