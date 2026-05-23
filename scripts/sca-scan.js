@@ -6,13 +6,7 @@
 
 import fs from 'fs';
 import { exec } from 'child_process';
-
-const RESET = "\x1b[0m";
-const BOLD = "\x1b[1m";
-const GREEN = "\x1b[32m";
-const YELLOW = "\x1b[33m";
-const RED = "\x1b[31m";
-const CYAN = "\x1b[36m";
+import { RESET, BOLD, GREEN, YELLOW, RED, CYAN } from './scan-utils.js';
 
 console.log(`${BOLD}${CYAN}=====================================================${RESET}`);
 console.log(`${BOLD}${CYAN}   TODDLER SCREEN DEFENDER - SCA DEPENDENCY ENGINE   ${RESET}`);
