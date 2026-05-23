@@ -671,21 +671,48 @@ export default function App() {
                 <div className="space-y-4 text-xs">
                   <div>
                     <label className="block mb-1.5 font-semibold text-white/80">Voice Model</label>
-                    <select
-                      value={settings.speechVoiceName}
-                      onChange={(e) => setSettings((p) => ({ ...p, speechVoiceName: e.target.value }))}
-                      className="w-full bg-black/20 border border-slate-500/20 p-2 rounded-lg text-xs"
+                    {voices.length === 0 ? (
+                      <p className="text-slate-500 italic">Loading browser voices…</p>
+                    ) : (() => {
+                      const isHigh = (v: SpeechSynthesisVoice) => {
+                        const n = v.name.toLowerCase();
+                        return n.includes("online") || n.includes("natural") || n.includes("neural") || n.includes("google") || n.includes("premium");
+                      };
+                      const highQuality = voices.filter(isHigh);
+                      const standard = voices.filter((v) => !isHigh(v));
+                      return (
+                        <select
+                          value={settings.speechVoiceName}
+                          onChange={(e) => setSettings((p) => ({ ...p, speechVoiceName: e.target.value }))}
+                          className="w-full bg-black/20 border border-slate-500/20 p-2 rounded-lg text-xs"
+                        >
+                          {highQuality.length > 0 && (
+                            <optgroup label="⭐ High Quality (Neural / Online)">
+                              {highQuality.map((v) => (
+                                <option key={v.name} value={v.name}>{v.name}</option>
+                              ))}
+                            </optgroup>
+                          )}
+                          {standard.length > 0 && (
+                            <optgroup label="Standard Voices">
+                              {standard.map((v) => (
+                                <option key={v.name} value={v.name}>{v.name} ({v.lang})</option>
+                              ))}
+                            </optgroup>
+                          )}
+                        </select>
+                      );
+                    })()}
+                    <button
+                      onClick={() => speakToddlerText("Hello! I am your toddler's voice companion.", {
+                        name: settings.speechVoiceName,
+                        rate: settings.speechRate,
+                        pitch: settings.speechPitch,
+                      })}
+                      className="mt-2 w-full py-1.5 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/30 border border-indigo-500/25 text-indigo-300 font-semibold transition-colors cursor-pointer"
                     >
-                      {voices.length === 0 ? (
-                        <option>Loading browser voices...</option>
-                      ) : (
-                        voices.map((v) => (
-                          <option key={v.name} value={v.name}>
-                            {v.name} ({v.lang})
-                          </option>
-                        ))
-                      )}
-                    </select>
+                      ▶ Test Voice
+                    </button>
                   </div>
 
                   {/* Speech Rate Slider */}
