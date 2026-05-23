@@ -166,14 +166,13 @@ namespace ToddlerScreenDefender
                     }
                 }
 
-                // 3. Block Ctrl+Esc, Ctrl+Shift+Esc
+                // 3. Block Ctrl+Esc (Start menu) and Ctrl+Shift+Esc (Task Manager).
+                // Both sequences end with VK_ESCAPE as the triggering key while Ctrl is held,
+                // so checking vkCode == VK_ESCAPE with ctrlPressed covers both.
                 bool ctrlPressed = IsModifierKeyDown(VK_LCONTROL) || IsModifierKeyDown(VK_RCONTROL);
-                if (ctrlPressed)
+                if (ctrlPressed && vkCode == VK_ESCAPE)
                 {
-                    if (vkCode == VK_ESCAPE || vkCode == VK_SHIFT)
-                    {
-                        swallowKeystroke = true;
-                    }
+                    swallowKeystroke = true;
                 }
 
                 // 4. Block F11 to prevent kiosk escape
