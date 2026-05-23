@@ -159,7 +159,7 @@ namespace ToddlerScreenDefender
 
                 // Hold the splash for at least 8 s AND until React signals ready —
                 // whichever finishes last wins, so fast machines still see the splash.
-                await Task.WhenAll(Task.Delay(8000), _readyTcs.Task);
+                await Task.WhenAll(Task.Delay(12000), _readyTcs.Task);
                 HideSplash();
             }
             catch (Exception ex)
