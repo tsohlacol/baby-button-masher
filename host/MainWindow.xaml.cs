@@ -141,8 +141,13 @@ namespace ToddlerScreenDefender
 
                 if (Directory.Exists(localAppPath) && File.Exists(indexPath))
                 {
-                    TsdLog.Write($"Loading local app: {indexPath}");
-                    WebViewControl.Source = new Uri(indexPath);
+                    // Serve the local folder over a synthetic HTTPS origin so Vite's
+                    // type="module" + crossorigin scripts pass Chromium's CORS check.
+                    // Direct file:// navigation silently drops module scripts, leaving a blank page.
+                    WebViewControl.CoreWebView2.SetVirtualHostNameToFolderMapping(
+                        "app.local", localAppPath, CoreWebView2HostResourceAccessKind.Allow);
+                    TsdLog.Write($"Virtual host mapped: app.local -> {localAppPath}");
+                    WebViewControl.Source = new Uri("https://app.local/index.html");
                 }
                 else
                 {
@@ -150,9 +155,9 @@ namespace ToddlerScreenDefender
                     WebViewControl.Source = new Uri("https://ais-pre-2ojkzky7dd3ixx5xjcj6g3-457582934602.us-east1.run.app");
                 }
 
-                // Hold the splash for at least 2.5 s AND until React signals ready —
-                // whichever finishes last wins, so fast machines still see the splash briefly.
-                await Task.WhenAll(Task.Delay(2500), _readyTcs.Task);
+                // Hold the splash for at least 5 s AND until React signals ready —
+                // whichever finishes last wins, so fast machines still see the splash.
+                await Task.WhenAll(Task.Delay(5000), _readyTcs.Task);
                 HideSplash();
             }
             catch (Exception ex)
