@@ -1131,7 +1131,7 @@ export default function App() {
                                         setLongPressProgress(0);
                                         // Exit play room completely
                                         setAppState("dashboard");
-                                        if (window.speechSynthesis) window.speechSynthesis.cancel();
+                                        cancelSpeech();
                                         return 0;
                                       }
                                       return old + 4; // increment fast
@@ -1149,7 +1149,7 @@ export default function App() {
                                         clearInterval(longPressTimerRef.current);
                                         setLongPressProgress(0);
                                         setAppState("dashboard");
-                                        if (window.speechSynthesis) window.speechSynthesis.cancel();
+                                        cancelSpeech();
                                         return 0;
                                       }
                                       return old + 4;
@@ -1201,7 +1201,7 @@ export default function App() {
                               <button
                                 onClick={() => {
                                   setAppState("dashboard");
-                                  if (window.speechSynthesis) window.speechSynthesis.cancel();
+                                  cancelSpeech();
                                 }}
                                 className="group flex items-center p-4 bg-slate-900/95 border border-slate-700/60 rounded-full text-white hover:bg-red-950/20 hover:border-red-500 max-w-sm transition-all shadow-xl font-mono cursor-pointer"
                               >
