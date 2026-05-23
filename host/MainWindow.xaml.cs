@@ -157,9 +157,9 @@ namespace ToddlerScreenDefender
                     WebViewControl.Source = new Uri("https://ais-pre-2ojkzky7dd3ixx5xjcj6g3-457582934602.us-east1.run.app");
                 }
 
-                // Hold the splash for at least 5 s AND until React signals ready —
+                // Hold the splash for at least 8 s AND until React signals ready —
                 // whichever finishes last wins, so fast machines still see the splash.
-                await Task.WhenAll(Task.Delay(5000), _readyTcs.Task);
+                await Task.WhenAll(Task.Delay(8000), _readyTcs.Task);
                 HideSplash();
             }
             catch (Exception ex)
