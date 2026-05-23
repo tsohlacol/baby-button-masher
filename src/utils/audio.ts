@@ -112,6 +112,7 @@ export function playSyntheticPiano(key: string, type: OscillatorType = "sine") {
 export function playFireworkSynth() {
   try {
     const ctx = getAudioContext();
+    if (!ctx) return;
     const osc = ctx.createOscillator();
     const gainNode = ctx.createGain();
 
