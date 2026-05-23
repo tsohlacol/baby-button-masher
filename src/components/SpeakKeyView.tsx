@@ -28,14 +28,15 @@ interface LetterBubble {
   duration: number;
 }
 
-export default function SpeakKeyView({ lastEvent, voiceName, speechRate, speechPitch }: SpeakKeyProps) {
+export default function SpeakKeyView({ lastEvent, voiceName, speechRate, speechPitch, speechEnabled }: SpeakKeyProps) {
   const [currentKey, setCurrentKey] = useState<string>("A");
   const [bubbles, setBubbles] = useState<LetterBubble[]>([]);
 
   useEffect(() => {
     if (!lastEvent) {
-      // Speak greeting initially
-      speakToddlerText("Press any key to start playing!", { name: voiceName, rate: speechRate, pitch: speechPitch });
+      if (speechEnabled) {
+        speakToddlerText("Press any key to start playing!", { name: voiceName, rate: speechRate, pitch: speechPitch });
+      }
       return;
     }
 
