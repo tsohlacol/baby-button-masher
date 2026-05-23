@@ -74,10 +74,31 @@ malware:
 
 security-audit: sast sca dast secrets malware
 
-test: lint build security-audit
+# All eight jobs read from source files they do not modify and write to separate
+# log files, so they are safe to run in parallel with no race conditions.
+# lint/build/scans all read src/; none reads dist/ or another job's log file.
+# vitest imports from src/ directly and does not depend on the vite build output.
+test:
 	@mkdir -p $(LOG_DIR)
-	npm run test 2>&1 | tee $(LOG_DIR)/test.log; exit $${PIPESTATUS[0]}
-	@echo "All local validation checks, security scans, and parallelized unit tests completed successfully!"
+	@(npm run lint    2>&1 | tee $(LOG_DIR)/lint.log;    exit $${PIPESTATUS[0]}) & _lint=$$!;    \
+	(npm run build   2>&1 | tee $(LOG_DIR)/build.log;   exit $${PIPESTATUS[0]}) & _build=$$!;   \
+	(npm run sast    2>&1 | tee $(LOG_DIR)/sast.log;    exit $${PIPESTATUS[0]}) & _sast=$$!;    \
+	(npm run sca     2>&1 | tee $(LOG_DIR)/sca.log;     exit $${PIPESTATUS[0]}) & _sca=$$!;     \
+	(npm run dast    2>&1 | tee $(LOG_DIR)/dast.log;    exit $${PIPESTATUS[0]}) & _dast=$$!;    \
+	(npm run secrets 2>&1 | tee $(LOG_DIR)/secrets.log; exit $${PIPESTATUS[0]}) & _secrets=$$!; \
+	(npm run malware 2>&1 | tee $(LOG_DIR)/malware.log; exit $${PIPESTATUS[0]}) & _malware=$$!; \
+	(npm run test    2>&1 | tee $(LOG_DIR)/test.log;    exit $${PIPESTATUS[0]}) & _test=$$!;    \
+	fail=0; \
+	wait $$_lint    || fail=1; \
+	wait $$_build   || fail=1; \
+	wait $$_sast    || fail=1; \
+	wait $$_sca     || fail=1; \
+	wait $$_dast    || fail=1; \
+	wait $$_secrets || fail=1; \
+	wait $$_malware || fail=1; \
+	wait $$_test    || fail=1; \
+	[ $$fail -eq 0 ] && echo "All checks passed." || true; \
+	exit $$fail
 
 build-installer:
 	@chmod +x ./build-installer.sh
