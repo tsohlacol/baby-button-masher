@@ -46,7 +46,6 @@ const PACKAGE_LICENSES = {
   "vitest": "MIT",
   "@types/node": "MIT",
   "@types/express": "MIT",
-  "@google/genai": "Apache-2.0",
 };
 
 Object.keys(dependencies).forEach(pkgName => {
