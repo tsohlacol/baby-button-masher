@@ -1050,6 +1050,7 @@ export default function App() {
                           voiceName={settings.speechVoiceName}
                           speechRate={settings.speechRate}
                           speechPitch={settings.speechPitch}
+                          speechEnabled={settings.speechEnabled}
                         />
                       )}
 
