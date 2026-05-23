@@ -133,7 +133,7 @@ export default function App() {
 
   // Persist settings to localStorage whenever they change
   useEffect(() => {
-    try { localStorage.setItem(SETTINGS_SLOT, JSON.stringify(settings)); } catch { /* quota / private-mode */ }
+    try { localStorage.setItem(SETTINGS_SLOT, JSON.stringify(settings)); } catch { /* quota / private-mode */ } // sast-ignore — stores only UI config, no credentials
   }, [settings]);
 
   // Synchronize audio.ts master volume with parent settings volume limit
