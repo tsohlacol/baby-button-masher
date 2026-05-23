@@ -279,7 +279,7 @@ export function cancelSpeech() {
  * Retrieves lists of child-friendly voices.
  */
 export function getAvailableVoices(): SpeechSynthesisVoice[] {
-  if (!("speechSynthesis" in window)) return [];
+  if (typeof window === 'undefined' || !("speechSynthesis" in window)) return [];
   const voices = window.speechSynthesis.getVoices();
   return [...voices].sort((a, b) => {
     const aLower = a.name.toLowerCase();
