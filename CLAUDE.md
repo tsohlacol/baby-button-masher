@@ -130,6 +130,20 @@ make all
 make clean  # Removes dist/, build-output/, host/assets/react-app/
 ```
 
+### Debug Mode
+
+Launch TSD with `--debug` to enable diagnostic logging:
+
+```
+ToddlerScreenDefender.exe --debug
+```
+
+The log is written to `%LOCALAPPDATA%\ToddlerScreenDefender\tsd-debug.log` and captures WebView2 environment creation timing, window positioning, virtual desktop pinning results, navigation events, and all exceptions. React also receives `window.TSD_DEBUG = true`.
+
+From an installed shortcut: right-click the shortcut, choose **Properties**, and append ` --debug` to the **Target** field.
+
+The `--debug` flag is parsed in `host/App.xaml.cs` `OnStartup`; the logger lives in `host/TsdLog.cs`. `TsdLog.Write()` is a no-op when `--debug` is not passed, so it is safe to leave calls in hot paths.
+
 ---
 
 ## Key Concepts & Code Patterns
