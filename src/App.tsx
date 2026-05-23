@@ -412,10 +412,10 @@ export default function App() {
     if (!newWordValue.trim()) return;
     updateCustomWord(newWordChar, newWordValue.trim());
     setNewWordValue("");
-    
-    // Choose the next letter A-Z that does not have a custom word
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const nextChar = alphabet.split("").find(c => !settings.customWords[c]);
+    // Exclude the just-added char because setSettings is async and the snapshot is stale
+    const used = new Set(Object.keys(settings.customWords));
+    used.add(newWordChar.toUpperCase());
+    const nextChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").find(c => !used.has(c));
     if (nextChar) {
       setNewWordChar(nextChar);
     }
