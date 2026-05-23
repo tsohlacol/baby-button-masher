@@ -15,6 +15,11 @@ SolidCompression=yes
 WizardStyle=modern
 ; Displays EULA on startup and requires user acceptance to proceed
 LicenseFile=EULA.txt
+; Detect running TSD instances and prompt the user to close them before files are copied.
+; Without this, installing over a running exe silently leaves the old binary in place.
+CloseApplications=yes
+; Write a full install log to %TEMP%\Setup Log <date> #NNN.txt so failures are diagnosable.
+SetupLogging=yes
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
