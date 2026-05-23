@@ -272,7 +272,7 @@ export function speakToddlerText(text: string, settings: { name?: string; rate?:
 }
 
 export function cancelSpeech() {
-  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
 }
 
 /**
