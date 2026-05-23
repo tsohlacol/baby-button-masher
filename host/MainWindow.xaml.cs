@@ -30,6 +30,8 @@ namespace ToddlerScreenDefender
         private const int VK_SHIFT = 0x10;
         private const int VK_CONTROL = 0x11;
 
+        private const int VK_F4 = 0x73;       // F4 (for Alt+F4 parent exit)
+
         private const int VK_LCONTROL = 0xA2;
         private const int VK_RCONTROL = 0xA3;
         private const int VK_LMENU = 0xA4;    // Left Alt
