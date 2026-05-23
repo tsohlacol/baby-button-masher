@@ -220,6 +220,7 @@ export default function App() {
 
     // Capture standard keys, and block default browser mashing actions (scrolling, page reloads, tab jumps)
     e.preventDefault();
+    e.stopPropagation();
 
     const timestamp = Date.now();
     const keyStr = e.key;
