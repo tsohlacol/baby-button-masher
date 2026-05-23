@@ -31,8 +31,8 @@ import {
   Trash2,
 } from "lucide-react";
 
-import { ScreensaverMode, ParentSettings, KeystrokeEvent } from "./types";
-import { speakToddlerText, playFireworkSynth, playRocketSynth, getAvailableVoices, setAudioVolumeLimit } from "./utils/audio";
+import { ScreensaverMode, ParentSettings } from "./types";
+import { speakToddlerText, playFireworkSynth, getAvailableVoices, setAudioVolumeLimit, cancelSpeech } from "./utils/audio";
 import { getLearnItem } from "./utils/words";
 
 // Importer local components
