@@ -180,7 +180,7 @@ namespace ToddlerScreenDefender
         private void HideSplash()
         {
             TsdLog.Write("Hiding splash");
-            var fade = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(400));
+            var fade = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(1500));
             fade.Completed += (s, e) => SplashOverlay.Visibility = Visibility.Collapsed;
             SplashOverlay.BeginAnimation(OpacityProperty, fade);
         }
