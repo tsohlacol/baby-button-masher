@@ -137,6 +137,24 @@ namespace ToddlerScreenDefender
             this.Focus();
         }
 
+        private static readonly Guid _clsidVirtualDesktopPinnedApps = new Guid("AA509086-5CA9-4C25-8F95-589D3C07B48A");
+        private static readonly Guid _iidIVirtualDesktopPinnedApps  = new Guid("4CE81583-1E4C-4632-A621-07A53543148F");
+
+        private void TryPinToAllVirtualDesktops()
+        {
+            try
+            {
+                var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+                var shell = (IShellServiceProvider)(object)new CImmersiveShell();
+                shell.QueryService(ref _clsidVirtualDesktopPinnedApps, ref _iidIVirtualDesktopPinnedApps, out object ppv);
+                ((IVirtualDesktopPinnedApps)ppv).PinWindow(hwnd);
+            }
+            catch
+            {
+                // Pinning uses internal Windows shell COM interfaces; silently no-op if unavailable.
+            }
+        }
+
         // --- WIN32 SYSTEM KEY INTERCEPTION HOOK ---
         private IntPtr SetHook(LowLevelKeyboardProc proc)
         {
