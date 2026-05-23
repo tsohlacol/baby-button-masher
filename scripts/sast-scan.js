@@ -44,24 +44,7 @@ const SENSITIVE_PATTERNS = [
   }
 ];
 
-function scanDirectory(dir, fileList = []) {
-  const files = fs.readdirSync(dir);
-  for (const file of files) {
-    const fileP = path.join(dir, file);
-    if (fs.statSync(fileP).isDirectory()) {
-      if (!file.includes('node_modules') && !file.includes('dist') && !file.startsWith('.')) {
-        scanDirectory(fileP, fileList);
-      }
-    } else {
-      if (/\.(ts|tsx|js|jsx)$/.test(file)) {
-        fileList.push(fileP);
-      }
-    }
-  }
-  return fileList;
-}
-
-const fileCollection = scanDirectory('./src');
+const fileCollection = scanDirectory('./src', /\.(ts|tsx|js|jsx)$/);
 console.log(`Analyzing ${fileCollection.length} source code files concurrently...\n`);
 
 let totalIssues = 0;
