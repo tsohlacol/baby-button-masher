@@ -15,7 +15,7 @@ namespace ToddlerScreenDefender
         private static IntPtr _hookID = IntPtr.Zero;
         private LowLevelKeyboardProc _proc;
         private Task<CoreWebView2Environment>? _webView2EnvTask;
-        private bool _splashHidden;
+        private readonly TaskCompletionSource _readyTcs = new TaskCompletionSource();
 
         // Win32 API Constants
         private const int WH_KEYBOARD_LL = 13;
