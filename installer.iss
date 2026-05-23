@@ -40,6 +40,7 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 
 [Run]
 Filename: "{app}\ToddlerScreenDefender.exe"; Description: "{cm:LaunchProgram,Toddler Screen Defender}"; Flags: nowait postinstall skipifsilent
+Filename: "notepad.exe"; Parameters: "{log}"; Description: "Open install log"; Flags: postinstall skipifsilent unchecked
 
 [UninstallRun]
 ; Kill the running app instance silently prior to removing files
