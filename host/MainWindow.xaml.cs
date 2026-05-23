@@ -67,6 +67,8 @@ namespace ToddlerScreenDefender
             this.Width = SystemParameters.VirtualScreenWidth;
             this.Height = SystemParameters.VirtualScreenHeight;
 
+            TryPinToAllVirtualDesktops();
+
             try
             {
                 // Initialize WebView2 pointing to our bundled React frontend
