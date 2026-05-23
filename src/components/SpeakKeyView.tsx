@@ -76,7 +76,7 @@ export default function SpeakKeyView({ lastEvent, voiceName, speechRate, speechP
     }));
 
     setBubbles(newBubbles);
-  }, [lastEvent, voiceName, speechRate, speechPitch]);
+  }, [lastEvent, voiceName, speechRate, speechPitch, speechEnabled]);
 
   const matchInfo = getLearnItem(currentKey === "Space" ? " " : currentKey);
 
