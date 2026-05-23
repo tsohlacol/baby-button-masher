@@ -34,8 +34,6 @@ Name: "{group}\Toddler Screen Defender"; Filename: "{app}\ToddlerScreenDefender.
 Name: "{autodesktop}\Toddler Screen Defender"; Filename: "{app}\ToddlerScreenDefender.exe"; Tasks: desktopicon
 Name: "{autodesktop}\Toddler Screen Defender (Debug)"; Filename: "{app}\ToddlerScreenDefender.exe"; Parameters: "--debug"; Tasks: debugdesktopicon
 
-[Registry]
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "ToddlerScreenDefender"; ValueData: """{app}\ToddlerScreenDefender.exe"""; Flags: uninsdeletevalue; Tasks: runonstartup
 
 [Run]
 Filename: "{app}\ToddlerScreenDefender.exe"; Description: "{cm:LaunchProgram,Toddler Screen Defender}"; Flags: nowait postinstall skipifsilent
