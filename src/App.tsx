@@ -98,7 +98,7 @@ export default function App() {
       D: "Daddy Shark 🦈",
     },
     volumeLimit: 0.3,
-    multiMonitorStrategy: "blackout",
+    multiMonitorStrategy: "mirror",
     parentPin: "1234",
     passcodeUnlockEnabled: false,
   });
