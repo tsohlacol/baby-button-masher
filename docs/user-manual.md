@@ -64,3 +64,66 @@ If for any reason the application crashes, hangs, or fails to register input val
   2. Locate **Toddler Screen Defender** inside the programs library.
   3. Click **Uninstall** and follow the simple automated wizard. 
   4. The uninstaller terminates active instances, unregisters native keys hook bindings, deletes shortcut references, and cleans storage keys gracefully.
+
+---
+
+## 6. Code Quality, Parallel Unit Testing, and Security Audits
+
+To guarantee the child lockdown portal is resilient against input crashes, memory leaks, and typical security escalation paths, TSD maintains a comprehensive unit testing framework and three-tier automated security pipeline.
+
+### Parallelized Unit Testing (Vitest)
+Unit and integration tests are powered by **Vitest** for blistering speed. Vitest runs all test files concurrently in distinct worker processes in parallel by default:
+* **Dictionary Mapping Tests (`words.test.ts`)**: Confirms standard keys normalize correctly and map to correct child sensory assets without throwing exceptions.
+* **Audio Boundaries & Clamping Tests (`audio.test.ts`)**: Validates that absolute master volume caps remain strictly locked. Ensures any out-of-range programmatic gain triggers a clamping routine to preserve comfortable toddler ear levels.
+* **Security lock verification (`security.test.ts`)**: Validates the mathematical equations solver engine, safety bypass blocks, and layout coordinate checks.
+
+To trigger parallel unit tests manually, execute:
+```bash
+make test
+```
+*(Or call `npm run test` directly)*.
+
+---
+
+### Three-Tier Automated Security Assessment
+
+We execute three complementary classes of security audits to ensure code integrity:
+
+#### 1. SAST (Static Application Security Testing)
+* **What it is**: Scans the source code files statically to spot anti-patterns, potential injection points, or dynamic evaluators.
+* **Rules checked**:
+  * Safe usage of script compilation loops (disallows `eval` and dynamic `Function` declarations).
+  * Elimination of raw, unsanitized DOM insertion wrappers (`dangerouslySetInnerHTML`).
+  * Prevention of hardcoded secrets, certificates, or static tokens within variables (regex-based entropy matchers).
+* **How to run**:
+  ```bash
+  make sast
+  ```
+
+#### 2. SCA (Software Composition Analysis)
+* **What it is**: Audits third-party node packages for public security vulnerabilities (matching against CVE registries) and tracks open-source license compliance.
+* **Rules checked**:
+  * Scans dynamic modules against known security databases (`npm audit`).
+  * Enforces compliance with our copyleft and reciprocal model (**TSD-RCL**), red-flagging infectious licenses such as AGPL or GPL that contradict project terms.
+* **How to run**:
+  ```bash
+  make sca
+  ```
+
+#### 3. DAST (Dynamic Application Security Testing)
+* **What it is**: Evaluates the client-side active runtime conditions to block overlay clickjacking or window escape routes.
+* **Rules checked**:
+  * Inspects `index.html` for secure viewport restraints and content-security headers.
+  * Audits applet permission scopes in `metadata.json` to ensure camera/microphone access is denied or strictly restricted.
+  * Ensures active event handlers intercept user keyboards cleanly, invoking `preventDefault()` blocks on every masher keystroke.
+* **How to run**:
+  ```bash
+  make dast
+  ```
+
+#### Complete Security Pipeline Audit
+To audit all three security scanners (SAST + SCA + DAST) in a single command, run:
+```bash
+make security-audit
+```
+Integrate `make test` or `make security-audit` directly into your GitHub Actions CI/CD workflows (`.github/workflows/ci.yml`) to guarantee no insecure code enters the main branch. For advanced dynamic audits of active sandbox mirrors, we recommend hooking **OWASP ZAP** or **SonarQube DevSecOps** containers directly to target ports in release branch deployment flows.

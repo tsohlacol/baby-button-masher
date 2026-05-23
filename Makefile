@@ -1,12 +1,16 @@
-# Toddler Screen Defender (TSD) Build and Test Makefile
-.PHONY: install build lint test build-installer clean help
+# Toddler Screen Defender (TSD) Build, Test, and Security Audit Makefile
+.PHONY: install build lint test sast sca dast security-audit build-installer clean help
 
 help:
-	@echo "Toddler Screen Defender - Build and Test Targets:"
+	@echo "Toddler Screen Defender - Build, Test, and Security Audit Targets:"
 	@echo "  install          - Install Node.js frontend dependencies"
 	@echo "  build            - Build the static React game sandbox folder"
 	@echo "  lint             - Validate TypeScript and JavaScript files for errors"
-	@echo "  test             - Run all code validation and build checks"
+	@echo "  test             - Run all code linting, parallelized unit tests, and security scans"
+	@echo "  sast             - Execute static code scanning seeking security vulnerabilities"
+	@echo "  sca              - Execute software composition analysis and license checks"
+	@echo "  dast             - Audit dynamic sandbox frames, overrides, and clickjacking metrics"
+	@echo "  security-audit   - Run full three-tier security scanner suite (SAST + SCA + DAST)"
 	@echo "  build-installer  - Run Docker compilation container to assemble Windows Host and Installer"
 	@echo "  clean            - Clear previous build folders and installer targets"
 
@@ -19,8 +23,21 @@ build:
 lint:
 	npm run lint
 
-test: lint build
-	@echo "All local validation tests and React builds completed successfully!"
+sast:
+	npm run sast
+
+sca:
+	npm run sca
+
+dast:
+	npm run dast
+
+security-audit:
+	npm run security-audit
+
+test: lint build security-audit
+	npm run test
+	@echo "All local validation checks, security scans, and parallelized unit tests completed successfully!"
 
 build-installer:
 	@chmod +x ./build-installer.sh
