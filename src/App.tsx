@@ -1165,6 +1165,10 @@ export default function App() {
                                   if (longPressTimerRef.current) clearInterval(longPressTimerRef.current);
                                   setLongPressProgress(0);
                                 }}
+                                onTouchCancel={() => {
+                                  if (longPressTimerRef.current) clearInterval(longPressTimerRef.current);
+                                  setLongPressProgress(0);
+                                }}
                                 className="group relative flex items-center justify-center p-4 bg-slate-900/90 border border-slate-700/60 rounded-full text-white cursor-pointer hover:bg-slate-950 hover:border-indigo-500 shadow-xl transition-all duration-300"
                               >
                                 {/* Circular timer progress meter */}
