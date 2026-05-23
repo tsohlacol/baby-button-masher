@@ -156,11 +156,11 @@ namespace ToddlerScreenDefender
                     swallowKeystroke = true;
                 }
 
-                // 2. Block Alt+Tab, Alt+Esc, Alt+F4
+                // 2. Block Alt+Tab and Alt+Esc (Alt+F4 passes through so the parent can close the app)
                 bool altPressed = IsModifierKeyDown(VK_LMENU) || IsModifierKeyDown(VK_RMENU);
                 if (altPressed)
                 {
-                    if (vkCode == VK_TAB || vkCode == VK_ESCAPE || vkCode == VK_F4)
+                    if (vkCode == VK_TAB || vkCode == VK_ESCAPE)
                     {
                         swallowKeystroke = true;
                     }
