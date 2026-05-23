@@ -40,28 +40,15 @@ const SECRET_PATTERNS = [
   }
 ];
 
-function scanDirectory(dir, fileList = []) {
-  const files = fs.readdirSync(dir);
-  for (const file of files) {
-    const fileP = path.join(dir, file);
-    if (fs.statSync(fileP).isDirectory()) {
-      if (!file.includes('node_modules') && !file.includes('dist') && !file.startsWith('.')) {
-        scanDirectory(fileP, fileList);
-      }
-    } else {
-      // Analyze code files, env configs, manifest files, but ignore .env.example/readme/manuals/threat model to avoid placeholder false-positives
-      if (/\.(ts|tsx|js|jsx|env|json)$/.test(file) && 
-          !file.includes('.env.example') && 
-          !file.includes('-model.md') &&
-          !file.includes('package-lock.json')) {
-        fileList.push(fileP);
-      }
-    }
-  }
-  return fileList;
+// Secrets scan covers a broader set of file types but excludes known false-positive files
+const SECRETS_EXT = /\.(ts|tsx|js|jsx|env|json)$/;
+function secretsScanDir(dir) {
+  return scanDirectory(dir, SECRETS_EXT).filter(
+    f => !f.includes('.env.example') && !f.includes('-model.md') && !f.includes('package-lock.json')
+  );
 }
 
-const fileCollection = scanDirectory('.');
+const fileCollection = secretsScanDir('.');
 console.log(`Auditing ${fileCollection.length} workspace files for hardcoded secrets...\n`);
 
 let secretsDetected = 0;
