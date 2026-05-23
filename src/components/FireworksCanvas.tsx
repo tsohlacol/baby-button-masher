@@ -56,9 +56,15 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Pick a semi-random position on screen
-    const x = Math.random() * (canvas.width - 200) + 100;
-    const y = Math.random() * (canvas.height - 200) + 100;
+    // Position the burst at the keyboard-layout location of the pressed key.
+    // Unknown keys (Shift, arrows, etc.) fall back to a random position.
+    const keyPos = KEY_POSITIONS[lastEvent.key.toLowerCase()] ?? KEY_POSITIONS[lastEvent.key];
+    const x = keyPos
+      ? keyPos[0] * canvas.width
+      : Math.random() * (canvas.width - 200) + 100;
+    const y = keyPos
+      ? keyPos[1] * canvas.height
+      : Math.random() * (canvas.height - 200) + 100;
 
     const colors = THEME_COLORS[theme] || THEME_COLORS.cosmic;
     const baseColor = colors[Math.floor(Math.random() * colors.length)];
