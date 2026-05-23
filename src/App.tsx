@@ -500,67 +500,43 @@ export default function App() {
 
       {/* 1. PARENT SETUP DASHBOARD VIEW */}
       {appState === "dashboard" && (
-        <div className="max-w-6xl mx-auto px-4 py-8 relative z-10">
-          
+        <div className="h-screen overflow-hidden flex flex-col px-4 py-4 relative z-10">
+
           {/* Header row */}
-          <header className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-6 mb-8 border-slate-500/10">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-indigo-600/10 rounded-2xl border border-indigo-500/20 text-indigo-500">
-                <Lock className="w-8 h-8 animate-pulse" />
+          <header className="flex items-center justify-between gap-3 border-b pb-4 mb-4 border-slate-500/10 shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-indigo-600/10 rounded-2xl border border-indigo-500/20 text-indigo-500">
+                <Lock className="w-6 h-6 animate-pulse" />
               </div>
               <div>
-                <h1 className="text-3xl font-black tracking-tight flex items-center gap-2">
-                  <span>Toddler Screen Defender</span>
+                <h1 className="text-2xl font-black tracking-tight flex items-center gap-2">
+                  <span>Baby Button Masher</span>
                   <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-semibold border border-indigo-500/10">v1.1</span>
                 </h1>
-                <p className="text-sm opacity-60">Protect your desktop windows from mashers. Let your baby girl play & learn securely!</p>
+                <p className="text-xs opacity-60">Keep your desktop safe while your toddler plays &amp; learns!</p>
               </div>
             </div>
 
-            {/* DateTime Display */}
-            <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-xs font-mono">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
-              <span>{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
-              <span className="text-white/40">|</span>
-              <span>{currentTime.toLocaleDateString([], { year: 'numeric', month: '2-digit', day: '2-digit' })}</span>
+            <div className="flex items-center gap-3">
+              {/* DateTime Display */}
+              <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-xs font-mono">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
+                <span>{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                <span className="text-white/40">|</span>
+                <span>{currentTime.toLocaleDateString([], { year: 'numeric', month: '2-digit', day: '2-digit' })}</span>
+              </div>
+              {/* Launch button */}
+              <button
+                onClick={enterPlaySandbox}
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm flex items-center gap-2 shadow-lg transition-all active:scale-95 select-none"
+              >
+                <Lock className="w-4 h-4" />
+                <span>Launch Play Screen</span>
+              </button>
             </div>
           </header>
 
-          {/* Core Launch Banner */}
-          <div className="mb-8 p-8 rounded-3xl bg-linear-to-r from-indigo-900 to-purple-900 text-white relative overflow-hidden shadow-2xl">
-            <div className="absolute top-[-50%] right-[-10%] w-96 h-96 rounded-full bg-violet-600/25 blur-3xl" />
-            <div className="absolute bottom-[-20%] left-[20%] w-64 h-64 rounded-full bg-pink-500/15 blur-2xl" />
-
-            <div className="relative z-10 max-w-2xl">
-              <span className="px-3 py-1 rounded-full text-xs font-mono font-bold tracking-wider bg-white/15 text-violet-200 border border-white/10 uppercase">
-                Ready to protect
-              </span>
-              <h2 className="text-4xl font-extrabold tracking-tight mt-3 mb-2">
-                Launch Toddler Screensaver Sandbox
-              </h2>
-              <p className="text-indigo-200 text-sm leading-relaxed mb-6">
-                Starts an ambient locked screensaver interface. When your daughter presses letters A-Z or mashing keys, 
-                she'll trigger educational speech spelling, rainbow music chords, dinosaurs, or firework bursts. 
-                Exiting requires a secure parents verification formula.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 items-stretch">
-                <button
-                  onClick={enterPlaySandbox}
-                  className="px-8 py-4 rounded-2xl bg-white text-indigo-900 font-bold hover:bg-neutral-150 transition-all select-none flex items-center justify-center gap-3 shadow-lg active:scale-98 text-lg"
-                >
-                  <Lock className="w-5 h-5 text-indigo-600" />
-                  <span>Launch Play Screen Now</span>
-                </button>
-                <div className="flex items-center gap-2 text-xs text-indigo-200 bg-white/10 border border-white/10 rounded-2xl px-4 py-2">
-                  <Unlock className="w-4 h-4 text-emerald-400" />
-                  <span>Press <kbd className="bg-slate-800 px-1 rounded mx-0.5">Parent Exit Button</kbd> at the bottom right to unlock.</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
             
             {/* COLUMN 1: INTERACTIVE MODES CONFIG */}
             <div className={`p-6 rounded-3xl flex flex-col justify-between ${activeTheme.cardBg}`}>
