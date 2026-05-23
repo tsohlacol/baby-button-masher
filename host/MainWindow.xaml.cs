@@ -172,10 +172,27 @@ namespace ToddlerScreenDefender
                 if (GetMonitorInfo(hMonitor, ref mi))
                 {
                     bool isPrimary = (mi.dwFlags & MONITORINFOF_PRIMARY) != 0;
-                    int left = mi.rcMonitor.Left;
-                    int top = mi.rcMonitor.Top;
-                    int width = mi.rcMonitor.Right - mi.rcMonitor.Left;
-                    int height = mi.rcMonitor.Bottom - mi.rcMonitor.Top;
+                    int physLeft   = mi.rcMonitor.Left;
+                    int physTop    = mi.rcMonitor.Top;
+                    int physWidth  = mi.rcMonitor.Right  - mi.rcMonitor.Left;
+                    int physHeight = mi.rcMonitor.Bottom - mi.rcMonitor.Top;
+
+                    // EnumDisplayMonitors returns physical pixels; React's CSS viewport uses
+                    // WPF logical pixels (96-DPI basis). Divide by the per-monitor DPI scale
+                    // so the coordinates match what the browser actually sees.
+                    double scaleX = 1.0, scaleY = 1.0;
+                    if (GetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, out uint dpiX, out uint dpiY) == 0)
+                    {
+                        scaleX = dpiX / 96.0;
+                        scaleY = dpiY / 96.0;
+                    }
+
+                    int left   = (int)Math.Round(physLeft   / scaleX);
+                    int top    = (int)Math.Round(physTop    / scaleY);
+                    int width  = (int)Math.Round(physWidth  / scaleX);
+                    int height = (int)Math.Round(physHeight / scaleY);
+
+                    TsdLog.Write($"Monitor: phys={physWidth}x{physHeight} dpi={dpiX}x{dpiY} logical={width}x{height} primary={isPrimary}");
                     monitors.Add($"{{\"left\":{left},\"top\":{top},\"width\":{width},\"height\":{height},\"isPrimary\":{(isPrimary ? "true" : "false")}}}");
                 }
                 return true;
