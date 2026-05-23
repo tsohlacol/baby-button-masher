@@ -34,7 +34,7 @@ The application is distributed as a Windows installer (`TSD_Setup_v*.exe`) compi
 User Keyboard Input
   |
 Windows Kernel (WH_KEYBOARD_LL hook in MainWindow.xaml.cs)
-  ├─ Blocks: Win key, Alt+Tab, Alt+Esc, Alt+F4, Ctrl+Esc, Ctrl+Shift+Esc, F11
+  ├─ Blocks: Win key, Alt+Tab, Alt+Esc, Ctrl+Esc, Ctrl+Shift+Esc, F11
   └─ Passes through: All other keys
   |
 WebView2 Control (embedded browser)
