@@ -434,6 +434,26 @@ export default function App() {
 
   const activeTheme = THEME_PRESETS[settings.theme] || THEME_PRESETS.cosmic;
 
+  // Monitor layout is static after launch — compute once and memoize
+  const parsedMonitors = useMemo(() => {
+    const list = (window as any).TSD_MONITORS?.length > 0
+      ? (window as any).TSD_MONITORS
+      : [{ left: 0, top: 0, width: window.innerWidth, height: window.innerHeight, isPrimary: true }];
+    const minLeft = Math.min(...list.map((m: any) => m.left));
+    const minTop = Math.min(...list.map((m: any) => m.top));
+    const maxRight = Math.max(...list.map((m: any) => m.left + m.width));
+    const maxBottom = Math.max(...list.map((m: any) => m.top + m.height));
+    const totalW = maxRight - minLeft || 1;
+    const totalH = maxBottom - minTop || 1;
+    return list.map((m: any) => ({
+      ...m,
+      normLeft: ((m.left - minLeft) / totalW) * 100,
+      normTop: ((m.top - minTop) / totalH) * 100,
+      normWidth: (m.width / totalW) * 100,
+      normHeight: (m.height / totalH) * 100,
+    }));
+  }, []);
+
   return (
     <div className={`min-h-screen w-full transition-colors duration-500 overflow-x-hidden ${activeTheme.bg} font-sans relative`}>
       
