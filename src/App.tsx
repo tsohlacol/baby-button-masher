@@ -357,7 +357,7 @@ export default function App() {
           setTimeout(() => {
             setIsPasscodeOverlayOpen(false);
             setAppState("dashboard");
-            if (window.speechSynthesis) window.speechSynthesis.cancel();
+            cancelSpeech();
           }, 200);
           return next;
         } else {
