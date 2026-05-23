@@ -40,4 +40,4 @@ Filename: "taskkill"; Parameters: "/F /IM ToddlerScreenDefender.exe"; RunOnceId:
 
 [UninstallDelete]
 ; Cleanly purge the user's local WebView2 browser data caches on uninstall
-Type: filesandordirs; Name: "{userlocalappdata}\ToddlerScreenDefender"
+Type: filesandordirs; Name: "{localappdata}\ToddlerScreenDefender"
