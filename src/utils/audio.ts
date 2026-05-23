@@ -18,7 +18,8 @@ export function setAudioVolumeLimit(vol: number) {
   audioVolumeLimit = Math.max(0, Math.min(1, vol));
 }
 
-function getAudioContext(): AudioContext {
+function getAudioContext(): AudioContext | null {
+  if (typeof window === 'undefined') return null;
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
   }
