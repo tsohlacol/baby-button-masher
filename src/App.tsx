@@ -587,6 +587,12 @@ export default function App() {
                       icon: <Paintbrush className="w-4 h-4 text-indigo-400" />,
                       title: "🎨 Sensory Mouse Drawing",
                       desc: "Use the mouse/touchscreen to draw glowing rainbow streams; tap keys to stamp cute emojis & hear chimes!"
+                    },
+                    {
+                      id: ScreensaverMode.SPACE_EXPLORER,
+                      icon: <Sparkles className="w-4 h-4 text-cyan-400" />,
+                      title: "🌌 Space Explorer",
+                      desc: "Tour the solar system and constellations! Hover over planets, stars, and constellation shapes to hear their names."
                     }
                   ].map((mode) => (
                     <button
