@@ -471,7 +471,7 @@ export default function App() {
               <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
               <span>{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
               <span className="text-white/40">|</span>
-              <span>2026-05-21</span>
+              <span>{currentTime.toLocaleDateString([], { year: 'numeric', month: '2-digit', day: '2-digit' })}</span>
             </div>
           </header>
 
