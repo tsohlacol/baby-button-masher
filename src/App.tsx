@@ -194,11 +194,13 @@ export default function App() {
     };
   }, []);
 
-  // Auto-select the best available voice once the list loads.
-  // getAvailableVoices() already sorts neural/online voices to the front, so the
-  // first English voice in the sorted list is the highest quality available.
+  // Once the browser voice list loads, ensure a valid voice is selected.
+  // getAvailableVoices() sorts neural/online voices first, so voices[0] is the
+  // best available. If the persisted name is gone (OS reinstall, etc.), re-pick.
   useEffect(() => {
-    if (voices.length > 0 && !settings.speechVoiceName) {
+    if (voices.length === 0) return;
+    const savedStillAvailable = voices.some((v) => v.name === settings.speechVoiceName);
+    if (!settings.speechVoiceName || !savedStillAvailable) {
       const best = voices.find((v) => v.lang.startsWith("en")) ?? voices[0];
       setSettings((prev) => ({ ...prev, speechVoiceName: best.name }));
     }
