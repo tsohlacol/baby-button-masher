@@ -10,6 +10,18 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <!-- Reproducible builds: remove embedded timestamps and randomised MVIDs. -->
+    <Deterministic>true</Deterministic>
+    <!-- Rewrite every source path the compiler would embed (stack traces, PDB refs,
+         [CallerFilePath] values) to a neutral prefix so no build-machine or container
+         path appears in the shipped binary. -->
+    <PathMap>$(MSBuildProjectDirectory)=/src</PathMap>
+    <!-- Suppress PDB generation entirely for release; no debug artefact, no paths. -->
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2207.123" />
   </ItemGroup>
