@@ -185,6 +185,7 @@ export function playRocketSynth() {
 export function playAnimalSynth(animalName: string) {
   try {
     const ctx = getAudioContext();
+    if (!ctx) return;
     const osc = ctx.createOscillator();
     const gainNode = ctx.createGain();
 
