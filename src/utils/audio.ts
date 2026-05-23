@@ -266,6 +266,10 @@ export function speakToddlerText(text: string, settings: { name?: string; rate?:
   }
 }
 
+export function cancelSpeech() {
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+}
+
 /**
  * Retrieves lists of child-friendly voices.
  */
