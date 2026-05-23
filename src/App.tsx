@@ -246,7 +246,7 @@ export default function App() {
       const kpm = countInLast5s * 12; // extrapolation to 1 minute
       setMashingSpeed(kpm);
 
-      // Perform auto mode switching based on her tempo behavior
+      // Perform auto mode switching based on their tempo behavior
       if (settings.autoModeSwitchEnabled && countInLast5s > 0) {
         // Evaluate typical average interval
         const averageInterval = countInLast5s > 1 ? 5000 / countInLast5s : 5000;
