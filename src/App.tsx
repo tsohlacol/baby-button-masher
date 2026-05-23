@@ -1248,8 +1248,8 @@ export default function App() {
               );
             })}
           </div>
-        );
-      })()}
+        </div>
+      )}
 
       {/* 3. SECURITY POPUP COMPONENT (MATH FORMULA) */}
       {isExitOverlayOpen && (
