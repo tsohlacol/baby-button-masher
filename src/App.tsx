@@ -769,200 +769,112 @@ export default function App() {
               </div>
             </div>
 
-            {/* COLUMN 3: DAUGHTER PERSONAL CUSTOMIZATION (Alices Mode!) */}
-            <div className={`p-6 rounded-3xl flex flex-col justify-between ${activeTheme.cardBg}`}>
-              <div>
-                <h3 className="text-lg font-bold flex items-center gap-2 mb-4">
-                  <Users className="w-5 h-5 text-indigo-400" />
-                  <span>Special Daughter Words</span>
-                </h3>
-                <p className={`text-xs ${activeTheme.textMuted} mb-6`}>
-                  Make learning personal! Assign custom spelling expressions so the screen speaks family names or private characters.
-                </p>
+            {/* COLUMN 3: SETTINGS & SECURITY */}
+            <div className={`p-5 rounded-3xl flex flex-col gap-4 ${activeTheme.cardBg} overflow-y-auto`}>
+              <h3 className="text-base font-bold flex items-center gap-2 shrink-0">
+                <Settings className="w-4 h-4 text-indigo-400" />
+                <span>Settings &amp; Security</span>
+              </h3>
 
-                <div className="space-y-4 text-xs">
-                  {/* 1. Creator row to ADD or MODIFY custom word mapping */}
-                <div className="bg-black/25 border border-slate-500/10 p-3 rounded-2xl space-y-2 mb-4">
-                  <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Add Custom Key Word</span>
-                  <div className="flex gap-2 text-xs">
-                    <div className="w-16">
-                      <select
-                        value={newWordChar}
-                        onChange={(e) => setNewWordChar(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700/60 p-2 rounded-lg text-white font-mono font-bold text-center focus:outline-hidden"
-                      >
-                        {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c) => (
-                          <option key={c} value={c}>
-                            {c}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        value={newWordValue}
-                        onChange={(e) => setNewWordValue(e.target.value)}
-                        placeholder="e.g. Bear 🐻"
-                        className="w-full bg-slate-900 border border-slate-700/60 p-2 rounded-lg text-white text-xs focus:outline-hidden"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleAddCustomWord();
-                          }
-                        }}
-                      />
+              <div className="space-y-3 text-xs flex-1">
+                {/* Custom Words card */}
+                <div className="bg-black/15 p-3 rounded-xl border border-slate-500/10">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <span className="font-bold block">📚 Custom Words</span>
+                      <span className="text-[10px] opacity-60 block mt-0.5">
+                        {Object.keys(settings.customWords).length} word{Object.keys(settings.customWords).length !== 1 ? "s" : ""} configured
+                      </span>
                     </div>
                     <button
-                      onClick={handleAddCustomWord}
-                      className="p-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-medium transition-all flex items-center justify-center cursor-pointer"
-                      title="Add Word Mapping"
+                      onClick={() => setAppState("dictionary")}
+                      className="px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/25 text-indigo-300 font-semibold text-[11px] transition-all cursor-pointer whitespace-nowrap"
                     >
-                      <Plus className="w-3.5 h-3.5 mr-1" /> Add
+                      Edit Words →
                     </button>
                   </div>
                 </div>
 
-                {/* 2. Scrollable keys list */}
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Configured Keys ({Object.keys(settings.customWords).length})</span>
-                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
-                  {Object.keys(settings.customWords).length === 0 ? (
-                    <div className="text-center py-6 text-slate-500 border border-dashed border-slate-500/10 rounded-xl">
-                      <p className="text-[11px]">No custom spelling associations yet.</p>
-                      <p className="text-[9px] text-slate-600 mt-0.5">Add some letters above!</p>
-                    </div>
-                  ) : (
-                    Object.keys(settings.customWords)
-                      .sort()
-                      .map((char) => (
-                        <div
-                          key={char}
-                          className="flex items-center gap-2 p-2 rounded-xl bg-black/10 border border-slate-500/5 group hover:border-slate-500/15 transition-all text-xs"
-                        >
-                          {/* Badge Key */}
-                          <div className="w-7 h-7 shrink-0 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-bold font-mono flex items-center justify-center text-sm">
-                            {char}
-                          </div>
-
-                          {/* Editable word field */}
-                          <input
-                            type="text"
-                            value={settings.customWords[char] || ""}
-                            onChange={(e) => updateCustomWord(char, e.target.value)}
-                            placeholder={`Spelling for ${char}`}
-                            className="flex-1 bg-black/10 hover:bg-black/20 focus:bg-slate-900/90 border border-slate-500/10 focus:border-slate-500/30 p-1.5 rounded-md text-[11px] font-medium text-slate-100 placeholder-slate-500 transition-all focus:outline-hidden"
-                          />
-
-                          {/* Sound test button */}
-                          <button
-                            onClick={() => triggerVoiceTest(char)}
-                            className="p-1 px-1.5 rounded bg-slate-850 hover:bg-slate-700 text-slate-300 transition-all cursor-pointer active:scale-95 flex items-center justify-center"
-                            title="Test Speech"
-                          >
-                            <Volume2 className="w-3.5 h-3.5" />
-                          </button>
-
-                          {/* Delete association button */}
-                          <button
-                            onClick={() => handleRemoveCustomWord(char)}
-                            className="p-1 px-1.5 rounded bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white transition-all cursor-pointer active:scale-95 flex items-center justify-center"
-                            title="Remove Word"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      ))
-                  )}
+                {/* Toggle to enable/disable PIN passcode unlock feature */}
+                <div className="flex items-center justify-between bg-black/10 p-2.5 rounded-xl border border-slate-500/10">
+                  <div className="flex flex-col gap-0.5 max-w-[80%]">
+                    <span className="font-semibold text-white/90">Enable PIN lock option</span>
+                    <span className="text-[10px] text-slate-400">Add backup numeric PIN unlock method</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={!!settings.passcodeUnlockEnabled}
+                    onChange={(e) => {
+                      const enabled = e.target.checked;
+                      setSettings((p) => {
+                        let nextRequirement = p.unlockRequirement;
+                        if (!enabled && p.unlockRequirement === "passcode") {
+                          nextRequirement = "math";
+                        }
+                        return {
+                          ...p,
+                          passcodeUnlockEnabled: enabled,
+                          unlockRequirement: nextRequirement,
+                        };
+                      });
+                    }}
+                    className="w-4 h-4 rounded text-blue-500 accent-blue-500 bg-slate-900 border-slate-700 cursor-pointer"
+                  />
                 </div>
 
-                  {/* Safety Configuration options */}
-                  <div className="pt-4 border-t border-slate-500/10 space-y-3">
-                    {/* Toggle to enable/disable PIN passcode unlock feature */}
-                    <div className="flex items-center justify-between text-xs bg-black/10 p-2.5 rounded-xl border border-slate-500/10">
-                      <div className="flex flex-col gap-0.5 max-w-[80%]">
-                        <span className="font-semibold text-white/90">Enable passcode PIN lock option</span>
-                        <span className="text-[10px] text-slate-400">Add backup numeric PIN keypad unlock method to protection modes</span>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={!!settings.passcodeUnlockEnabled}
-                        onChange={(e) => {
-                          const enabled = e.target.checked;
-                          setSettings((p) => {
-                            let nextRequirement = p.unlockRequirement;
-                            // Reset requirement if disabling active passcode mode
-                            if (!enabled && p.unlockRequirement === "passcode") {
-                              nextRequirement = "math";
-                            }
-                            return {
-                              ...p,
-                              passcodeUnlockEnabled: enabled,
-                              unlockRequirement: nextRequirement,
-                            };
-                          });
-                        }}
-                        className="w-4 h-4 rounded text-blue-500 accent-blue-500 bg-slate-900 border-slate-700 cursor-pointer"
-                      />
-                    </div>
+                <div>
+                  <label className="block mb-1.5 font-semibold text-white/80">Unlock Strategy</label>
+                  <select
+                    value={settings.unlockRequirement}
+                    onChange={(e) => setSettings((p) => ({ ...p, unlockRequirement: e.target.value as any }))}
+                    className="w-full bg-black/20 border border-slate-500/20 p-2 rounded-lg text-xs font-medium"
+                  >
+                    <option value="math">Math Sum (A + B formula)</option>
+                    {settings.passcodeUnlockEnabled && (
+                      <option value="passcode">4-Digit PIN Passcode</option>
+                    )}
+                    <option value="long_press">3-Second Press (harder for baby)</option>
+                    <option value="click">Simple Click (easy mock test)</option>
+                  </select>
+                </div>
 
-                    <div>
-                      <label className="block mb-1.5 font-semibold text-white/80">Unlock Safeguard Strategy</label>
-                      <select
-                        value={settings.unlockRequirement}
-                        onChange={(e) => setSettings((p) => ({ ...p, unlockRequirement: e.target.value as any }))}
-                        className="w-full bg-black/20 border border-slate-500/20 p-2 rounded-lg text-xs font-medium"
-                      >
-                        <option value="math">Parent Math Sum verification (A + B formula)</option>
-                        {settings.passcodeUnlockEnabled && (
-                          <option value="passcode">4-Digit PIN Passcode Verification</option>
-                        )}
-                        <option value="long_press">3-Second Lock Button Press (harder for baby)</option>
-                        <option value="click">Simple Click (easy mock test)</option>
-                      </select>
-                    </div>
-
-                    {settings.passcodeUnlockEnabled && settings.unlockRequirement === "passcode" && (
-                      <div className="mt-2.5 p-2.5 bg-blue-500/5 border border-blue-500/20 rounded-xl">
-                        <label className="block mb-1 text-[10px] font-bold uppercase tracking-wider text-blue-400">Custom 4-Digit Parent PIN</label>
-                        <input
-                          type="password"
-                          maxLength={4}
-                          value={settings.parentPin || ""}
-                          onChange={(e) => {
-                            const val = e.target.value.replace(/\D/g, "").slice(0, 4);
-                            setSettings((p) => ({ ...p, parentPin: val }));
-                          }}
-                          placeholder="Enter 4-digit PIN"
-                          className="w-full bg-black/30 border border-blue-500/30 p-1.5 rounded-lg text-xs font-mono text-center tracking-widest text-blue-300 focus:outline-hidden focus:border-blue-400 font-bold"
-                        />
-                        {(settings.parentPin === "1234" || !settings.parentPin) && (
-                          <p className="text-[10px] text-yellow-400 mt-1">Change this from the default — "1234" is easily guessed.</p>
-                        )}
-                      </div>
+                {settings.passcodeUnlockEnabled && settings.unlockRequirement === "passcode" && (
+                  <div className="p-2.5 bg-blue-500/5 border border-blue-500/20 rounded-xl">
+                    <label className="block mb-1 text-[10px] font-bold uppercase tracking-wider text-blue-400">Custom 4-Digit Parent PIN</label>
+                    <input
+                      type="password"
+                      maxLength={4}
+                      value={settings.parentPin || ""}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, "").slice(0, 4);
+                        setSettings((p) => ({ ...p, parentPin: val }));
+                      }}
+                      placeholder="Enter 4-digit PIN"
+                      className="w-full bg-black/30 border border-blue-500/30 p-1.5 rounded-lg text-xs font-mono text-center tracking-widest text-blue-300 focus:outline-hidden focus:border-blue-400 font-bold"
+                    />
+                    {(settings.parentPin === "1234" || !settings.parentPin) && (
+                      <p className="text-[10px] text-yellow-400 mt-1">Change from the default — "1234" is easily guessed.</p>
                     )}
                   </div>
+                )}
 
-                  {/* Multi-Monitor Safeguard configuration */}
-                  <div className="pt-4 border-t border-slate-500/10">
-                    <label className="block mb-1.5 font-semibold text-white/80">Multi-Monitor Strategy (Default: Blackout)</label>
-                    <select
-                      value={settings.multiMonitorStrategy}
-                      onChange={(e) => setSettings((p) => ({ ...p, multiMonitorStrategy: e.target.value as any }))}
-                      className="w-full bg-black/20 border border-slate-500/20 p-2 rounded-lg text-xs font-semibold text-indigo-400"
-                    >
-                      <option value="blackout">Deep Blackout (Protect Secondary Screens)</option>
-                      <option value="mirror">Mirror Playroom (Clone Active Canvas)</option>
-                      <option value="independent">Multi-Canvas (Separate Canvases)</option>
-                    </select>
-                    <span className="text-[10px] text-slate-500 block mt-1 leading-relaxed">
-                      Connected secondary displays are locked into blackout to block accidental mouse movements.
-                    </span>
-                  </div>
+                <div>
+                  <label className="block mb-1.5 font-semibold text-white/80">Multi-Monitor Strategy</label>
+                  <select
+                    value={settings.multiMonitorStrategy}
+                    onChange={(e) => setSettings((p) => ({ ...p, multiMonitorStrategy: e.target.value as any }))}
+                    className="w-full bg-black/20 border border-slate-500/20 p-2 rounded-lg text-xs font-semibold text-indigo-400"
+                  >
+                    <option value="blackout">Blackout (Protect Secondary Screens)</option>
+                    <option value="mirror">Mirror (Clone Active Canvas)</option>
+                    <option value="independent">Multi-Canvas (Separate Canvases)</option>
+                  </select>
                 </div>
               </div>
 
               {/* Theme Selector */}
-              <div className="mt-6 pt-4 border-t border-slate-500/10">
-                <span className="text-[10px] font-mono text-slate-500 uppercase block mb-2">Visual Palette Theme:</span>
+              <div className="pt-3 border-t border-slate-500/10 shrink-0">
+                <span className="text-[10px] font-mono text-slate-500 uppercase block mb-2">Visual Theme:</span>
                 <div className="grid grid-cols-4 gap-2">
                   {[
                     { id: "cosmic", label: "🌌 Night" },
@@ -984,55 +896,123 @@ export default function App() {
                   ))}
                 </div>
               </div>
-
-              {/* About & Developer Credits */}
-              <div className="mt-6 pt-5 border-t border-slate-500/10 text-xs text-left">
-                <div className="p-3.5 rounded-2xl bg-black/35 border border-white/5 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Heart className="w-4 h-4 text-pink-400 animate-pulse" />
-                    <span className="font-bold text-white/95">About TSD Defender</span>
-                  </div>
-                  <p className="text-[10px] text-slate-400 leading-normal">
-                    Designed to secure low-level keyboard handlers and shield workspaces when toddlers play & mash keys.
-                  </p>
-                  <div className="pt-2 border-t border-white/5 flex flex-col gap-1 text-[10px]">
-                    <div className="flex justify-between items-center text-slate-400">
-                      <span>Developer / Author:</span>
-                      <strong className="text-white">tsohlacol</strong>
-                    </div>
-                    <div className="flex justify-between items-center text-slate-400">
-                      <span>Source Repository:</span>
-                      <a 
-                        href="https://github.com/tsohlacol/toddler-screen-defender" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-indigo-400 hover:underline flex items-center gap-1 font-mono hover:text-indigo-200"
-                      >
-                        <Github className="w-3 h-3 text-indigo-400 shrink-0" />
-                        <span>github.com/tsohlacol</span>
-                      </a>
-                    </div>
-                    <div className="flex justify-between items-center text-slate-400">
-                      <span>License Model:</span>
-                      <span className="text-purple-300 font-bold font-mono">TSD-RCL (Reciprocal)</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
           </div>
 
-          {/* Quick Guidance banner footer */}
-          <footer className="mt-12 p-6 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs relative z-10">
-            <div className="flex items-center gap-3">
-              <HelpCircle className="w-5 h-5 text-indigo-400 shrink-0" />
-              <p className="opacity-70">
-                <strong>Why is this toddler proof?</strong> Standard screensaver applications in web browsers cannot capture reserved OS hotkeys like Alt+Tab or Win+D. For absolute safety, we advise running the application in a <strong>Chromium Fullscreen App</strong> mode (Press <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-white border border-slate-700">F11</kbd> after launching) so children cannot escape or click taskbars.
-              </p>
-            </div>
-          </footer>
+        </div>
+      )}
 
+      {/* DICTIONARY SCREEN */}
+      {appState === "dictionary" && (
+        <div className="h-screen overflow-hidden flex flex-col px-4 py-4 relative z-10">
+          <header className="flex items-center gap-4 border-b pb-4 mb-4 border-slate-500/10 shrink-0">
+            <button
+              onClick={() => setAppState("dashboard")}
+              className="p-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition-all cursor-pointer"
+            >
+              ← Back
+            </button>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-indigo-600/10 rounded-xl border border-indigo-500/20 text-indigo-500">
+                <Users className="w-5 h-5" />
+              </div>
+              <div>
+                <h1 className="text-xl font-black tracking-tight">Custom Words</h1>
+                <p className="text-xs opacity-60">Assign words so the app speaks family names or personal characters when keys are pressed.</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            <div className="max-w-lg mx-auto space-y-4 pb-4">
+              {/* Creator row */}
+              <div className={`p-5 rounded-3xl ${activeTheme.cardBg}`}>
+                <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider block mb-3">Add Custom Key Word</span>
+                <div className="flex gap-2 text-xs">
+                  <div className="w-16">
+                    <select
+                      value={newWordChar}
+                      onChange={(e) => setNewWordChar(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700/60 p-2 rounded-lg text-white font-mono font-bold text-center focus:outline-hidden"
+                    >
+                      {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={newWordValue}
+                      onChange={(e) => setNewWordValue(e.target.value)}
+                      placeholder="e.g. Bear 🐻"
+                      className="w-full bg-slate-900 border border-slate-700/60 p-2 rounded-lg text-white text-xs focus:outline-hidden"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddCustomWord();
+                      }}
+                    />
+                  </div>
+                  <button
+                    onClick={handleAddCustomWord}
+                    className="p-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-medium transition-all flex items-center justify-center cursor-pointer"
+                    title="Add Word Mapping"
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-1" /> Add
+                  </button>
+                </div>
+              </div>
+
+              {/* Configured words list */}
+              <div className={`p-5 rounded-3xl ${activeTheme.cardBg}`}>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">
+                  Configured Keys ({Object.keys(settings.customWords).length})
+                </span>
+                {Object.keys(settings.customWords).length === 0 ? (
+                  <div className="text-center py-8 text-slate-500 border border-dashed border-slate-500/10 rounded-xl">
+                    <p className="text-sm">No custom words yet.</p>
+                    <p className="text-xs text-slate-600 mt-1">Add some letters above!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {Object.keys(settings.customWords)
+                      .sort()
+                      .map((char) => (
+                        <div
+                          key={char}
+                          className="flex items-center gap-2 p-2 rounded-xl bg-black/10 border border-slate-500/5 group hover:border-slate-500/15 transition-all text-xs"
+                        >
+                          <div className="w-7 h-7 shrink-0 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-bold font-mono flex items-center justify-center text-sm">
+                            {char}
+                          </div>
+                          <input
+                            type="text"
+                            value={settings.customWords[char] || ""}
+                            onChange={(e) => updateCustomWord(char, e.target.value)}
+                            placeholder={`Spelling for ${char}`}
+                            className="flex-1 bg-black/10 hover:bg-black/20 focus:bg-slate-900/90 border border-slate-500/10 focus:border-slate-500/30 p-1.5 rounded-md text-[11px] font-medium text-slate-100 placeholder-slate-500 transition-all focus:outline-hidden"
+                          />
+                          <button
+                            onClick={() => triggerVoiceTest(char)}
+                            className="p-1 px-1.5 rounded bg-slate-850 hover:bg-slate-700 text-slate-300 transition-all cursor-pointer active:scale-95 flex items-center justify-center"
+                            title="Test Speech"
+                          >
+                            <Volume2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleRemoveCustomWord(char)}
+                            className="p-1 px-1.5 rounded bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white transition-all cursor-pointer active:scale-95 flex items-center justify-center"
+                            title="Remove Word"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
