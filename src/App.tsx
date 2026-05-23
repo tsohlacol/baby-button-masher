@@ -1235,7 +1235,7 @@ export default function App() {
                           </div>
 
                           {/* REAL-TIME ROLL MONITOR RADAR FOR STATS (SUBCONSCIOUS FEEDBACK) */}
-                          <div className="absolute bottom-6 left-6 z-40 bg-black/75 border border-white/5 backdrop-blur-md text-white px-4 py-2 rounded-2xl font-mono text-[9px] text-left pointer-events-none flex items-center gap-4 shadow-xl">
+                          <div className="absolute bottom-6 left-6 z-40 bg-black/75 border border-white/5 backdrop-blur-md text-white px-4 py-2 rounded-2xl font-mono text-[9px] text-left flex items-center gap-4 shadow-xl">
                             <div>
                               <span className="text-white/40 block">BEHAVIOR TEMPO</span>
                               <span className="font-bold text-indigo-400">
@@ -1243,12 +1243,30 @@ export default function App() {
                               </span>
                             </div>
                             <div className="border-l border-white/10 h-6" />
-                            <div>
-                              <span className="text-white/40 block">PLAY MODE STATE</span>
+                            {/* Click to cycle through play modes manually */}
+                            <button
+                              className="text-left cursor-pointer hover:bg-white/10 rounded-lg px-2 -mx-2 py-1 -my-1 transition-colors"
+                              onClick={() => {
+                                const idx = PLAY_MODES.indexOf(currentPlayMode);
+                                setCurrentPlayMode(PLAY_MODES[(idx + 1) % PLAY_MODES.length]);
+                              }}
+                            >
+                              <span className="text-white/40 block">PLAY MODE ▶</span>
                               <span className="font-bold text-pink-400 uppercase">
-                                {currentPlayMode.replace("_", " ")}
+                                {currentPlayMode.replaceAll("_", " ")}
                               </span>
-                            </div>
+                            </button>
+                            <div className="border-l border-white/10 h-6" />
+                            {/* Click to toggle auto-switch on/off */}
+                            <button
+                              className="text-left cursor-pointer hover:bg-white/10 rounded-lg px-2 -mx-2 py-1 -my-1 transition-colors"
+                              onClick={() => setSettings((p) => ({ ...p, autoModeSwitchEnabled: !p.autoModeSwitchEnabled }))}
+                            >
+                              <span className="text-white/40 block">AUTO-SWITCH</span>
+                              <span className={`font-bold uppercase ${settings.autoModeSwitchEnabled ? "text-emerald-400" : "text-white/30"}`}>
+                                {settings.autoModeSwitchEnabled ? "ON" : "OFF"}
+                              </span>
+                            </button>
                           </div>
                         </>
                       )}
