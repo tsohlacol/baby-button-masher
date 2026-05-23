@@ -119,8 +119,25 @@ namespace ToddlerScreenDefender
                 };
 
                 string debugFlag = TsdLog.IsEnabled ? "true" : "false";
+
+                // In debug mode, patch console.log/warn/error to forward messages to TsdLog
+                // via the WebMessageReceived channel (ConsoleMessageReceived requires a newer SDK).
+                string consoleOverride = TsdLog.IsEnabled ? @"
+(function(){
+    ['log','warn','error'].forEach(function(lvl){
+        var orig = console[lvl].bind(console);
+        console[lvl] = function(){
+            orig.apply(console, arguments);
+            try {
+                var msg = '[JS:' + lvl + '] ' + Array.prototype.slice.call(arguments).join(' ');
+                if (window.chrome && window.chrome.webview) window.chrome.webview.postMessage(msg);
+            } catch(e) {}
+        };
+    });
+})();" : "";
+
                 await WebViewControl.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(
-                    $"window.TSD_MONITORS = {monitorsJson}; window.TSD_DEBUG = {debugFlag};");
+                    $"window.TSD_MONITORS = {monitorsJson}; window.TSD_DEBUG = {debugFlag}; {consoleOverride}");
 
                 if (Directory.Exists(localAppPath) && File.Exists(indexPath))
                 {
