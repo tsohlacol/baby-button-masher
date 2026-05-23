@@ -60,8 +60,9 @@ export default function SpeakKeyView({ lastEvent, voiceName, speechRate, speechP
       sayPhrase = `${matchInfo.word}!`;
     }
 
-    // Trigger Speech synthesis!
-    speakToddlerText(sayPhrase, { name: voiceName, rate: speechRate, pitch: speechPitch });
+    if (speechEnabled) {
+      speakToddlerText(sayPhrase, { name: voiceName, rate: speechRate, pitch: speechPitch });
+    }
 
     // Spawn 8-12 beautiful little floating bubble matches
     const newBubbles: LetterBubble[] = Array.from({ length: 10 }).map((_, idx) => ({
