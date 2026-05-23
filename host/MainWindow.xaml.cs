@@ -102,20 +102,19 @@ namespace ToddlerScreenDefender
                     TsdLog.Write($"Navigation starting: {args.Uri}");
                 WebViewControl.CoreWebView2.NavigationCompleted += OnNavigationCompleted;
 
-                // Log all JS console output in debug mode so React errors are visible in the log.
-                if (TsdLog.IsEnabled)
-                {
-                    WebViewControl.CoreWebView2.ConsoleMessageReceived += (s, args) =>
-                        TsdLog.Write($"[JS:{args.Level}] {args.Message}  ({args.Source}:{args.Line})");
-                }
-
                 // Primary signal: React posts 'tsd:ready' after its first paint via setTimeout(0).
+                // In debug mode all JS console output is also forwarded as web messages.
                 WebViewControl.CoreWebView2.WebMessageReceived += (s, args) =>
                 {
-                    if (args.TryGetWebMessageAsString() == "tsd:ready")
+                    var raw = args.TryGetWebMessageAsString();
+                    if (raw == "tsd:ready")
                     {
                         TsdLog.Write("Received tsd:ready from React");
                         _readyTcs.TrySetResult();
+                    }
+                    else if (TsdLog.IsEnabled && raw != null)
+                    {
+                        TsdLog.Write(raw);
                     }
                 };
 
