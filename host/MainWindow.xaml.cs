@@ -300,7 +300,6 @@ namespace ToddlerScreenDefender
 
     [ComImport]
     [Guid("C2F03A33-21F5-47FA-B4BB-156362A2F239")]
-    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     internal class CImmersiveShell { }
 
     [ComImport]
