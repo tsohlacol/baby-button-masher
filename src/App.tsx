@@ -86,6 +86,41 @@ const THEME_PRESETS = {
   },
 };
 
+const SETTINGS_KEY = "tsd-parent-settings";
+
+const DEFAULT_SETTINGS: ParentSettings = {
+  speechEnabled: true,
+  speechVoiceName: "",
+  speechRate: 0.85,
+  speechPitch: 1.3,
+  soundEffectsEnabled: true,
+  autoModeSwitchEnabled: true,
+  activeMode: ScreensaverMode.SPEAK_THE_KEY,
+  unlockRequirement: "math",
+  theme: "cosmic",
+  customWords: {
+    A: "Alice 💖",
+    M: "Mommy Bear 🐻",
+    D: "Daddy Shark 🦈",
+  },
+  volumeLimit: 0.3,
+  multiMonitorStrategy: "mirror",
+  parentPin: "1234",
+  passcodeUnlockEnabled: false,
+};
+
+/** Load persisted settings from localStorage, falling back to defaults for any missing keys. */
+function loadSettings(): ParentSettings {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return DEFAULT_SETTINGS;
+    // Shallow-merge so fields added in future versions always have their defaults.
+    return { ...DEFAULT_SETTINGS, ...(JSON.parse(raw) as Partial<ParentSettings>) };
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
 export default function App() {
   // Page states: "dashboard" | "locked_screensaver" | "sandbox"
   const [appState, setAppState] = useState<"dashboard" | "sandbox">("dashboard");
@@ -93,27 +128,8 @@ export default function App() {
   // Voice list loaded state
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
 
-  // Settings state
-  const [settings, setSettings] = useState<ParentSettings>({
-    speechEnabled: true,
-    speechVoiceName: "",
-    speechRate: 0.85,
-    speechPitch: 1.3,
-    soundEffectsEnabled: true,
-    autoModeSwitchEnabled: true,
-    activeMode: ScreensaverMode.SPEAK_THE_KEY,
-    unlockRequirement: "math",
-    theme: "cosmic",
-    customWords: {
-      A: "Alice 💖",
-      M: "Mommy Bear 🐻",
-      D: "Daddy Shark 🦈",
-    },
-    volumeLimit: 0.3,
-    multiMonitorStrategy: "mirror",
-    parentPin: "1234",
-    passcodeUnlockEnabled: false,
-  });
+  // Settings state — initialised from localStorage, persisted on every change
+  const [settings, setSettings] = useState<ParentSettings>(loadSettings);
 
   // Synchronize audio.ts master volume with parent settings volume limit
   useEffect(() => {
