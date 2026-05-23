@@ -1107,6 +1107,17 @@ export default function App() {
                         />
                       )}
 
+                      {currentPlayMode === ScreensaverMode.SPACE_EXPLORER && (
+                        <SpaceExplorerView
+                          lastEvent={lastKeystroke}
+                          voiceName={settings.speechVoiceName}
+                          speechRate={settings.speechRate}
+                          speechPitch={settings.speechPitch}
+                          speechEnabled={settings.speechEnabled}
+                          soundEnabled={settings.soundEffectsEnabled}
+                        />
+                      )}
+
                       {/* BACKGROUND CONTINUOUS MOUSE-CLICK EMITTER LISTENER FOR SANDBOX */}
                       {currentPlayMode !== ScreensaverMode.MOUSE_DRAWING && (
                         <div 
