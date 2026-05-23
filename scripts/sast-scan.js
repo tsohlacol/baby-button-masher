@@ -5,6 +5,7 @@
  */
 
 import fs from 'fs';
+import path from 'path';
 import { scanDirectory, RESET, BOLD, GREEN, YELLOW, RED, CYAN } from './scan-utils.js';
 
 console.log(`${BOLD}${CYAN}=====================================================${RESET}`);
