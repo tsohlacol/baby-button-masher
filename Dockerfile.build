@@ -27,32 +27,36 @@ RUN dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleF
 # =========================================================
 FROM ubuntu:22.04 AS installer-builder
 ENV DEBIAN_FRONTEND=noninteractive
+ENV WINEDEBUG=-all
+ENV WINEARCH=win32
+ENV WINEPREFIX=/opt/wine-inno
 
-# Install Wine to run Windows-based Inno Setup compiler
+# Install Wine and Xvfb (virtual framebuffer needed for headless Wine installer)
 RUN dpkg --add-architecture i386 && apt-get update && apt-get install -y \
     wine \
     wine32 \
-    wine64 \
     curl \
-    unzip \
-    innoextract \
+    xvfb \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Inno Setup via innoextract
+# Initialize the Wine prefix before running any executables
+RUN wineboot --init
+
+# Download and silently install Inno Setup 6 via Wine
+# innoextract is not used: Ubuntu 22.04 ships version 1.9 which cannot parse IS 6.2+
 WORKDIR /inno
-RUN (curl -fSL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" "https://files.jrsoftware.org/is/6/innosetup-6.2.2.exe" -o innosetup.exe || \
-     curl -fSL -A "Mozilla/5.0" "http://files.jrsoftware.org/is/6/innosetup-6.2.2.exe" -o innosetup.exe || \
-     curl -fSL -A "Mozilla/5.0" "https://jrsoftware.org/download.php/is.exe" -o innosetup.exe) \
-    && innoextract innosetup.exe \
+RUN curl -fSL "https://jrsoftware.org/download.php/is.exe" -o innosetup.exe \
+    && xvfb-run --auto-servernum wine innosetup.exe /SP- /VERYSILENT /SUPPRESSMSGBOXES /NORESTART \
     && rm innosetup.exe
 
-# Copy installer specification and compiled binary
+# Copy installer specification, license, and compiled binary
 WORKDIR /build
 COPY installer.iss .
+COPY EULA.txt .
 COPY --from=native-builder /publish ./bin/publish/
 
-# Compile installer setup.exe
-RUN wine /inno/app/ISCC.exe installer.iss
+# Compile installer setup.exe using Inno Setup Console Compiler
+RUN wine "C:\\Program Files\\Inno Setup 6\\ISCC.exe" installer.iss
 
 # =========================================================
 # FINAL RUNTIME: Output Extractor
