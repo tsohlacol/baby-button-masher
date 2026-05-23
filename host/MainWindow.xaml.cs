@@ -283,14 +283,13 @@ namespace ToddlerScreenDefender
                     swallowKeystroke = true;
                 }
 
-                // 2. Block Alt+Tab and Alt+Esc (Alt+F4 passes through so the parent can close the app)
+                // 2. Block all Alt+key combinations except Alt+F4.
+                // Alt+F4 is preserved so a parent can close the app.
+                // Everything else (Alt+Tab, Alt+Esc, Alt+Z for Nvidia Game Bar, etc.) is blocked.
                 bool altPressed = IsModifierKeyDown(VK_LMENU) || IsModifierKeyDown(VK_RMENU);
-                if (altPressed)
+                if (altPressed && vkCode != VK_F4)
                 {
-                    if (vkCode == VK_TAB || vkCode == VK_ESCAPE)
-                    {
-                        swallowKeystroke = true;
-                    }
+                    swallowKeystroke = true;
                 }
 
                 // 3. Block Ctrl+Esc (Start menu) and Ctrl+Shift+Esc (Task Manager).
