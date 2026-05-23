@@ -12,6 +12,31 @@ interface FireworksProps {
   theme: "cosmic" | "pastel" | "forest" | "rainbow";
 }
 
+// Maps each typeable key to a normalized (x, y) screen position that mirrors its
+// physical location on a standard QWERTY keyboard.
+// x=0 is the far-left edge, x=1 is the far-right edge; y=0 is top, y=1 is bottom.
+const KEY_POSITIONS: Record<string, [number, number]> = {
+  // Number row (y ≈ 0.08)
+  "`": [0.03, 0.08],
+  "1": [0.07, 0.08], "2": [0.15, 0.08], "3": [0.23, 0.08], "4": [0.31, 0.08],
+  "5": [0.39, 0.08], "6": [0.47, 0.08], "7": [0.55, 0.08], "8": [0.63, 0.08],
+  "9": [0.71, 0.08], "0": [0.79, 0.08], "-": [0.87, 0.08], "=": [0.92, 0.08],
+  // QWERTY row (y ≈ 0.28, slight right offset for Tab)
+  "q": [0.10, 0.28], "w": [0.18, 0.28], "e": [0.26, 0.28], "r": [0.34, 0.28],
+  "t": [0.42, 0.28], "y": [0.50, 0.28], "u": [0.58, 0.28], "i": [0.66, 0.28],
+  "o": [0.74, 0.28], "p": [0.82, 0.28], "[": [0.88, 0.28], "]": [0.93, 0.28],
+  // ASDF row (y ≈ 0.52, CapsLock offset)
+  "a": [0.12, 0.52], "s": [0.20, 0.52], "d": [0.28, 0.52], "f": [0.36, 0.52],
+  "g": [0.44, 0.52], "h": [0.52, 0.52], "j": [0.60, 0.52], "k": [0.68, 0.52],
+  "l": [0.76, 0.52], ";": [0.84, 0.52], "'": [0.90, 0.52],
+  // ZXCV row (y ≈ 0.74, large Shift offset)
+  "z": [0.16, 0.74], "x": [0.24, 0.74], "c": [0.32, 0.74], "v": [0.40, 0.74],
+  "b": [0.48, 0.74], "n": [0.56, 0.74], "m": [0.64, 0.74],
+  ",": [0.72, 0.74], ".": [0.80, 0.74], "/": [0.87, 0.74],
+  // Space bar
+  " ": [0.50, 0.92],
+};
+
 const THEME_COLORS: Record<string, string[]> = {
   cosmic: ["#a855f7", "#3b82f6", "#06b6d4", "#ec4899", "#f43f5e", "#e11d48"],
   pastel: ["#fbcfe8", "#c084fc", "#93c5fd", "#a7f3d0", "#fef08a", "#fda4af"],
