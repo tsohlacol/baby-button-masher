@@ -105,6 +105,12 @@ build-installer:
 	./build-installer.sh
 
 run: build
+	@command -v dotnet >/dev/null 2>&1 || { \
+		echo "Error: 'dotnet' not found."; \
+		echo "  make run requires .NET 8 SDK and only works on Windows (WPF is Windows-only)."; \
+		echo "  To build the Windows installer from any OS, use: make build-installer"; \
+		exit 1; \
+	}
 	@echo "==> Syncing React build outputs to C# WPF layout asset folders..."
 	@mkdir -p host/assets/react-app
 	@cp -R dist/* host/assets/react-app/
