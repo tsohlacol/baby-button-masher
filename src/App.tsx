@@ -720,7 +720,7 @@ export default function App() {
                       onChange={(e) => setSettings((p) => ({ ...p, volumeLimit: parseFloat(e.target.value) }))}
                       className="w-full h-1 bg-black/20 rounded-lg appearance-none cursor-pointer accent-indigo-500"
                     />
-                    <span className="text-[10px] text-slate-400 block mt-0.5">Locks absolute maximum gain. Restricts toddler sound slamming.</span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">Locks absolute maximum gain.</span>
                   </div>
 
                   <div className="flex gap-4 items-center border-t border-slate-500/10 pt-4">
