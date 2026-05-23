@@ -614,15 +614,12 @@ export default function App() {
             </div>
 
             {/* COLUMN 2: SPEECH SYNTHESIS & SOUNDS */}
-            <div className={`p-6 rounded-3xl flex flex-col justify-between ${activeTheme.cardBg}`}>
+            <div className={`p-5 rounded-3xl flex flex-col ${activeTheme.cardBg} overflow-y-auto`}>
               <div>
-                <h3 className="text-lg font-bold flex items-center gap-2 mb-4">
-                  <Volume2 className="w-5 h-5 text-indigo-500" />
-                  <span>Speech Voice & Audio Settings</span>
+                <h3 className="text-base font-bold flex items-center gap-2 mb-4 shrink-0">
+                  <Volume2 className="w-4 h-4 text-indigo-500" />
+                  <span>Speech Voice &amp; Audio</span>
                 </h3>
-                <p className={`text-xs ${activeTheme.textMuted} mb-6`}>
-                  Adjust synthetic rate, pitch, and voice models. Double-click any key below to hear a test preview.
-                </p>
 
                 {/* Voice Selection */}
                 <div className="space-y-4 text-xs">
