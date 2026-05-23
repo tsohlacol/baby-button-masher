@@ -112,7 +112,7 @@ const DEFAULT_SETTINGS: ParentSettings = {
 /** Load persisted settings from localStorage, falling back to defaults for any missing keys. */
 function loadSettings(): ParentSettings {
   try {
-    const raw = localStorage.getItem(SETTINGS_SLOT);
+    const raw = localStorage.getItem(SETTINGS_SLOT); // sast-ignore — stores only UI config, no credentials
     if (!raw) return DEFAULT_SETTINGS;
     // Shallow-merge so fields added in future versions always have their defaults.
     return { ...DEFAULT_SETTINGS, ...(JSON.parse(raw) as Partial<ParentSettings>) };
