@@ -131,6 +131,11 @@ export default function App() {
   // Settings state — initialised from localStorage, persisted on every change
   const [settings, setSettings] = useState<ParentSettings>(loadSettings);
 
+  // Persist settings to localStorage whenever they change
+  useEffect(() => {
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* quota / private-mode */ }
+  }, [settings]);
+
   // Synchronize audio.ts master volume with parent settings volume limit
   useEffect(() => {
     setAudioVolumeLimit(settings.volumeLimit);
