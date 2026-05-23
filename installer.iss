@@ -30,13 +30,13 @@ Source: "bin\publish\ToddlerScreenDefender.exe"; DestDir: "{app}"; Flags: ignore
 Source: "bin\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\Toddler Screen Defender"; Filename: "{app}\ToddlerScreenDefender.exe"
-Name: "{autodesktop}\Toddler Screen Defender"; Filename: "{app}\ToddlerScreenDefender.exe"; Tasks: desktopicon
-Name: "{autodesktop}\Toddler Screen Defender (Debug)"; Filename: "{app}\ToddlerScreenDefender.exe"; Parameters: "--debug"; Tasks: debugdesktopicon
+Name: "{group}\Baby Button Masher"; Filename: "{app}\ToddlerScreenDefender.exe"
+Name: "{autodesktop}\Baby Button Masher"; Filename: "{app}\ToddlerScreenDefender.exe"; Tasks: desktopicon
+Name: "{autodesktop}\Baby Button Masher (Debug)"; Filename: "{app}\ToddlerScreenDefender.exe"; Parameters: "--debug"; Tasks: debugdesktopicon
 
 
 [Run]
-Filename: "{app}\ToddlerScreenDefender.exe"; Description: "{cm:LaunchProgram,Toddler Screen Defender}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\ToddlerScreenDefender.exe"; Description: "{cm:LaunchProgram,Baby Button Masher}"; Flags: nowait postinstall skipifsilent
 Filename: "notepad.exe"; Parameters: "{log}"; Description: "Open install log"; Flags: postinstall skipifsilent unchecked
 
 [UninstallRun]
