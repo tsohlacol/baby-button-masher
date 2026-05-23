@@ -6,7 +6,7 @@
  * @license TSD-RCL
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Lock,
