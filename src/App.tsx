@@ -139,6 +139,16 @@ export default function App() {
   const keyEventsRef = useRef<number[]>([]);
   const longPressTimerRef = useRef<any>(null);
 
+  // Refs so the keydown handler reads current values without needing to re-register on every state change
+  const isExitOverlayOpenRef = useRef(false);
+  const isPasscodeOverlayOpenRef = useRef(false);
+  const currentPlayModeRef = useRef(currentPlayMode);
+  const soundEffectsEnabledRef = useRef(settings.soundEffectsEnabled);
+  useEffect(() => { isExitOverlayOpenRef.current = isExitOverlayOpen; }, [isExitOverlayOpen]);
+  useEffect(() => { isPasscodeOverlayOpenRef.current = isPasscodeOverlayOpen; }, [isPasscodeOverlayOpen]);
+  useEffect(() => { currentPlayModeRef.current = currentPlayMode; }, [currentPlayMode]);
+  useEffect(() => { soundEffectsEnabledRef.current = settings.soundEffectsEnabled; }, [settings.soundEffectsEnabled]);
+
   // Load browser voices once on mount; re-run whenever the browser voice list updates
   useEffect(() => {
     const loadVoices = () => setVoices(getAvailableVoices());
