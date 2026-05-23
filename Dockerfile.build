@@ -35,14 +35,15 @@ RUN dpkg --add-architecture i386 && apt-get update && apt-get install -y \
     wine64 \
     curl \
     unzip \
+    innoextract \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Inno Setup
+# Install Inno Setup via innoextract
 WORKDIR /inno
 RUN (curl -fSL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" "https://files.jrsoftware.org/is/6/innosetup-6.2.2.exe" -o innosetup.exe || \
      curl -fSL -A "Mozilla/5.0" "http://files.jrsoftware.org/is/6/innosetup-6.2.2.exe" -o innosetup.exe || \
      curl -fSL -A "Mozilla/5.0" "https://jrsoftware.org/download.php/is.exe" -o innosetup.exe) \
-    && wine innosetup.exe /SILENT /VERYSILENT /SUPPRESSMSGBOXES /NORESTART \
+    && innoextract innosetup.exe \
     && rm innosetup.exe
 
 # Copy installer specification and compiled binary
@@ -51,7 +52,7 @@ COPY installer.iss .
 COPY --from=native-builder /publish ./bin/publish/
 
 # Compile installer setup.exe
-RUN wine "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+RUN wine /inno/app/ISCC.exe installer.iss
 
 # =========================================================
 # FINAL RUNTIME: Output Extractor

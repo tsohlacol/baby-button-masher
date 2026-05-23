@@ -1,5 +1,5 @@
 # Toddler Screen Defender (TSD) Build, Test, and Security Audit Makefile
-.PHONY: all setup build lint test sast sca dast secrets malware security-audit build-installer clean help
+.PHONY: all setup build lint test sast sca dast secrets malware security-audit build-installer run clean help
 
 all: setup test build-installer
 	@echo "==> Packaging local installer and creating a zipped package..."
@@ -34,6 +34,7 @@ help:
 	@echo "  malware          - Scan workspace scripts and binaries for signatures, mines, and backdoors"
 	@echo "  security-audit   - Run full five-tier security scanner suite (SAST + SCA + DAST + Secrets + Malware)"
 	@echo "  build-installer  - Run Docker compilation container to assemble Windows Host and Installer"
+	@echo "  run              - Build the React frontend, sync assets, and boot the WPF app locally via dotnet run"
 	@echo "  clean            - Clear previous build folders and installer targets"
 
 setup:
@@ -70,6 +71,13 @@ test: lint build security-audit
 build-installer:
 	@chmod +x ./build-installer.sh
 	./build-installer.sh
+
+run: build
+	@echo "==> Syncing React build outputs to C# WPF layout asset folders..."
+	@mkdir -p host/assets/react-app
+	@cp -R dist/* host/assets/react-app/
+	@echo "==> Booting Toddler Screen Defender locally..."
+	dotnet run --project host/ToddlerScreenDefender.csproj
 
 clean:
 	rm -rf dist
