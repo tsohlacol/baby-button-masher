@@ -14,6 +14,7 @@ interface SpeakKeyProps {
   voiceName: string;
   speechRate: number;
   speechPitch: number;
+  speechEnabled: boolean;
 }
 
 // Sparkle drift particle interface for specific letter
