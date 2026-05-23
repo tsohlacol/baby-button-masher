@@ -14,3 +14,12 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>,
 );
+
+// Signal the WPF host that React has painted and the splash can fade out.
+// setTimeout(0) schedules a macrotask, which the browser only runs after the
+// current paint cycle finishes — so the splash never drops before the first frame.
+setTimeout(() => {
+  if ((window as any).chrome?.webview) {
+    (window as any).chrome.webview.postMessage('tsd:ready');
+  }
+}, 0);
