@@ -43,6 +43,16 @@ import KeyboardPianoView from "./components/KeyboardPianoView";
 import SpaceRocketView from "./components/SpaceRocketView";
 import MouseDrawingView from "./components/MouseDrawingView";
 
+// Ordered list used for manual mode cycling via the status pill
+const PLAY_MODES: ScreensaverMode[] = [
+  ScreensaverMode.SPEAK_THE_KEY,
+  ScreensaverMode.ANIMAL_PARADE,
+  ScreensaverMode.COSMIC_FIREWORKS,
+  ScreensaverMode.KEYBOARD_PIANO,
+  ScreensaverMode.SPACE_ROCKET,
+  ScreensaverMode.MOUSE_DRAWING,
+];
+
 const THEME_PRESETS = {
   cosmic: {
     bg: "bg-[#0a0a1a] text-white",
