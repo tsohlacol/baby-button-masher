@@ -16,10 +16,13 @@ createRoot(document.getElementById('root')!).render(
 );
 
 // Signal the WPF host that React has painted and the splash can fade out.
-// setTimeout(0) schedules a macrotask, which the browser only runs after the
-// current paint cycle finishes — so the splash never drops before the first frame.
-setTimeout(() => {
-  if ((window as any).chrome?.webview) {
-    (window as any).chrome.webview.postMessage('tsd:ready');
-  }
-}, 0);
+// Double requestAnimationFrame ensures the signal fires only after the browser
+// has committed the first frame to the GPU, eliminating the black flash caused
+// by signalling before the compositor has rasterized React's initial render.
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    if ((window as any).chrome?.webview) {
+      (window as any).chrome.webview.postMessage('tsd:ready');
+    }
+  });
+});
