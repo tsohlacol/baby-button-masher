@@ -86,7 +86,7 @@ const THEME_PRESETS = {
   },
 };
 
-const SETTINGS_KEY = "tsd-parent-settings";
+const SETTINGS_SLOT = "tsd-parent-settings";
 
 const DEFAULT_SETTINGS: ParentSettings = {
   speechEnabled: true,
@@ -112,7 +112,7 @@ const DEFAULT_SETTINGS: ParentSettings = {
 /** Load persisted settings from localStorage, falling back to defaults for any missing keys. */
 function loadSettings(): ParentSettings {
   try {
-    const raw = localStorage.getItem(SETTINGS_KEY);
+    const raw = localStorage.getItem(SETTINGS_SLOT);
     if (!raw) return DEFAULT_SETTINGS;
     // Shallow-merge so fields added in future versions always have their defaults.
     return { ...DEFAULT_SETTINGS, ...(JSON.parse(raw) as Partial<ParentSettings>) };
@@ -133,7 +133,7 @@ export default function App() {
 
   // Persist settings to localStorage whenever they change
   useEffect(() => {
-    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* quota / private-mode */ }
+    try { localStorage.setItem(SETTINGS_SLOT, JSON.stringify(settings)); } catch { /* quota / private-mode */ }
   }, [settings]);
 
   // Synchronize audio.ts master volume with parent settings volume limit
