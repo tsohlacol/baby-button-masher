@@ -1143,6 +1143,10 @@ export default function App() {
                                   if (longPressTimerRef.current) clearInterval(longPressTimerRef.current);
                                   setLongPressProgress(0);
                                 }}
+                                onMouseLeave={() => {
+                                  if (longPressTimerRef.current) clearInterval(longPressTimerRef.current);
+                                  setLongPressProgress(0);
+                                }}
                                 onTouchStart={() => {
                                   longPressTimerRef.current = setInterval(() => {
                                     setLongPressProgress((old) => {
