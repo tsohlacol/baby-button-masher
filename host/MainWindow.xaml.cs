@@ -181,7 +181,9 @@ namespace ToddlerScreenDefender
             {
                 var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
                 var shell = (IShellServiceProvider)(object)new CImmersiveShell();
-                shell.QueryService(ref _clsidVirtualDesktopPinnedApps, ref _iidIVirtualDesktopPinnedApps, out object ppv);
+                var clsid = _clsidVirtualDesktopPinnedApps;
+                var iid  = _iidIVirtualDesktopPinnedApps;
+                shell.QueryService(ref clsid, ref iid, out object ppv);
                 ((IVirtualDesktopPinnedApps)ppv).PinWindow(hwnd);
                 TsdLog.Write("Pinned to all virtual desktops");
             }
