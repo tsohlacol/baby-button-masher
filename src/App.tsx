@@ -886,16 +886,19 @@ export default function App() {
                       <div className="mt-2.5 p-2.5 bg-blue-500/5 border border-blue-500/20 rounded-xl">
                         <label className="block mb-1 text-[10px] font-bold uppercase tracking-wider text-blue-400">Custom 4-Digit Parent PIN</label>
                         <input
-                          type="text"
+                          type="password"
                           maxLength={4}
                           value={settings.parentPin || ""}
                           onChange={(e) => {
                             const val = e.target.value.replace(/\D/g, "").slice(0, 4);
                             setSettings((p) => ({ ...p, parentPin: val }));
                           }}
-                          placeholder="e.g. 1234"
+                          placeholder="Enter 4-digit PIN"
                           className="w-full bg-black/30 border border-blue-500/30 p-1.5 rounded-lg text-xs font-mono text-center tracking-widest text-blue-300 focus:outline-hidden focus:border-blue-400 font-bold"
                         />
+                        {(settings.parentPin === "1234" || !settings.parentPin) && (
+                          <p className="text-[10px] text-yellow-400 mt-1">Change this from the default — "1234" is easily guessed.</p>
+                        )}
                       </div>
                     )}
                   </div>
