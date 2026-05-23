@@ -52,6 +52,7 @@ const PLAY_MODES: ScreensaverMode[] = [
   ScreensaverMode.KEYBOARD_PIANO,
   ScreensaverMode.SPACE_ROCKET,
   ScreensaverMode.MOUSE_DRAWING,
+  ScreensaverMode.SPACE_EXPLORER,
 ];
 
 const THEME_PRESETS = {
