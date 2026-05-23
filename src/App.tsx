@@ -327,13 +327,11 @@ export default function App() {
   };
 
   const verifyMathUnlock = () => {
-    const numericAns = parseInt(parentAnswerInput);
-    if (numericAns === mathSum.answer) {
-      // Exit sandbox play completely!
+    const numericAns = Number(parentAnswerInput.trim());
+    if (!isNaN(numericAns) && numericAns === mathSum.answer) {
       setIsExitOverlayOpen(false);
       setAppState("dashboard");
-      // cancel voice
-      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      cancelSpeech();
     } else {
       setMathErrorMessage("Oops! That's not correct. Try another formula so we know you are mommy/daddy.");
       setParentAnswerInput("");
