@@ -1,4 +1,7 @@
 # Toddler Screen Defender (TSD) Build, Test, and Security Audit Makefile
+SHELL := /bin/bash
+LOG_DIR := logs
+
 .PHONY: all setup build lint test sast sca dast secrets malware security-audit build-installer run clean help
 
 all: setup test build-installer
@@ -38,34 +41,42 @@ help:
 	@echo "  clean            - Clear previous build folders and installer targets"
 
 setup:
-	npm install && npm run build
+	@mkdir -p $(LOG_DIR)
+	npm install && npm run build 2>&1 | tee $(LOG_DIR)/setup.log; exit $${PIPESTATUS[0]}
 
 build:
-	npm run build
+	@mkdir -p $(LOG_DIR)
+	npm run build 2>&1 | tee $(LOG_DIR)/build.log; exit $${PIPESTATUS[0]}
 
 lint:
-	npm run lint
+	@mkdir -p $(LOG_DIR)
+	npm run lint 2>&1 | tee $(LOG_DIR)/lint.log; exit $${PIPESTATUS[0]}
 
 sast:
-	npm run sast
+	@mkdir -p $(LOG_DIR)
+	npm run sast 2>&1 | tee $(LOG_DIR)/sast.log; exit $${PIPESTATUS[0]}
 
 sca:
-	npm run sca
+	@mkdir -p $(LOG_DIR)
+	npm run sca 2>&1 | tee $(LOG_DIR)/sca.log; exit $${PIPESTATUS[0]}
 
 dast:
-	npm run dast
+	@mkdir -p $(LOG_DIR)
+	npm run dast 2>&1 | tee $(LOG_DIR)/dast.log; exit $${PIPESTATUS[0]}
 
 secrets:
-	npm run secrets
+	@mkdir -p $(LOG_DIR)
+	npm run secrets 2>&1 | tee $(LOG_DIR)/secrets.log; exit $${PIPESTATUS[0]}
 
 malware:
-	npm run malware
+	@mkdir -p $(LOG_DIR)
+	npm run malware 2>&1 | tee $(LOG_DIR)/malware.log; exit $${PIPESTATUS[0]}
 
-security-audit:
-	npm run security-audit
+security-audit: sast sca dast secrets malware
 
 test: lint build security-audit
-	npm run test
+	@mkdir -p $(LOG_DIR)
+	npm run test 2>&1 | tee $(LOG_DIR)/test.log; exit $${PIPESTATUS[0]}
 	@echo "All local validation checks, security scans, and parallelized unit tests completed successfully!"
 
 build-installer:
