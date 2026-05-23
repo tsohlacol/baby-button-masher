@@ -13,6 +13,7 @@ export enum ScreensaverMode {
   KEYBOARD_PIANO = "KEYBOARD_PIANO",
   SPACE_ROCKET = "SPACE_ROCKET",
   MOUSE_DRAWING = "MOUSE_DRAWING",
+  SPACE_EXPLORER = "SPACE_EXPLORER",
 }
 
 export interface KeystrokeEvent {
