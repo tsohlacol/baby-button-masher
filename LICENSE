@@ -1,0 +1,26 @@
+Toddler Screen Defender Reciprocal Contribution License (TSD-RCL)
+Version 1.0, May 2026
+
+Copyright (c) 2026 Toddler Screen Defender Contributors (https://github.com/tsohlacol/toddler-screen-defender)
+
+TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION, AND MODIFICATION
+
+1. DEFINITIONS
+"Software" refers to the Toddler Screen Defender program, source code, installers, documentation, and associated assets contained in this repository.
+"Modification" refers to any additions, deletions, refactoring, or functional changes made to the Software's code or visual elements.
+"Configuration" refers to files used solely to configure settings, sound files, custom vocabularies, or personal localization settings (e.g., config sheets, asset swaps, or local language options).
+
+2. GENERAL CONDITIONS
+You are permitted to download, install, run, compile, copy, and distribute verbatim copies of this Software for personal, educational, or organizational use, free of charge, subject to the conditions listed herein.
+
+3. EXCLUSION FOR CONFIGURATIONS
+Modifying, personalization of, or overriding setting parameters within Configuration files does not constitute a "Modification" under this License. You are free to maintain, adjust, and distribute custom configuration presets privately or publicly without any contribution obligations.
+
+4. MANDATORY RECIPROCAL CONTRIBUTION OF MODIFICATIONS
+If you make any Modifications to the Software (including but not limited to changing the React sandbox behavior, updating the native C# wrapper, altering the key-blocking hooks, or expanding the installer scripts) and you distribute, publish, share, or host these modifications (either as binary releases, containerized builds, or publicly viewable source code repositories):
+   a. You MUST make the full modified source code publicly available.
+   b. You MUST submit all functional modifications as a pull request (PR) or patch contribution back to the original upstream repository at: https://github.com/tsohlacol/toddler-screen-defender
+   c. You must grant the upstream maintainers a perpetual, irrevocable, worldwide, royalty-free license to merge, adapt, license, and distribute your contributions under the terms of this license or any subsequent license adopted by the project.
+
+5. NO WARRANTY & LIMITATION OF LIABILITY
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
