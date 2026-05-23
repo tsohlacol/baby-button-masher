@@ -1,5 +1,5 @@
 # Toddler Screen Defender (TSD) Build, Test, and Security Audit Makefile
-.PHONY: install build lint test sast sca dast security-audit build-installer clean help
+.PHONY: install build lint test sast sca dast secrets malware security-audit build-installer clean help
 
 help:
 	@echo "Toddler Screen Defender - Build, Test, and Security Audit Targets:"
@@ -10,7 +10,9 @@ help:
 	@echo "  sast             - Execute static code scanning seeking security vulnerabilities"
 	@echo "  sca              - Execute software composition analysis and license checks"
 	@echo "  dast             - Audit dynamic sandbox frames, overrides, and clickjacking metrics"
-	@echo "  security-audit   - Run full three-tier security scanner suite (SAST + SCA + DAST)"
+	@echo "  secrets          - Inspect workspace files scanning for hardcoded secrets/API keys"
+	@echo "  malware          - Scan workspace scripts and binaries for signatures, mines, and backdoors"
+	@echo "  security-audit   - Run full five-tier security scanner suite (SAST + SCA + DAST + Secrets + Malware)"
 	@echo "  build-installer  - Run Docker compilation container to assemble Windows Host and Installer"
 	@echo "  clean            - Clear previous build folders and installer targets"
 
@@ -31,6 +33,12 @@ sca:
 
 dast:
 	npm run dast
+
+secrets:
+	npm run secrets
+
+malware:
+	npm run malware
 
 security-audit:
 	npm run security-audit

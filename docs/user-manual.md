@@ -69,7 +69,7 @@ If for any reason the application crashes, hangs, or fails to register input val
 
 ## 6. Code Quality, Parallel Unit Testing, and Security Audits
 
-To guarantee the child lockdown portal is resilient against input crashes, memory leaks, and typical security escalation paths, TSD maintains a comprehensive unit testing framework and three-tier automated security pipeline.
+To guarantee the child lockdown portal is resilient against input crashes, memory leaks, and typical security escalation paths, TSD maintains a comprehensive unit testing framework and automated five-tier security pipeline.
 
 ### Parallelized Unit Testing (Vitest)
 Unit and integration tests are powered by **Vitest** for blistering speed. Vitest runs all test files concurrently in distinct worker processes in parallel by default:
@@ -85,44 +85,32 @@ make test
 
 ---
 
-### Three-Tier Automated Security Assessment
+### Five-Tier Automated Security Assessment
 
-We execute three complementary classes of security audits to ensure code integrity:
+We execute five complementary classes of security audits and scans to ensure code integrity:
 
 #### 1. SAST (Static Application Security Testing)
 * **What it is**: Scans the source code files statically to spot anti-patterns, potential injection points, or dynamic evaluators.
-* **Rules checked**:
-  * Safe usage of script compilation loops (disallows `eval` and dynamic `Function` declarations).
-  * Elimination of raw, unsanitized DOM insertion wrappers (`dangerouslySetInnerHTML`).
-  * Prevention of hardcoded secrets, certificates, or static tokens within variables (regex-based entropy matchers).
-* **How to run**:
-  ```bash
-  make sast
-  ```
+* **How to run**: `make sast`
 
 #### 2. SCA (Software Composition Analysis)
-* **What it is**: Audits third-party node packages for public security vulnerabilities (matching against CVE registries) and tracks open-source license compliance.
-* **Rules checked**:
-  * Scans dynamic modules against known security databases (`npm audit`).
-  * Enforces compliance with our copyleft and reciprocal model (**TSD-RCL**), red-flagging infectious licenses such as AGPL or GPL that contradict project terms.
-* **How to run**:
-  ```bash
-  make sca
-  ```
+* **What it is**: Audits third-party node packages for public security vulnerabilities (matching against CVE registries via `npm audit` integration) and tracks open-source license compliance against copyleft restrictions (preventing infectious GPL/AGPL inclusions).
+* **How to run**: `make sca`
 
 #### 3. DAST (Dynamic Application Security Testing)
-* **What it is**: Evaluates the client-side active runtime conditions to block overlay clickjacking or window escape routes.
-* **Rules checked**:
-  * Inspects `index.html` for secure viewport restraints and content-security headers.
-  * Audits applet permission scopes in `metadata.json` to ensure camera/microphone access is denied or strictly restricted.
-  * Ensures active event handlers intercept user keyboards cleanly, invoking `preventDefault()` blocks on every masher keystroke.
-* **How to run**:
-  ```bash
-  make dast
-  ```
+* **What it is**: Evaluates active dynamic parameters, event wrappers, index view security limits, and package permission controls.
+* **How to run**: `make dast`
+
+#### 4. Hardcoded Secrets Scanning
+* **What it is**: Continuously inspects workspace configuration settings, `.env` scripts, packages, and code lines matching against high-entropy variables or regular expression databases (e.g. Google/Gemini API key formats, AWS client credential patterns, private authentication keys, as well as Slack webhook URLs) to eliminate git leak risks.
+* **How to run**: `make secrets`
+
+#### 5. Malware & Cryptomining Signature Scanning
+* **What it is**: Actively scans workspace scripts, servers, and modules for indications of compromise (IOCs), trojan shells, reverse bash/netcat socket spawning, cryptocurrency miner injections (Coinhive, etc.), high-risk external executable downloads, and dynamic payloads execution.
+* **How to run**: `make malware`
 
 #### Complete Security Pipeline Audit
-To audit all three security scanners (SAST + SCA + DAST) in a single command, run:
+To audit all five security scanners concurrently, run:
 ```bash
 make security-audit
 ```

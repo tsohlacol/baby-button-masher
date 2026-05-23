@@ -112,7 +112,59 @@ TSD works on two logical tiers:
 
 ## 5. Summary of Compliance
 
-Through the implementation of the three-tier automated verification pipeline (**SAST, SCA, and DAST**), the following are continuously validated:
-*   **Static Safety (SAST):** Zero instances of dynamic compilation, script injection sinks, or hardcoded tokens within variables.
-*   **Supply Chain Safety (SCA):** Strict compliance with the **TSD-RCL License** prevents dependency contamination.
-*   **Active Defense (DAST):** Complete operational trapping of all relevant keystroke propagation bubbles, preventing leakage to background applications.
+Through the implementation of the five-tier automated verification pipeline (**SAST, SCA, DAST, Secrets Scanner, and Malware Scanner**), the following are continuously validated:
+*   **Static Safety (SAST):** Zero instances of dynamic compilation, script injection sinks, or raw HTML insertions.
+*   **Supply Chain Safety (SCA):** Zero unlicensed package dependencies and direct compliance with the reciprocal **TSD-RCL License**.
+*   **Active Defense (DAST):** Complete trapping of keyboard event bubbling routes inside the dynamic render frames.
+*   **Secrets Exposure (Secrets Scanner):** Absence of hardcoded Google/Gemini API keys, AWS credentials, Slack webhooks, and private cert payloads inside repository sources.
+*   **Infection Controls (Malware Scanner):** Total prevention of integrated miner engines, cryptojacking lines, backdoor dynamic execution links, and malicious reverse shell codebases.
+
+---
+
+## 6. Rationale for Custom Lightweight Security Scanners (SAST, SCA, DAST, Secrets, Malware)
+
+Rather than relying purely on heavy, general-purpose enterprise vulnerability scanners, TSD maintains **custom-tailored, lightweight security scanning engines** executed as Node.js scripts (`/scripts/*`).
+
+### Why Custom Scanners Were Created
+
+General-purpose scanners (like SonarQube, Snyk, or OWASP ZAP) are standard for standard cloud enterprises, but they have major blind spots. We tailored these utility scanner scripts to TSD's specific, unique structural requirements:
+
+1.  **Tailored Sandbox Safety Rule Sets (SAST)**
+    *   Standard static engines look for generic server variables or database injection routes, which do not apply to TSD's client-only UI.
+    *   Our custom SAST engine actively filters and targets front-end critical risk factors: verifying that **raw HTML injectors** like `dangerouslySetInnerHTML`, sandbox bypasses like raw `eval()`, and dynamic string constructors like `new Function()` are completely barred from entering the codebase.
+2.  **Reciprocal Copyleft License Compliance (SCA)**
+    *   Standard dependency scanners only report vulnerability CVE databases. They do not know or care about legal licensing alignment!
+    *   Since TSD operates under the reciprocal **TSD-RCL License** model, any copyleft GPL, AGPL, or unauthorized proprietary package could contaminate the upstream core code or disrupt owner distribution rights. Our custom SCA automatically checks dependency declarations directly against strict copyleft licensing blacklists.
+3.  **Active Input Lock Verification (DAST)**
+    *   Standard dynamic scanners (e.g. web application scanners fuzzing port endpoints) are designed for client-server protocol audits. They are entirely blind to front-end browser keyboard-lock mechanics!
+    *   TSD's primary failure mode is a toddler escaping the lock interface via unhandled key bubbles. Our custom DAST dynamically audits browser-locking routines: enforcing that all custom keyboard-blocking listeners call `preventDefault()` and `stopPropagation()` concurrently, and checks runtime permissions constraints (`metadata.json`) to keep the iframe environment securely sealed.
+4.  **Local Dev Leak Protection (Secrets Scanner)**
+    *   Scans configuration settings, `.env` blocks, and scripts specifically targeting credentials layout, blocking inadvertent git commits of live keys.
+5.  **Child Play Safe-Guards (Malware & Miner Engine Scanner)**
+    *   React platforms have faced attacks involving hijacked open-source libraries that inject CPU-intensive crypto-miners (which would make the child interface lag or freeze) or backdoor payload scripts. We enforce an active local malware signature scan as a build gating criteria.
+6.  **Zero-Dependency Portability & Speed**
+    *   Enterprise tools require large Docker images, cloud account tokens, and lengthy startup sequences.
+    *   Our scripts execute in milliseconds with zero dependencies, allowing developers to run `make security-audit` instantly and continuously in local development workspaces and minimal containerized builders.
+
+---
+
+### 6.1 Complementary Hybrid Strategy: Custom vs. Commodity Scanners
+
+We acknowledge that **custom lightweight scripts are not replacements for robust, industry-standard commodity scanners** (like Semgrep, Snyk, SonarQube, or Trivy for dependencies and Microsoft Windows Defender / ClamAV for binary packages). While custom scripts excel at validating specific business logic and contextual front-end constraints (like key propagation or copyleft license violations), they lack the massive heuristic databases, semantic control-flow graph (CFG) parsers, and continuous global CVE tracking possessed by specialized, enterprise scanners.
+
+Consequently, TSD adopts a **Hybrid Security Strategy** that integrates commodity capabilities alongside local custom checks:
+
+1.  **Commodity Vulnerability Core (`npm audit`)**: 
+    Our custom SCA script does not operate in a vacuum. It internally spawns the commodity **`npm audit`** security engine to automatically query the official global registry of vulnerabilities, giving us direct access to thousands of live, community-vouched security alerts.
+2.  **Binary & OS Antivirus Integrity (Microsoft Defender)**:
+    Since the final Windows wrapper is compiled into an executable installer, we recommend passing all production bundles through **Microsoft Defender Antivirus (WSL/Windows Host)** or scanning with **ClamAV** to check compiled installers for malicious code embeddings before final signing.
+3.  **Pipeline Division of Labor**:
+    *   **Custom Local Scanners** run instantly during local development (via `make security-audit`) to prevent basic logical errors (e.g., forgetting a key intercept propagation hook) from ever being committed.
+    *   **CI/CD Commodity Scanners** operate on the repository origin (e.g., GitHub Actions, GitLab CI) using heavy, specialized engines:
+        *   **Semgrep & GitGuardian**: To scan React structures for deep, multi-file code injection vectors, dependency-reachability bugs, secrets leak exposures, and cloud keys.
+        *   **Snyk / Socket.dev**: To continuously monitor our deep dependency trees for newly discovered exploits, malicious supply-chain pull-requests, and security anomalies.
+        *   **OWASP ZAP / Burp Suite DevSecOps**: In staging or production wrappers to check for dynamic runtime frame breakouts and sandbox escapes.
+
+By using this hybrid tiering, TSD preserves extreme local speed and zero-dependency portability without compromising on the deep security coverage provided by professional commodity scanners.
+
+

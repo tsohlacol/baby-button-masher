@@ -13,7 +13,9 @@
     "sast": "node scripts/sast-scan.js",
     "sca": "node scripts/sca-scan.js",
     "dast": "node scripts/dast-scan.js",
-    "security-audit": "npm run sast && npm run sca && npm run dast"
+    "secrets": "node scripts/secrets-scan.js",
+    "malware": "node scripts/malware-scan.js",
+    "security-audit": "npm run sast && npm run sca && npm run dast && npm run secrets && npm run malware"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",
