@@ -1,0 +1,73 @@
+name: Bug Report
+description: Report a bug in Toddler Screen Defender
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Before you submit
+
+        Please run TSD with the `--debug` flag to capture a log, reproduce the bug, then attach the log below.
+
+        **How to run with debug logging:**
+        - **Installed shortcut:** right-click the desktop shortcut, choose **Properties**, append ` --debug` to the **Target** field, then launch normally.
+        - **Command line:** `ToddlerScreenDefender.exe --debug`
+
+        The log is written to `%LOCALAPPDATA%\ToddlerScreenDefender\tsd-debug.log`.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      placeholder: What happened? What did you expect to happen instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Launch TSD
+        2. ...
+        3. Bug occurs
+    validations:
+      required: true
+
+  - type: input
+    id: windows-version
+    attributes:
+      label: Windows version
+      placeholder: "e.g. Windows 11 24H2"
+    validations:
+      required: true
+
+  - type: input
+    id: tsd-version
+    attributes:
+      label: TSD version
+      placeholder: "e.g. 1.0.4 (shown in Add/Remove Programs)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: debug-log
+    attributes:
+      label: Debug log
+      description: >
+        Paste the full contents of `%LOCALAPPDATA%\ToddlerScreenDefender\tsd-debug.log`.
+        You can also drag and drop the file directly into this text area.
+      placeholder: "[paste log contents here]"
+      render: text
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have included a debug log captured with `--debug`
+          required: true
+        - label: I have searched existing issues to confirm this is not a duplicate
+          required: true
