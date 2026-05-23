@@ -81,6 +81,7 @@ function getFrequencyForKey(key: string): { note: string; freq: number } {
 export function playSyntheticPiano(key: string, type: OscillatorType = "sine") {
   try {
     const ctx = getAudioContext();
+    if (!ctx) return;
     const { freq } = getFrequencyForKey(key);
 
     const osc = ctx.createOscillator();
