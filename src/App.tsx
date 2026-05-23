@@ -253,64 +253,49 @@ export default function App() {
     return () => clearInterval(interval);
   }, [appState, settings.autoModeSwitchEnabled, currentPlayMode]);
 
-  // Handler for all toddler play room keystrokes
-  const handleSandboxKeystroke = (e: KeyboardEvent) => {
-    if (appState !== "sandbox") return;
-
-    if (isExitOverlayOpen || isPasscodeOverlayOpen) {
-      // Allow parent key verification entries without mashing intercepts
+  // Handler for all toddler play room keystrokes. Uses refs to read current state so the listener
+  // does not need to be re-registered on every settings or mode change.
+  const handleSandboxKeystroke = useCallback((e: KeyboardEvent) => {
+    if (isExitOverlayOpenRef.current || isPasscodeOverlayOpenRef.current) {
       return;
     }
-
-    // Don't intercept exit key bindings like Ctrl+Alt or developer keys unless standard Toddler key down
     if (e.ctrlKey || e.altKey || (e.key === "f" && (e.metaKey || e.ctrlKey))) {
-      return; 
+      return;
     }
-
-    // Capture standard keys, and block default browser mashing actions (scrolling, page reloads, tab jumps)
     e.preventDefault();
     e.stopPropagation();
-
     const timestamp = Date.now();
-    const keyStr = e.key;
-
-    // Append to rolling tempo trackers
     keyEventsRef.current.push(timestamp);
-
-    setLastKeystroke({
-      key: keyStr,
-      timestamp,
-    });
-
-    // Fire sound effect if on Cosmic mode
-    if (currentPlayMode === ScreensaverMode.COSMIC_FIREWORKS && settings.soundEffectsEnabled) {
+    setLastKeystroke({ key: e.key, timestamp });
+    if (currentPlayModeRef.current === ScreensaverMode.COSMIC_FIREWORKS && soundEffectsEnabledRef.current) {
       playFireworkSynth();
     }
-  };
+  }, []);
 
-  // Intercept events globally inside active sandbox
+  // Welcome speech on sandbox entry
   useEffect(() => {
-    const handleContextMenu = (e: MouseEvent) => {
-      e.preventDefault();
-    };
-
-    if (appState === "sandbox") {
-      window.addEventListener("keydown", handleSandboxKeystroke, { passive: false });
-      window.addEventListener("contextmenu", handleContextMenu, { capture: true });
-      
-      // Let's speak dynamic welcome prompt on enter
+    if (appState !== "sandbox") return;
+    if (settings.speechEnabled) {
       speakToddlerText("Toddler Play Sandbox Activated! Mash keys to play!", {
         name: settings.speechVoiceName,
         rate: settings.speechRate,
         pitch: settings.speechPitch,
       });
     }
+  }, [appState]);
 
+  // Register keyboard and context-menu intercepts for the active sandbox
+  useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => { e.preventDefault(); };
+    if (appState === "sandbox") {
+      window.addEventListener("keydown", handleSandboxKeystroke, { passive: false });
+      window.addEventListener("contextmenu", handleContextMenu, { capture: true });
+    }
     return () => {
       window.removeEventListener("keydown", handleSandboxKeystroke);
       window.removeEventListener("contextmenu", handleContextMenu, { capture: true });
     };
-  }, [appState, currentPlayMode, settings]);
+  }, [appState, handleSandboxKeystroke]);
 
   // Formulates math sum for exit control challenge (add, subtract, or multiply two single digit numbers)
   const startMathUnlockChallenge = () => {
