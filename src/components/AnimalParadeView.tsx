@@ -40,6 +40,14 @@ export default function AnimalParadeView({ lastEvent, soundEnabled }: AnimalPara
   useEffect(() => {
     if (!lastEvent) return;
 
+    // Burst-rate limiter: allow at most MAX_SPAWNS_PER_BURST animals within BURST_WINDOW_MS.
+    // This prevents a rapid key-mash from flooding the screen in one instant while still
+    // letting animals accumulate naturally up to MAX_ANIMALS_ON_SCREEN over time.
+    const now = Date.now();
+    spawnTimestampsRef.current = spawnTimestampsRef.current.filter(t => now - t < BURST_WINDOW_MS);
+    if (spawnTimestampsRef.current.length >= MAX_SPAWNS_PER_BURST) return;
+    spawnTimestampsRef.current.push(now);
+
     // Map character or let it be random
     const keyIndex = (lastEvent.key.charCodeAt(0) || 5) % PARADE_EMOJIS.length;
     const selected = PARADE_EMOJIS[keyIndex];
