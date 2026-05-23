@@ -18,7 +18,7 @@
         <!-- Splash overlay: visible until NavigationCompleted, then fades out -->
         <Grid Name="SplashOverlay" Background="#FF000000">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="Toddler Screen Defender"
+                <TextBlock Text="Baby Button Masher"
                            FontSize="52"
                            FontWeight="Light"
                            FontFamily="Segoe UI"
