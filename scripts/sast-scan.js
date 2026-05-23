@@ -61,7 +61,9 @@ for (const file of fileCollection) {
   lines.forEach((line, index) => {
     // Basic comment stripping for regex match
     if (line.trim().startsWith('//') || line.trim().startsWith('*')) return;
-    
+    // Inline suppression: trailing // sast-ignore marks a known-safe false positive
+    if (line.includes('// sast-ignore')) return;
+
     for (const pattern of SENSITIVE_PATTERNS) {
       pattern.regex.lastIndex = 0; // Reset
       if (pattern.regex.test(line)) {
