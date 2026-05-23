@@ -139,31 +139,31 @@ export default function App() {
   const keyEventsRef = useRef<number[]>([]);
   const longPressTimerRef = useRef<any>(null);
 
-  // Load browser voices
+  // Load browser voices once on mount; re-run whenever the browser voice list updates
   useEffect(() => {
-    const loadVoices = () => {
-      const available = getAvailableVoices();
-      setVoices(available);
-      
-      // Auto-select a friendly voice if not yet chosen
-      if (available.length > 0 && !settings.speechVoiceName) {
-        // Try to find a standard friendly Google/Microsoft child or female voice as default
-        const fallback = available.find(
-          (v) =>
-            v.name.includes("Zira") ||
-            v.name.includes("Natural") ||
-            v.name.includes("Google US English") ||
-            v.lang.startsWith("en")
-        ) || available[0];
-        setSettings((prev) => ({ ...prev, speechVoiceName: fallback.name }));
-      }
-    };
-
+    const loadVoices = () => setVoices(getAvailableVoices());
     loadVoices();
     if (window.speechSynthesis) {
       window.speechSynthesis.onvoiceschanged = loadVoices;
     }
-  }, [settings.speechVoiceName]);
+    return () => {
+      if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = null;
+    };
+  }, []);
+
+  // Auto-select a default voice once the voice list is populated
+  useEffect(() => {
+    if (voices.length > 0 && !settings.speechVoiceName) {
+      const fallback = voices.find(
+        (v) =>
+          v.name.includes("Zira") ||
+          v.name.includes("Natural") ||
+          v.name.includes("Google US English") ||
+          v.lang.startsWith("en")
+      ) || voices[0];
+      setSettings((prev) => ({ ...prev, speechVoiceName: fallback.name }));
+    }
+  }, [voices]);
 
   // Update Clock
   useEffect(() => {
