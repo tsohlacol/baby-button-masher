@@ -39,6 +39,9 @@ namespace ToddlerScreenDefender
         private const int VK_LSHIFT = 0xA0;
         private const int VK_RSHIFT = 0xA1;
 
+        private const int VK_SNAPSHOT = 0x2C;  // Print Screen — triggers OS screen capture, steals WebView2 focus
+        private const int VK_APPS     = 0x5D;  // Context menu key — can surface OS context menus
+
         private static bool IsModifierKeyDown(int vk)
         {
             return (GetKeyState(vk) & 0x8000) != 0;
