@@ -310,6 +310,16 @@ namespace ToddlerScreenDefender
                     swallowKeystroke = true;
                 }
 
+                // 5. Block Print Screen and the context-menu key.
+                // Print Screen triggers an OS-level screen-capture action that briefly pulls focus
+                // away from WebView2, causing all subsequent keyboard events to be dropped until
+                // the child physically taps the screen again. The context-menu key can surface
+                // OS context menus in the same way.
+                if (vkCode == VK_SNAPSHOT || vkCode == VK_APPS)
+                {
+                    swallowKeystroke = true;
+                }
+
                 if (swallowKeystroke)
                 {
                     // Return 1 to swallow keypress, breaking default OS action sequence
