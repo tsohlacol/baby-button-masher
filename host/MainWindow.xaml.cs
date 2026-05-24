@@ -239,6 +239,11 @@ namespace ToddlerScreenDefender
             this.Topmost = true;
             this.Activate();
             this.Focus();
+            // Re-focus the WebView2 control specifically so keyboard events resume flowing into
+            // React. Window.Focus() restores WPF window activation but does not guarantee that
+            // the embedded Chromium process recaptures keyboard delivery — WebViewControl.Focus()
+            // does that explicitly.
+            WebViewControl.Focus();
         }
 
         private static readonly Guid _clsidVirtualDesktopPinnedApps = new Guid("AA509086-5CA9-4C25-8F95-589D3C07B48A");
