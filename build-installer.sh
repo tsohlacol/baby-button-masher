@@ -8,10 +8,10 @@ rm -rf ./build-output
 mkdir -p ./build-output
 
 echo "==> Building installer in isolated Docker container..."
-docker build -t tsd-pipeline -f Dockerfile.build . 2>&1 | tee logs/build-installer.log
+docker build -t bbm-pipeline -f Dockerfile.build . 2>&1 | tee logs/build-installer.log
 
 echo "==> Copying final Windows Installer wrapper straight to ./build-output/ ..."
-docker run --rm -v "$(pwd)/build-output:/output-directory" tsd-pipeline 2>&1 | tee -a logs/build-installer.log
+docker run --rm -v "$(pwd)/build-output:/output-directory" bbm-pipeline 2>&1 | tee -a logs/build-installer.log
 
 echo "========================================================="
 echo " SUCCESS: Windows Installer assembled!"
