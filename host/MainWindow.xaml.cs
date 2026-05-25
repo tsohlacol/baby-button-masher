@@ -216,7 +216,7 @@ namespace BabyButtonMasher
 })();" : "";
 
                 await WebViewControl.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(
-                    $"window.TSD_MONITORS = {monitorsJson}; window.TSD_DEBUG = {debugFlag}; {consoleOverride}");
+                    $"window.BBM_MONITORS = {monitorsJson}; window.BBM_DEBUG = {debugFlag}; {consoleOverride}");
 
                 if (Directory.Exists(localAppPath) && File.Exists(indexPath))
                 {
