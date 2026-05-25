@@ -114,8 +114,8 @@ run: build
 	@echo "==> Syncing React build outputs to C# WPF layout asset folders..."
 	@mkdir -p host/assets/react-app
 	@cp -R dist/* host/assets/react-app/
-	@echo "==> Booting Toddler Screen Defender locally..."
-	dotnet run --project host/ToddlerScreenDefender.csproj
+	@echo "==> Booting Baby Button Masher locally..."
+	dotnet run --project host/BabyButtonMasher.csproj
 
 clean:
 	rm -rf dist
