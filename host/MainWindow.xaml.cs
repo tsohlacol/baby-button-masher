@@ -139,7 +139,7 @@ namespace BabyButtonMasher
 
             // Kick off WebView2 environment creation immediately so it runs in parallel with window setup
             string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string udataFolder = Path.Combine(localAppData, "ToddlerScreenDefender");
+            string udataFolder = Path.Combine(localAppData, "BabyButtonMasher");
             _webView2EnvTask = CoreWebView2Environment.CreateAsync(null, udataFolder);
             TsdLog.Write("WebView2 environment creation started");
         }
