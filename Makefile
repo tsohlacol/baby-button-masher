@@ -1,4 +1,4 @@
-# Toddler Screen Defender (TSD) Build, Test, and Security Audit Makefile
+# Baby Button Masher (BBM) Build, Test, and Security Audit Makefile
 SHELL := /bin/bash
 LOG_DIR := logs
 
