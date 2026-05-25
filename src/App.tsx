@@ -131,14 +131,40 @@ export default function App() {
   // Settings state — initialised from localStorage, persisted on every change
   const [settings, setSettings] = useState<ParentSettings>(loadSettings);
 
-  // Signal the WPF host that React has rendered and the browser has painted.
-  // useEffect fires after the browser has committed the initial render to screen,
-  // so this is the correct place to signal "ready" — unlike requestAnimationFrame
-  // in main.tsx, which fires before React's component tree has committed.
+  // Startup splash overlay — mirrors the WPF SplashOverlay so the transition is seamless.
+  // The WPF airspace problem means WebView2's Win32 HWND always renders in front of WPF
+  // elements, so the WPF splash becomes invisible behind the WebView2 black HWND after
+  // ~1-2 s. This React overlay takes over from that point and provides the full-duration
+  // splash experience. C# calls window.__bbmReveal() after the minimum hold time, which
+  // triggers the CSS fade-out. In dev mode (no webview), the overlay auto-dismisses after
+  // 500 ms so it doesn't block development.
+  const [splashRevealing, setSplashRevealing] = useState(false);
+  const [splashDone, setSplashDone] = useState(false);
+
   useEffect(() => {
     const w = window as any;
-    if (w.chrome?.webview) w.chrome.webview.postMessage('tsd:ready');
+    const inWebView = !!w.chrome?.webview;
+
+    if (!inWebView) {
+      // Dev mode: dismiss quickly so it doesn't block development.
+      const t = setTimeout(() => setSplashRevealing(true), 500);
+      return () => clearTimeout(t);
+    }
+
+    // Signal the WPF host that React has rendered its first paint.
+    w.chrome.webview.postMessage('tsd:ready');
+
+    // C# will call this after the minimum hold time to trigger the fade-out.
+    w.__bbmReveal = () => setSplashRevealing(true);
+    return () => { delete w.__bbmReveal; };
   }, []);
+
+  useEffect(() => {
+    if (!splashRevealing) return;
+    // Remove the overlay element from the DOM after the CSS transition finishes (1.5 s).
+    const t = setTimeout(() => setSplashDone(true), 1600);
+    return () => clearTimeout(t);
+  }, [splashRevealing]);
 
   // Persist settings to localStorage whenever they change
   useEffect(() => {
