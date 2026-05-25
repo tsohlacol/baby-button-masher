@@ -238,17 +238,13 @@ namespace BabyButtonMasher
                 // whichever finishes last wins, so fast machines still see the splash.
                 await Task.WhenAll(Task.Delay(12000), _readyTcs.Task);
 
-                // Wake the Chromium compositor before fading the WPF overlay.
-                // While the WPF splash is fully opaque, Windows DWM marks the WebView2 as
-                // occluded and Chromium throttles compositing to ~0 fps. When the overlay
-                // starts fading and the WebView2 becomes visible, Chromium needs to produce
-                // a fresh frame — but that can take several seconds, causing a black gap.
-                // Executing a double RAF inside Chromium (via ExecuteScriptAsync, which awaits
-                // Promises) forces the compositor to produce two frames so the content is
-                // ready the instant the WPF opacity animation reveals it.
-                var wakeTask = WebViewControl.CoreWebView2.ExecuteScriptAsync(
-                    "new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))");
-                await Task.WhenAny(wakeTask, Task.Delay(500));
+                // Signal React to fade out its own startup splash overlay.
+                // The WPF airspace problem means WebView2's Win32 HWND always renders in
+                // front of WPF elements, so the WPF SplashOverlay is invisible behind the
+                // WebView2 black HWND after ~1-2 s. React renders its own matching splash
+                // overlay and waits for this call before fading it out, eliminating the gap.
+                await WebViewControl.CoreWebView2.ExecuteScriptAsync(
+                    "window.__bbmReveal && window.__bbmReveal()");
 
                 HideSplash();
             }
