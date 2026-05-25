@@ -27,7 +27,7 @@ WORKDIR /src
 # (the only dependency) is not re-downloaded when only source files change.
 COPY host/*.csproj ./host/
 RUN --mount=type=cache,target=/root/.nuget/packages \
-    dotnet restore ./host/ToddlerScreenDefender.csproj -r win-x64 /p:EnableWindowsTargeting=true
+    dotnet restore ./host/BabyButtonMasher.csproj -r win-x64 /p:EnableWindowsTargeting=true
 
 # Copy source and React build, then publish.
 # --no-restore skips the restore phase; packages are read from the cache mount.
