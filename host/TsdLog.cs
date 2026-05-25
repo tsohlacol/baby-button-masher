@@ -19,7 +19,7 @@ namespace BabyButtonMasher
                 AutoFlush = true
             };
             var ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            Write($"TSD {ver} debug log started");
+            Write($"BBM {ver} debug log started");
             Write($"OS: {Environment.OSVersion}");
             Write($"Args: {string.Join(" ", Environment.GetCommandLineArgs())}");
         }
