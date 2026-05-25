@@ -1,9 +1,9 @@
 /**
- * Toddler Screen Defender (TSD)
+ * Baby Button Masher (BBM)
  * Developed/Authored by tsohlacol (https://github.com/tsohlacol/toddler-screen-defender)
- * Certified Open Source Software licensed under the TSD-RCL Reciprocal License.
+ * Certified Open Source Software licensed under the BBM-RCL Reciprocal License.
  *
- * @license TSD-RCL
+ * @license BBM-RCL
  */
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
@@ -130,6 +130,15 @@ export default function App() {
 
   // Settings state — initialised from localStorage, persisted on every change
   const [settings, setSettings] = useState<ParentSettings>(loadSettings);
+
+  // Signal the WPF host that React has rendered and the browser has painted.
+  // useEffect fires after the browser has committed the initial render to screen,
+  // so this is the correct place to signal "ready" — unlike requestAnimationFrame
+  // in main.tsx, which fires before React's component tree has committed.
+  useEffect(() => {
+    const w = window as any;
+    if (w.chrome?.webview) w.chrome.webview.postMessage('tsd:ready');
+  }, []);
 
   // Persist settings to localStorage whenever they change
   useEffect(() => {
@@ -467,8 +476,8 @@ export default function App() {
 
   // Monitor layout is static after launch — compute once and memoize
   const parsedMonitors = useMemo(() => {
-    const list = (window as any).TSD_MONITORS?.length > 0
-      ? (window as any).TSD_MONITORS
+    const list = (window as any).BBM_MONITORS?.length > 0
+      ? (window as any).BBM_MONITORS
       : [{ left: 0, top: 0, width: window.innerWidth, height: window.innerHeight, isPrimary: true }];
     const minLeft = Math.min(...list.map((m: any) => m.left));
     const minTop = Math.min(...list.map((m: any) => m.top));
@@ -606,7 +615,7 @@ export default function App() {
                     </div>
                     <div className="flex justify-between items-center text-slate-400">
                       <span>License:</span>
-                      <span className="text-purple-300 font-bold font-mono">TSD-RCL (Reciprocal)</span>
+                      <span className="text-purple-300 font-bold font-mono">BBM-RCL (Reciprocal)</span>
                     </div>
                   </div>
                 </div>
@@ -1038,7 +1047,7 @@ export default function App() {
                     // Deep Blackout Display for Secondary Screens
                     <div className="w-full h-full bg-black flex flex-col items-center justify-center border-l border-white/5 selection:bg-transparent">
                       <span className="text-[10px] uppercase tracking-widest font-mono text-slate-800 pointer-events-none">
-                        TSD Screen Shield Guard Active • Auxiliary Display Cloaked
+                        BBM Screen Shield Guard Active • Auxiliary Display Cloaked
                       </span>
                     </div>
                   ) : shouldRenderSandbox ? (
