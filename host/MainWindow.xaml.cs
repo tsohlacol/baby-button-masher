@@ -354,33 +354,64 @@ namespace ToddlerScreenDefender
             if (nCode >= HC_ACTION)
             {
                 int vkCode = Marshal.ReadInt32(lParam);
+                bool isKeyDown = wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN;
                 bool swallowKeystroke = false;
 
-                // 1. Block Win Keys
+                // 0. Alt+F4 parent exit — must be checked BEFORE rule 2 swallows Alt.
+                // We use GetAsyncKeyState (hardware state) instead of GetKeyState (message-queue
+                // state) because we swallow VK_LMENU/VK_RMENU below, which means the Alt keydown
+                // never reaches the queue and GetKeyState never reflects it as pressed.
+                // GetAsyncKeyState reads the physical interrupt state and is always accurate.
+                if (isKeyDown && vkCode == VK_F4)
+                {
+                    bool altPhysicallyHeld = (GetAsyncKeyState(VK_LMENU) & 0x8000) != 0 ||
+                                             (GetAsyncKeyState(VK_RMENU) & 0x8000) != 0;
+                    if (altPhysicallyHeld)
+                    {
+                        // Alt is physically held but we swallowed the Alt keydown, so the OS
+                        // message queue won't generate WM_SYSCOMMAND SC_CLOSE on its own.
+                        // Close explicitly via the dispatcher.
+                        Dispatcher.BeginInvoke(() => this.Close());
+                        return (IntPtr)1;
+                    }
+                }
+
+                // 1. Block Win keys.
                 if (vkCode == VK_LWIN || vkCode == VK_RWIN)
                 {
                     swallowKeystroke = true;
                 }
 
-                // 2. Block all Alt+key combinations except Alt+F4.
-                // Alt+F4 is preserved so a parent can close the app.
-                // Everything else (Alt+Tab, Alt+Esc, Alt+Z for Nvidia Game Bar, etc.) is blocked.
+                // 2. Block the Alt key itself and all Alt+key combinations.
+                //
+                // BUG CONTEXT: when Alt first goes down, GetKeyState(VK_LMENU) returns 0 because
+                // the key-state table is updated AFTER CallNextHookEx, not before. This means the
+                // original "altPressed && vkCode != VK_F4" check missed the Alt keydown, letting
+                // it reach the OS menu system or tools like Razer Synapse which then steal focus
+                // from WebView2 and break subsequent keyboard input.
+                //
+                // FIX: also swallow VK_LMENU/VK_RMENU explicitly. The GetKeyState check is kept
+                // as belt-and-suspenders for Alt+key combos where Alt was already held long enough
+                // for the state to be reflected.
+                if (vkCode == VK_LMENU || vkCode == VK_RMENU)
+                {
+                    swallowKeystroke = true;
+                }
                 bool altPressed = IsModifierKeyDown(VK_LMENU) || IsModifierKeyDown(VK_RMENU);
-                if (altPressed && vkCode != VK_F4)
+                if (altPressed)
                 {
                     swallowKeystroke = true;
                 }
 
                 // 3. Block Ctrl+Esc (Start menu) and Ctrl+Shift+Esc (Task Manager).
-                // Both sequences end with VK_ESCAPE as the triggering key while Ctrl is held,
-                // so checking vkCode == VK_ESCAPE with ctrlPressed covers both.
+                // Both sequences end with VK_ESCAPE as the triggering key while Ctrl is held.
                 bool ctrlPressed = IsModifierKeyDown(VK_LCONTROL) || IsModifierKeyDown(VK_RCONTROL);
                 if (ctrlPressed && vkCode == VK_ESCAPE)
                 {
                     swallowKeystroke = true;
                 }
 
-                // 4. Block F11 to prevent kiosk escape
+                // 4. Block F11 to prevent kiosk escape.
                 if (vkCode == VK_F11)
                 {
                     swallowKeystroke = true;
@@ -388,9 +419,8 @@ namespace ToddlerScreenDefender
 
                 // 5. Block Print Screen and the context-menu key.
                 // Print Screen triggers an OS-level screen-capture action that briefly pulls focus
-                // away from WebView2, causing all subsequent keyboard events to be dropped until
-                // the child physically taps the screen again. The context-menu key can surface
-                // OS context menus in the same way.
+                // away from WebView2, dropping all subsequent keyboard events until the child
+                // physically taps the screen again.
                 if (vkCode == VK_SNAPSHOT || vkCode == VK_APPS)
                 {
                     swallowKeystroke = true;
@@ -398,7 +428,6 @@ namespace ToddlerScreenDefender
 
                 if (swallowKeystroke)
                 {
-                    // Return 1 to swallow keypress, breaking default OS action sequence
                     return (IntPtr)1;
                 }
             }
