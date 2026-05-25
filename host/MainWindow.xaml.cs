@@ -145,6 +145,7 @@ namespace ToddlerScreenDefender
             TsdLog.Write("Window_Loaded: registering keyboard hook");
             _hookID = SetHook(_proc);
             TsdLog.Write($"Keyboard hook: 0x{_hookID:X}");
+            SuppressAccessibilityHotkeys();
 
             // Set secure positioning covering screens
             this.Left = SystemParameters.VirtualScreenLeft;
