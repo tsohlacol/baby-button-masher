@@ -15,5 +15,5 @@ docker run --rm -v "$(pwd)/build-output:/output-directory" bbm-pipeline 2>&1 | t
 
 echo "========================================================="
 echo " SUCCESS: Windows Installer assembled!"
-echo " Output path: ./build-output/TSD_Setup_v1.0.exe"
+echo " Output path: ./build-output/BBM_Setup_v1.0.exe"
 echo "========================================================="
