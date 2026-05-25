@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a bug in Toddler Screen Defender
+description: Report a bug in Baby Button Masher
 labels: ["bug"]
 body:
   - type: markdown
@@ -7,13 +7,13 @@ body:
       value: |
         ## Before you submit
 
-        Please run TSD with the `--debug` flag to capture a log, reproduce the bug, then attach the log below.
+        Please run BBM with the `--debug` flag to capture a log, reproduce the bug, then attach the log below.
 
         **How to run with debug logging:**
         - **Installed shortcut:** right-click the desktop shortcut, choose **Properties**, append ` --debug` to the **Target** field, then launch normally.
-        - **Command line:** `ToddlerScreenDefender.exe --debug`
+        - **Command line:** `BabyButtonMasher.exe --debug`
 
-        The log is written to `%LOCALAPPDATA%\ToddlerScreenDefender\tsd-debug.log`.
+        The log is written to `%LOCALAPPDATA%\BabyButtonMasher\bbm-debug.log`.
 
   - type: textarea
     id: description
@@ -28,7 +28,7 @@ body:
     attributes:
       label: Steps to reproduce
       placeholder: |
-        1. Launch TSD
+        1. Launch BBM
         2. ...
         3. Bug occurs
     validations:
@@ -45,7 +45,7 @@ body:
   - type: input
     id: tsd-version
     attributes:
-      label: TSD version
+      label: BBM version
       placeholder: "e.g. 1.0.4 (shown in Add/Remove Programs)"
     validations:
       required: true
@@ -55,7 +55,7 @@ body:
     attributes:
       label: Debug log
       description: >
-        Paste the full contents of `%LOCALAPPDATA%\ToddlerScreenDefender\tsd-debug.log`.
+        Paste the full contents of `%LOCALAPPDATA%\BabyButtonMasher\bbm-debug.log`.
         You can also drag and drop the file directly into this text area.
       placeholder: "[paste log contents here]"
       render: text

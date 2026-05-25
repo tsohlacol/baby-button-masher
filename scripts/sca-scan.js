@@ -1,7 +1,7 @@
 /**
- * Toddler Screen Defender (TSD) - Custom SCA Scan Engine
+ * Baby Button Masher (BBM) - Custom SCA Scan Engine
  * Developed/Authored by tsohlacol (https://github.com/tsohlacol/toddler-screen-defender)
- * Certified Open Source Software licensed under the TSD-RCL Reciprocal License.
+ * Certified Open Source Software licensed under the BBM-RCL Reciprocal License.
  */
 
 import fs from 'fs';
@@ -63,9 +63,9 @@ Object.keys(dependencies).forEach(pkgName => {
   if (matchFound) {
     licenseViolations++;
     console.log(`${BOLD}${RED}[VIOLATION]${RESET} Incompatible License for dependency ${pkgName}: ${licenseType}`);
-    console.log(`  Reason: ${matchFound} requires source transparency terms that conflict with TSD-RCL.\n`);
+    console.log(`  Reason: ${matchFound} requires source transparency terms that conflict with BBM-RCL.\n`);
   } else {
-    console.log(`  [OK] ${pkgName} is licensed under ${GREEN}${licenseType}${RESET} (Compatible with TSD-RCL)`);
+    console.log(`  [OK] ${pkgName} is licensed under ${GREEN}${licenseType}${RESET} (Compatible with BBM-RCL)`);
   }
 });
 
@@ -99,7 +99,7 @@ exec('npm audit --json', (error, stdout, stderr) => {
     console.log(`${RED}${BOLD}🔴 SCA SCAN FAILURE: License compliance checker failed!${RESET}\n`);
     process.exit(1);
   } else {
-    console.log(`${GREEN}${BOLD}💚 SCA SCAN SUCCESS: All dependencies and licenses comply safely with the TSD-RCL reciprocal license!${RESET}\n`);
+    console.log(`${GREEN}${BOLD}💚 SCA SCAN SUCCESS: All dependencies and licenses comply safely with the BBM-RCL reciprocal license!${RESET}\n`);
     process.exit(0);
   }
 });

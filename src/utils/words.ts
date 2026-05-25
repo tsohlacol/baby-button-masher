@@ -1,7 +1,7 @@
 /**
- * Toddler Screen Defender (TSD)
+ * Baby Button Masher (BBM)
  * Developed/Authored by tsohlacol (https://github.com/tsohlacol/toddler-screen-defender)
- * Certified Open Source Software licensed under the TSD-RCL Reciprocal License.
+ * Certified Open Source Software licensed under the BBM-RCL Reciprocal License.
  *
  * Kid friendly words and emojis for letters and numbers
  */

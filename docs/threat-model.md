@@ -1,16 +1,16 @@
-# Threat Model for Toddler Screen Defender (TSD)
+# Threat Model for Baby Button Masher (BBM)
 
 *   **Developed/Authored by Logo/Maintainer:** tsohlacol
 *   **Source Repository:** [github.com/tsohlacol/toddler-screen-defender](https://github.com/tsohlacol/toddler-screen-defender)
-*   **License Model:** TSD-RCL (Reciprocal Licence)
+*   **License Model:** BBM-RCL (Reciprocal Licence)
 
 ---
 
 ## 1. Executive Summary
 
-Toddler Screen Defender (TSD) is a security-focused sandbox software package designed to lock down active keyboard inputs, block system shortcut mashings, and protect host workspaces from unauthorized alterations or destructive clicks when an infant or young child is actively interacting with the screen. 
+Baby Button Masher (BBM) is a security-focused sandbox software package designed to lock down active keyboard inputs, block system shortcut mashings, and protect host workspaces from unauthorized alterations or destructive clicks when an infant or young child is actively interacting with the screen. 
 
-As a web-and-native lightweight solution, TSD's primary security guarantee is **robust input isolation**. Since this application runs both in an sandboxed iframe (development/previews) and inside a compiled desktop wrapper, this threat model maps the critical boundaries, attack surfaces, and defensive measures implemented within the TSD codebase.
+As a web-and-native lightweight solution, BBM's primary security guarantee is **robust input isolation**. Since this application runs both in an sandboxed iframe (development/previews) and inside a compiled desktop wrapper, this threat model maps the critical boundaries, attack surfaces, and defensive measures implemented within the BBM codebase.
 
 ---
 
@@ -31,7 +31,7 @@ As a web-and-native lightweight solution, TSD's primary security guarantee is **
                   +----------------------------------------------+
                   |       Chromium Embedded / Webview Sandbox    |
                   | +------------------------------------------+ |
-                  | |             TSD React Client             | |
+                  | |             BBM React Client             | |
                   | |   * Event PreventDefaults (Keyboard)     | |
                   | |   * Event StopPropagations (Keyboard)    | |
                   | |   * Canvas Overlay (Lock Mode)           | |
@@ -44,7 +44,7 @@ As a web-and-native lightweight solution, TSD's primary security guarantee is **
                   +----------------------------------------------+
 ```
 
-TSD works on two logical tiers:
+BBM works on two logical tiers:
 1.  **Client-Side Sandboxed React Layer:** Employs standard hook constraints (`preventDefault`, `stopPropagation`) to lock mouse, scrolling, context menus, and keys in multi-screen grids.
 2.  **Native C# Host Wrapper hook (Production Installer):** Binds low-level windows message intercepts (`WH_KEYBOARD_LL`) to filter critical OS shortcuts (such as `Win`, `Alt+Tab`, `Alt+F4`, `Ctrl+Alt+Del`) which regular web views cannot capture alone.
 
@@ -114,7 +114,7 @@ TSD works on two logical tiers:
 
 Through the implementation of the five-tier automated verification pipeline (**SAST, SCA, DAST, Secrets Scanner, and Malware Scanner**), the following are continuously validated:
 *   **Static Safety (SAST):** Zero instances of dynamic compilation, script injection sinks, or raw HTML insertions.
-*   **Supply Chain Safety (SCA):** Zero unlicensed package dependencies and direct compliance with the reciprocal **TSD-RCL License**.
+*   **Supply Chain Safety (SCA):** Zero unlicensed package dependencies and direct compliance with the reciprocal **BBM-RCL License**.
 *   **Active Defense (DAST):** Complete trapping of keyboard event bubbling routes inside the dynamic render frames.
 *   **Secrets Exposure (Secrets Scanner):** Absence of hardcoded Google/Gemini API keys, AWS credentials, Slack webhooks, and private cert payloads inside repository sources.
 *   **Infection Controls (Malware Scanner):** Total prevention of integrated miner engines, cryptojacking lines, backdoor dynamic execution links, and malicious reverse shell codebases.
@@ -123,21 +123,21 @@ Through the implementation of the five-tier automated verification pipeline (**S
 
 ## 6. Rationale for Custom Lightweight Security Scanners (SAST, SCA, DAST, Secrets, Malware)
 
-Rather than relying purely on heavy, general-purpose enterprise vulnerability scanners, TSD maintains **custom-tailored, lightweight security scanning engines** executed as Node.js scripts (`/scripts/*`).
+Rather than relying purely on heavy, general-purpose enterprise vulnerability scanners, BBM maintains **custom-tailored, lightweight security scanning engines** executed as Node.js scripts (`/scripts/*`).
 
 ### Why Custom Scanners Were Created
 
-General-purpose scanners (like SonarQube, Snyk, or OWASP ZAP) are standard for standard cloud enterprises, but they have major blind spots. We tailored these utility scanner scripts to TSD's specific, unique structural requirements:
+General-purpose scanners (like SonarQube, Snyk, or OWASP ZAP) are standard for standard cloud enterprises, but they have major blind spots. We tailored these utility scanner scripts to BBM's specific, unique structural requirements:
 
 1.  **Tailored Sandbox Safety Rule Sets (SAST)**
-    *   Standard static engines look for generic server variables or database injection routes, which do not apply to TSD's client-only UI.
+    *   Standard static engines look for generic server variables or database injection routes, which do not apply to BBM's client-only UI.
     *   Our custom SAST engine actively filters and targets front-end critical risk factors: verifying that **raw HTML injectors** like `dangerouslySetInnerHTML`, sandbox bypasses like raw `eval()`, and dynamic string constructors like `new Function()` are completely barred from entering the codebase.
 2.  **Reciprocal Copyleft License Compliance (SCA)**
     *   Standard dependency scanners only report vulnerability CVE databases. They do not know or care about legal licensing alignment!
-    *   Since TSD operates under the reciprocal **TSD-RCL License** model, any copyleft GPL, AGPL, or unauthorized proprietary package could contaminate the upstream core code or disrupt owner distribution rights. Our custom SCA automatically checks dependency declarations directly against strict copyleft licensing blacklists.
+    *   Since BBM operates under the reciprocal **BBM-RCL License** model, any copyleft GPL, AGPL, or unauthorized proprietary package could contaminate the upstream core code or disrupt owner distribution rights. Our custom SCA automatically checks dependency declarations directly against strict copyleft licensing blacklists.
 3.  **Active Input Lock Verification (DAST)**
     *   Standard dynamic scanners (e.g. web application scanners fuzzing port endpoints) are designed for client-server protocol audits. They are entirely blind to front-end browser keyboard-lock mechanics!
-    *   TSD's primary failure mode is a toddler escaping the lock interface via unhandled key bubbles. Our custom DAST dynamically audits browser-locking routines: enforcing that all custom keyboard-blocking listeners call `preventDefault()` and `stopPropagation()` concurrently, and checks runtime permissions constraints (`metadata.json`) to keep the iframe environment securely sealed.
+    *   BBM's primary failure mode is a toddler escaping the lock interface via unhandled key bubbles. Our custom DAST dynamically audits browser-locking routines: enforcing that all custom keyboard-blocking listeners call `preventDefault()` and `stopPropagation()` concurrently, and checks runtime permissions constraints (`metadata.json`) to keep the iframe environment securely sealed.
 4.  **Local Dev Leak Protection (Secrets Scanner)**
     *   Scans configuration settings, `.env` blocks, and scripts specifically targeting credentials layout, blocking inadvertent git commits of live keys.
 5.  **Child Play Safe-Guards (Malware & Miner Engine Scanner)**
@@ -152,7 +152,7 @@ General-purpose scanners (like SonarQube, Snyk, or OWASP ZAP) are standard for s
 
 We acknowledge that **custom lightweight scripts are not replacements for robust, industry-standard commodity scanners** (like Semgrep, Snyk, SonarQube, or Trivy for dependencies and Microsoft Windows Defender / ClamAV for binary packages). While custom scripts excel at validating specific business logic and contextual front-end constraints (like key propagation or copyleft license violations), they lack the massive heuristic databases, semantic control-flow graph (CFG) parsers, and continuous global CVE tracking possessed by specialized, enterprise scanners.
 
-Consequently, TSD adopts a **Hybrid Security Strategy** that integrates commodity capabilities alongside local custom checks:
+Consequently, BBM adopts a **Hybrid Security Strategy** that integrates commodity capabilities alongside local custom checks:
 
 1.  **Commodity Vulnerability Core (`npm audit`)**: 
     Our custom SCA script does not operate in a vacuum. It internally spawns the commodity **`npm audit`** security engine to automatically query the official global registry of vulnerabilities, giving us direct access to thousands of live, community-vouched security alerts.
@@ -165,6 +165,6 @@ Consequently, TSD adopts a **Hybrid Security Strategy** that integrates commodit
         *   **Snyk / Socket.dev**: To continuously monitor our deep dependency trees for newly discovered exploits, malicious supply-chain pull-requests, and security anomalies.
         *   **OWASP ZAP / Burp Suite DevSecOps**: In staging or production wrappers to check for dynamic runtime frame breakouts and sandbox escapes.
 
-By using this hybrid tiering, TSD preserves extreme local speed and zero-dependency portability without compromising on the deep security coverage provided by professional commodity scanners.
+By using this hybrid tiering, BBM preserves extreme local speed and zero-dependency portability without compromising on the deep security coverage provided by professional commodity scanners.
 
 

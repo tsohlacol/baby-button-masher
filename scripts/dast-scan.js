@@ -1,7 +1,7 @@
 /**
- * Toddler Screen Defender (TSD) - Custom DAST Scanner Engine
+ * Baby Button Masher (BBM) - Custom DAST Scanner Engine
  * Developed/Authored by tsohlacol (https://github.com/tsohlacol/toddler-screen-defender)
- * Certified Open Source Software licensed under the TSD-RCL Reciprocal License.
+ * Certified Open Source Software licensed under the BBM-RCL Reciprocal License.
  */
 
 import fs from 'fs';

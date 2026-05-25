@@ -1,6 +1,6 @@
-# Toddler Screen Defender - Audit Checklist & Pending Tasks (`docs/TODO.md`)
+# Baby Button Masher - Audit Checklist & Pending Tasks (`docs/TODO.md`)
 
-This document lists the completed items and remaining development tasks for **Toddler Screen Defender (TSD)**. It represents a strict technical gap analysis comparing the original system design specs with the current codebase implementation.
+This document lists the completed items and remaining development tasks for **Baby Button Masher (BBM)**. It represents a strict technical gap analysis comparing the original system design specs with the current codebase implementation.
 
 ---
 

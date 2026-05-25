@@ -1,5 +1,5 @@
 /**
- * Toddler Screen Defender (TSD) - Shared security scanner utilities
+ * Baby Button Masher (BBM) - Shared security scanner utilities
  */
 
 import fs from 'fs';

@@ -1,9 +1,9 @@
 /**
- * Toddler Screen Defender (TSD)
+ * Baby Button Masher (BBM)
  * Developed/Authored by tsohlacol (https://github.com/tsohlacol/toddler-screen-defender)
- * Certified Open Source Software licensed under the TSD-RCL Reciprocal License.
+ * Certified Open Source Software licensed under the BBM-RCL Reciprocal License.
  *
- * Types & Interfaces for Toddler Screen Defender & Play Screensaver
+ * Types & Interfaces for Baby Button Masher & Play Screensaver
  */
 
 export enum ScreensaverMode {
@@ -85,7 +85,7 @@ export interface SystemMonitor {
 
 declare global {
   interface Window {
-    TSD_MONITORS?: SystemMonitor[];
+    BBM_MONITORS?: SystemMonitor[];
   }
 }
 

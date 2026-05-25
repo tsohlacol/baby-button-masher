@@ -1,6 +1,6 @@
-# Toddler Screen Defender - Settled Design Configurations
+# Baby Button Masher - Settled Design Configurations
 
-This document outlines the final design configurations implemented in Toddler Screen Defender (TSD) driven by parental security, sensory playfulness, and robust desktop safety.
+This document outlines the final design configurations implemented in Baby Button Masher (BBM) driven by parental security, sensory playfulness, and robust desktop safety.
 
 ---
 

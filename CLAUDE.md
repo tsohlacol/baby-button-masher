@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Toddler Screen Defender (TSD)** is a full-screen interactive gaming sandbox that locks toddlers out of system-sensitive operations while providing sensory feedback for key presses. It combines a **React/Vite frontend** running inside a **Windows WPF host application** with a **low-level Win32 keyboard hook** that blocks system shortcuts like Alt+Tab, Win+Key, Alt+F4, and Ctrl+Esc.
+**Baby Button Masher (BBM)** is a full-screen interactive gaming sandbox that locks toddlers out of system-sensitive operations while providing sensory feedback for key presses. It combines a **React/Vite frontend** running inside a **Windows WPF host application** with a **low-level Win32 keyboard hook** that blocks system shortcuts like Alt+Tab, Win+Key, Alt+F4, and Ctrl+Esc.
 
-The application is distributed as a Windows installer (`TSD_Setup_v*.exe`) compiled using Docker, with no local environment dependencies required.
+The application is distributed as a Windows installer (`BBM_Setup_v*.exe`) compiled using Docker, with no local environment dependencies required.
 
-**License:** TSD-RCL (Reciprocal Contribution License) - modifications must be contributed back upstream.
+**License:** BBM-RCL (Reciprocal Contribution License) - modifications must be contributed back upstream.
 
 ---
 
@@ -49,7 +49,7 @@ Audio & Canvas (Web Audio API, Canvas 2D)
 
 ### Monitor Integration
 
-The C# host detects all connected displays (`Screen.AllScreens` / Win32 `EnumDisplayMonitors`) and passes their geometry to React via `window.TSD_MONITORS`. React can then:
+The C# host detects all connected displays (`Screen.AllScreens` / Win32 `EnumDisplayMonitors`) and passes their geometry to React via `window.BBM_MONITORS`. React can then:
 - Blackout secondary monitors
 - Mirror the active canvas to all screens
 - Spawn independent canvases per monitor (future feature)
@@ -118,7 +118,7 @@ make test
 
 ### Creating the Windows Installer
 ```bash
-# Builds everything in Docker and outputs TSD_Setup_v*.exe to ./build-output/
+# Builds everything in Docker and outputs BBM_Setup_v*.exe to ./build-output/
 make build-installer
 
 # Or run the full pipeline (setup, test, build-installer, zip)
@@ -132,13 +132,13 @@ make clean  # Removes dist/, build-output/, host/assets/react-app/
 
 ### Debug Mode
 
-Launch TSD with `--debug` to enable diagnostic logging:
+Launch BBM with `--debug` to enable diagnostic logging:
 
 ```
-ToddlerScreenDefender.exe --debug
+BabyButtonMasher.exe --debug
 ```
 
-The log is written to `%LOCALAPPDATA%\ToddlerScreenDefender\tsd-debug.log` and captures WebView2 environment creation timing, window positioning, virtual desktop pinning results, navigation events, and all exceptions. React also receives `window.TSD_DEBUG = true`.
+The log is written to `%LOCALAPPDATA%\BabyButtonMasher\bbm-debug.log` and captures WebView2 environment creation timing, window positioning, virtual desktop pinning results, navigation events, and all exceptions. React also receives `window.BBM_DEBUG = true`.
 
 From an installed shortcut: right-click the shortcut, choose **Properties**, and append ` --debug` to the **Target** field.
 
@@ -177,7 +177,7 @@ On exit unlock, users must solve a random single-digit math equation or enter a 
 
 ### 4. Multi-Monitor Handling
 
-C# host passes `window.TSD_MONITORS` (array of `{ left, top, width, height, isPrimary }`).
+C# host passes `window.BBM_MONITORS` (array of `{ left, top, width, height, isPrimary }`).
 
 React's multi-monitor strategy:
 - **Blackout (default):** Secondary monitors are rendered with a black full-screen overlay.
@@ -192,7 +192,7 @@ React's multi-monitor strategy:
    - Prevents text selection (`select-none` class)
    - Blocks drag-and-drop
 3. **CSS Layer** (Tailwind): Full-screen viewport coverage, no borders or gaps.
-4. **Ctrl+Alt+Del Escape:** Kernel-level SAS sequence always reaches Task Manager, allowing force-termination if TSD hangs.
+4. **Ctrl+Alt+Del Escape:** Kernel-level SAS sequence always reaches Task Manager, allowing force-termination if BBM hangs.
 
 ---
 
@@ -261,7 +261,7 @@ npm run malware   # Binary signature checks for known backdoors
    - React frontend is bundled from `dist/` into `host/assets/react-app/`.
    - Native hook *is* active.
 
-3. **Installer Testing:** Build with `make build-installer` and run `./build-output/TSD_Setup_v*.exe` on a Windows machine.
+3. **Installer Testing:** Build with `make build-installer` and run `./build-output/BBM_Setup_v*.exe` on a Windows machine.
    - Tests full installation flow, registry entries, desktop shortcuts.
    - Tests uninstallation and cleanup.
 
@@ -273,7 +273,7 @@ The **Dockerfile.build** orchestrates a 3-stage build:
 
 1. **Stage 1 (frontend-builder):** Node 18 Alpine → builds React via Vite → outputs `dist/`
 2. **Stage 2 (native-builder):** .NET 8 SDK → copies `dist/` as host assets → publishes self-contained Windows exe
-3. **Stage 3 (installer-builder):** Ubuntu + Wine → runs Inno Setup compiler on the exe → outputs `TSD_Setup_v*.exe`
+3. **Stage 3 (installer-builder):** Ubuntu + Wine → runs Inno Setup compiler on the exe → outputs `BBM_Setup_v*.exe`
 4. **Stage 4 (final):** Alpine → extracts the exe and makes it available for docker run copy
 
 **Key build flags:**
@@ -300,10 +300,10 @@ The **Dockerfile.build** orchestrates a 3-stage build:
 
 ## Licensing & Contributing
 
-**TSD is licensed under the TSD-RCL (Reciprocal Contribution License).**
+**BBM is licensed under the BBM-RCL (Reciprocal Contribution License).**
 
 **Key obligations:**
-- You are free to modify TSD for personal use.
+- You are free to modify BBM for personal use.
 - **If you distribute modifications**, you *must* submit them as a Pull Request to the upstream repository: `https://github.com/tsohlacol/toddler-screen-defender`
 - Editing config files (e.g., changing volume settings) does *not* trigger this obligation.
 

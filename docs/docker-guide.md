@@ -2,7 +2,7 @@
 
 Since .NET and Windows installer tooling (like Inno Setup / WiX) run natively on Windows, cross-compiling windows binaries in a clean Docker container under WSL represents the ultimate developer workflow. 
 
-This document explains how to set up the multi-stage Docker environment to compile the Toddler Screen Defender client automatically.
+This document explains how to set up the multi-stage Docker environment to compile the Baby Button Masher client automatically.
 
 ---
 
@@ -98,7 +98,7 @@ docker run --rm -v "$(pwd)/build-output:/output-directory" tsd-pipeline
 
 echo "========================================================="
 echo " SUCCESS: Windows Installer assembled!"
-echo " Output path: ./build-output/TSD_Setup_v1.0.exe"
+echo " Output path: ./build-output/BBM_Setup_v1.0.exe"
 echo "========================================================="
 ```
 
@@ -111,4 +111,4 @@ echo "========================================================="
    ```bash
    ./build-installer.sh
    ```
-3. Locate the finished installer in your standard Explorer panel at: `\\wsl$\Ubuntu\...\toddler-screen-defender\build-output\TSD_Setup_v1.0.exe`.
+3. Locate the finished installer in your standard Explorer panel at: `\\wsl$\Ubuntu\...\toddler-screen-defender\build-output\BBM_Setup_v1.0.exe`.

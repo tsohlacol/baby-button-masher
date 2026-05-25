@@ -1,12 +1,12 @@
-# Toddler Screen Defender (TSD) - System Architecture
+# Baby Button Masher (BBM) - System Architecture
 
-This document describes the architectural design for the local desktop client of Toddler Screen Defender. It outlines how a native Windows wrapper hosts our React gameplay and uses system-level configurations to protect your computer from toddler-key-slapping.
+This document describes the architectural design for the local desktop client of Baby Button Masher. It outlines how a native Windows wrapper hosts our React gameplay and uses system-level configurations to protect your computer from toddler-key-slapping.
 
 ---
 
 ## 1. Architectural Overview
 
-At its core, Toddler Screen Defender consists of a **native host layer** and a **local front-end sandbox**. 
+At its core, Baby Button Masher consists of a **native host layer** and a **local front-end sandbox**. 
 
 By packaging the React applet into a local single-page application (SPA), we run it inside a headless browser window with custom windows-messaging hooks.
 
@@ -20,7 +20,7 @@ By packaging the React applet into a local single-page application (SPA), we run
                                                |  WinKey, TaskManager Block)
                                                v
                           +--------------------+--------------------+
-                          |     Toddler Screen Defender Host App    |
+                          |     Baby Button Masher Host App    |
                           | (WPF / WebView2 or Tauri Native Wrapper)|
                           +--------------------+--------------------+
                                                |
@@ -41,7 +41,7 @@ By packaging the React applet into a local single-page application (SPA), we run
 
 ## 2. Low-Level Keyboard Interception & Escape Velocity
 
-Browsers cannot intercept system hotkeys by design. To block severe shortcuts, the native TSD wrapper hooks directly into the Windows Win32 API.
+Browsers cannot intercept system hotkeys by design. To block severe shortcuts, the native BBM wrapper hooks directly into the Windows Win32 API.
 
 ### Low-Level Keyboard Hook (`WH_KEYBOARD_LL`)
 The wrapper registers a global hook callback through `SetWindowsHookEx`. This callback runs on the primary thread of the native process and intercepts every keystroke:
@@ -91,7 +91,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 ### Why Ctrl+Alt+Del Remains Safe
 The Secure Attention Sequence (SAS)—which triggers the `Ctrl+Alt+Del` GINA (Graphical Identification and Authentication) overlay screen—is handled natively in the Windows kernel by `winlogon.exe` at a hardware level. 
 * User-land user hooks (`WH_KEYBOARD_LL`) are **never** permitted to capture or override this sequence.
-* This acts as an architectural safety-valve. If TSD hangs or crashes, hitting `Ctrl+Alt+Del` will overlay the secure desk screen, allowing you to select **Task Manager** and force-terminate the shell process (`ToddlerScreenDefender.exe`).
+* This acts as an architectural safety-valve. If BBM hangs or crashes, hitting `Ctrl+Alt+Del` will overlay the secure desk screen, allowing you to select **Task Manager** and force-terminate the shell process (`BabyButtonMasher.exe`).
 
 ---
 
@@ -100,7 +100,7 @@ The Secure Attention Sequence (SAS)—which triggers the `Ctrl+Alt+Del` GINA (Gr
 To ensure your baby cannot click out or discover gaps to the background desktop:
 
 * **Topmost & Borderless Window Style**: The host is initialized with WS_POPUP (removing frame borders, title bars, and control boxes) and positioned with the `HWND_TOPMOST` z-order flag.
-* **Focus Enforcement**: If TSD loses focus (for example, if a background notifier pops up), the App listens to its own native focus events (`WM_ACTIVATE` or WPF 'Deactivated' trigger) and forces focus back to itself:
+* **Focus Enforcement**: If BBM loses focus (for example, if a background notifier pops up), the App listens to its own native focus events (`WM_ACTIVATE` or WPF 'Deactivated' trigger) and forces focus back to itself:
   ```csharp
   private void OnWindowDeactivated(object sender, EventArgs e) {
       this.Topmost = true;
