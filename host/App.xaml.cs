@@ -14,8 +14,8 @@ namespace BabyButtonMasher
             {
                 string logDir = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "ToddlerScreenDefender");
-                TsdLog.Init(Path.Combine(logDir, "tsd-debug.log"));
+                    "BabyButtonMasher");
+                TsdLog.Init(Path.Combine(logDir, "bbm-debug.log"));
             }
         }
 
