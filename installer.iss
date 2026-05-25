@@ -32,9 +32,9 @@ Source: "bin\publish\BabyButtonMasher.exe"; DestDir: "{app}"; Flags: ignoreversi
 Source: "bin\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\Baby Button Masher"; Filename: "{app}\BabyButtonMasher.exe"
-Name: "{autodesktop}\Baby Button Masher"; Filename: "{app}\BabyButtonMasher.exe"; Tasks: desktopicon
-Name: "{autodesktop}\Baby Button Masher (Debug)"; Filename: "{app}\BabyButtonMasher.exe"; Parameters: "--debug"; Tasks: debugdesktopicon
+Name: "{group}\Baby Button Masher"; Filename: "{app}\BabyButtonMasher.exe"; IconFilename: "{app}\BabyButtonMasher.exe"
+Name: "{autodesktop}\Baby Button Masher"; Filename: "{app}\BabyButtonMasher.exe"; IconFilename: "{app}\BabyButtonMasher.exe"; Tasks: desktopicon
+Name: "{autodesktop}\Baby Button Masher (Debug)"; Filename: "{app}\BabyButtonMasher.exe"; Parameters: "--debug"; IconFilename: "{app}\BabyButtonMasher.exe"; Tasks: debugdesktopicon
 
 
 [Run]
