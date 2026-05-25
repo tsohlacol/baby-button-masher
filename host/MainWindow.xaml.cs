@@ -417,6 +417,13 @@ namespace ToddlerScreenDefender
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
         private static extern short GetKeyState(int keyCode);
 
+        // GetAsyncKeyState reads the raw hardware state set by the keyboard interrupt,
+        // not the logical message-queue state. This lets us detect Alt as physically held
+        // even after we swallow the VK_LMENU/VK_RMENU keydown (which skips CallNextHookEx
+        // and therefore never updates GetKeyState for the current thread).
+        [DllImport("user32.dll", ExactSpelling = true)]
+        private static extern short GetAsyncKeyState(int vKey);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetModuleHandle(string lpModuleName);
 
