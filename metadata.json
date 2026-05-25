@@ -1,5 +1,5 @@
 {
-  "name": "Toddler Screen Defender",
+  "name": "Baby Button Masher",
   "description": "An interactive locked playground screensaver for toddlers. Features multiple interactive modes (Speak the Key, Animal Parade, Cosmic Fireworks, Keyboard Piano) with automatic mode switching based on keystroke frequency.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
