@@ -266,9 +266,10 @@ namespace BabyButtonMasher
         private void HideSplash()
         {
             TsdLog.Write("Hiding splash");
-            var fade = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(1500));
-            fade.Completed += (s, e) => SplashOverlay.Visibility = Visibility.Collapsed;
-            SplashOverlay.BeginAnimation(OpacityProperty, fade);
+            // Collapse the WPF splash instantly — the React overlay handles the visible
+            // fade-out, so no WPF animation is needed here. The WPF splash has been
+            // hidden behind the WebView2 HWND since shortly after startup anyway.
+            SplashOverlay.Visibility = Visibility.Collapsed;
         }
 
         private string GetMonitorsJson()
