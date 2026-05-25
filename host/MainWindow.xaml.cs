@@ -361,50 +361,44 @@ namespace ToddlerScreenDefender
                 bool isKeyDown = wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN;
                 bool swallowKeystroke = false;
 
-                // 0. Alt+F4 parent exit — must be checked BEFORE rule 2 swallows Alt.
-                // We use GetAsyncKeyState (hardware state) instead of GetKeyState (message-queue
-                // state) because we swallow VK_LMENU/VK_RMENU below, which means the Alt keydown
-                // never reaches the queue and GetKeyState never reflects it as pressed.
-                // GetAsyncKeyState reads the physical interrupt state and is always accurate.
-                if (isKeyDown && vkCode == VK_F4)
-                {
-                    bool altPhysicallyHeld = (GetAsyncKeyState(VK_LMENU) & 0x8000) != 0 ||
-                                             (GetAsyncKeyState(VK_RMENU) & 0x8000) != 0;
-                    if (altPhysicallyHeld)
-                    {
-                        // Alt is physically held but we swallowed the Alt keydown, so the OS
-                        // message queue won't generate WM_SYSCOMMAND SC_CLOSE on its own.
-                        // Close explicitly via the dispatcher.
-                        Dispatcher.BeginInvoke(() => this.Close());
-                        return (IntPtr)1;
-                    }
-                }
-
                 // 1. Block Win keys.
                 if (vkCode == VK_LWIN || vkCode == VK_RWIN)
                 {
                     swallowKeystroke = true;
                 }
 
-                // 2. Block the Alt key itself and all Alt+key combinations.
+                // 2. Block Alt key itself and all Alt+key combinations.
                 //
-                // BUG CONTEXT: when Alt first goes down, GetKeyState(VK_LMENU) returns 0 because
-                // the key-state table is updated AFTER CallNextHookEx, not before. This means the
-                // original "altPressed && vkCode != VK_F4" check missed the Alt keydown, letting
-                // it reach the OS menu system or tools like Razer Synapse which then steal focus
-                // from WebView2 and break subsequent keyboard input.
+                // WHY explicit VK_LMENU/VK_RMENU swallow: when Alt first goes down,
+                // GetKeyState(VK_LMENU) returns 0 because the key-state table is updated AFTER
+                // CallNextHookEx, not before. The previous "altPressed && vkCode != VK_F4" check
+                // therefore missed the Alt keydown, letting it reach the OS menu system or tools
+                // like Razer Synapse, which stole WebView2 focus and broke subsequent key input.
                 //
-                // FIX: also swallow VK_LMENU/VK_RMENU explicitly. The GetKeyState check is kept
-                // as belt-and-suspenders for Alt+key combos where Alt was already held long enough
-                // for the state to be reflected.
+                // WHY _altTracked for Alt+F4: we track Alt state ourselves (set on keydown,
+                // cleared on keyup) instead of using GetAsyncKeyState, which is not reliably
+                // settled inside a WH_KEYBOARD_LL callback.
                 if (vkCode == VK_LMENU || vkCode == VK_RMENU)
+                {
+                    _altTracked = isKeyDown;   // true on keydown, false on keyup
+                    swallowKeystroke = true;
+                }
+                // Belt-and-suspenders: if GetKeyState already reflects Alt as held (possible when
+                // Alt has been physically down long enough for the state table to catch up), block
+                // any remaining Alt+key combos that slipped past the explicit check above.
+                if (IsModifierKeyDown(VK_LMENU) || IsModifierKeyDown(VK_RMENU))
                 {
                     swallowKeystroke = true;
                 }
-                bool altPressed = IsModifierKeyDown(VK_LMENU) || IsModifierKeyDown(VK_RMENU);
-                if (altPressed)
+
+                // Alt+F4 parent exit — placed after the VK_LMENU block so _altTracked is fresh.
+                // We close via the dispatcher because the OS message queue never saw the Alt
+                // keydown (we swallowed it), so the normal WM_SYSCOMMAND SC_CLOSE path is dead.
+                if (isKeyDown && vkCode == VK_F4 && _altTracked)
                 {
-                    swallowKeystroke = true;
+                    Dispatcher.BeginInvoke(() => this.Close());
+                    _altTracked = false;
+                    return (IntPtr)1;
                 }
 
                 // 3. Block Ctrl+Esc (Start menu) and Ctrl+Shift+Esc (Task Manager).
