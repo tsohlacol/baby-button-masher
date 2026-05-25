@@ -1471,6 +1471,36 @@ export default function App() {
         </div>
       )}
 
+      {/* Startup splash overlay — covers the WebView2 HWND black background until
+          C# calls window.__bbmReveal() after the minimum hold time. zIndex is set
+          to the maximum possible value so it renders above all other content. */}
+      {!splashDone && (
+        <div
+          aria-hidden
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: '#000',
+            opacity: splashRevealing ? 0 : 1,
+            transition: 'opacity 1.5s ease-in-out',
+            zIndex: 2147483647,
+            pointerEvents: splashRevealing ? 'none' : 'all',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            userSelect: 'none',
+          }}
+        >
+          <p style={{ color: '#fff', fontSize: '52px', fontWeight: 300, fontFamily: 'Segoe UI, system-ui, sans-serif', margin: 0 }}>
+            Baby Button Masher
+          </p>
+          <p style={{ color: '#888', fontSize: '22px', fontFamily: 'Segoe UI, system-ui, sans-serif', marginTop: '16px' }}>
+            by tsohlacol
+          </p>
+        </div>
+      )}
+
     </div>
   );
 }
