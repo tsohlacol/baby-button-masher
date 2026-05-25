@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace ToddlerScreenDefender
+namespace BabyButtonMasher
 {
     internal static class TsdLog
     {
