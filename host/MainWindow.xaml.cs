@@ -8,7 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media.Animation;
 using Microsoft.Web.WebView2.Core;
 
-namespace ToddlerScreenDefender
+namespace BabyButtonMasher
 {
     public partial class MainWindow : Window
     {
