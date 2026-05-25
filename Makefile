@@ -24,7 +24,7 @@ all: setup test build-installer
 	@echo "All deliverables (local installer copy and zip package) ready under ./build-output/!"
 
 help:
-	@echo "Toddler Screen Defender - Build, Test, and Security Audit Targets:"
+	@echo "Baby Button Masher - Build, Test, and Security Audit Targets:"
 	@echo "  all              - Setup, test, build installer, and compile upload zip package"
 	@echo "  setup            - Install Node.js frontend dependencies"
 	@echo "  build            - Build the static React game sandbox folder"
