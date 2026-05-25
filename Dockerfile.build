@@ -78,11 +78,14 @@ RUN curl -fSL "https://jrsoftware.org/download.php/is.exe" -o innosetup.exe \
     && xvfb-run --auto-servernum wine innosetup.exe /SP- /VERYSILENT /SUPPRESSMSGBOXES /NORESTART \
     && rm innosetup.exe
 
-# Copy installer specification, license, and compiled binary
+# Copy installer specification, license, compiled binary, and app icon.
+# bbm.ico is used by SetupIconFile (installer wizard branding) and lives in
+# the same directory as installer.iss so Inno Setup resolves it by filename.
 WORKDIR /build
 COPY installer.iss .
 COPY EULA.txt .
 COPY --from=native-builder /publish ./bin/publish/
+COPY --from=frontend-builder /app/host/bbm.ico ./
 
 # Compile installer setup.exe using Inno Setup Console Compiler
 RUN wine "C:\\Program Files\\Inno Setup 6\\ISCC.exe" installer.iss
