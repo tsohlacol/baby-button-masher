@@ -9,6 +9,10 @@
     <Platforms>AnyCPU</Platforms>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <!-- Branding: controls the exe filename, Task Manager description, and Add/Remove Programs entry. -->
+    <!-- ApplicationIcon embeds bbm.ico as a Win32 resource so Explorer, Task Manager,
+         and the taskbar all show the BBM icon. The Condition guard lets "make run"
+         (local dev) compile without the ICO; Docker always generates it in Stage 1. -->
+    <ApplicationIcon Condition="Exists('bbm.ico')">bbm.ico</ApplicationIcon>
     <AssemblyName>BabyButtonMasher</AssemblyName>
     <RootNamespace>BabyButtonMasher</RootNamespace>
     <Product>Baby Button Masher</Product>
