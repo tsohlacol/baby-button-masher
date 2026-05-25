@@ -301,6 +301,7 @@ namespace ToddlerScreenDefender
         {
             TsdLog.Write("Window_Closing: unhooking keyboard hook");
             UnhookWindowsHookEx(_hookID);
+            RestoreAccessibilityHotkeys();
         }
 
         private void Window_Deactivated(object sender, EventArgs e)
