@@ -8,6 +8,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>AnyCPU</Platforms>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <!-- Branding: controls the exe filename, Task Manager description, and Add/Remove Programs entry. -->
+    <AssemblyName>BabyButtonMasher</AssemblyName>
+    <RootNamespace>BabyButtonMasher</RootNamespace>
+    <Product>Baby Button Masher</Product>
+    <AssemblyTitle>Baby Button Masher</AssemblyTitle>
+    <Description>Baby Button Masher - Interactive toddler keyboard sandbox</Description>
+    <Company>tsohlacol</Company>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
