@@ -121,4 +121,5 @@ clean:
 	rm -rf dist
 	rm -rf build-output
 	rm -rf host/assets/react-app
+	rm -rf logs
 	@echo "Build and release assets cleaned."
