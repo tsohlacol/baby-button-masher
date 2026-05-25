@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 
-namespace ToddlerScreenDefender
+namespace BabyButtonMasher
 {
     public partial class App : Application
     {
