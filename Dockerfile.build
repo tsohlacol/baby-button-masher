@@ -5,6 +5,10 @@
 # =========================================================
 FROM node:22-alpine AS frontend-builder
 WORKDIR /app
+# Install imagemagick here (before COPY . .) so this layer is cached independently
+# of source-file changes. The convert command creates a multi-resolution ICO from the
+# PNG icon used by the WPF exe (via <ApplicationIcon>) and the Inno Setup installer.
+RUN apk add --no-cache imagemagick
 # Copy lockfile first so the cache layer is only invalidated when dependencies change
 COPY package*.json ./
 # --mount=type=cache keeps the npm download cache across builds on the same host
@@ -13,6 +17,9 @@ RUN --mount=type=cache,target=/root/.npm \
     npm ci --cache /root/.npm
 COPY . .
 RUN npm run build
+# Convert the app icon PNG to a multi-resolution ICO. Placed in host/ so Stage 2
+# picks it up via "COPY host/ ./host/" without an extra COPY --from directive.
+RUN convert images/bbm.png -define icon:auto-resize=256,128,64,48,32,16 host/bbm.ico
 
 # =========================================================
 # STAGE 2: .NET 8 WPF Host Cross-Compilation
