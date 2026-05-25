@@ -235,7 +235,7 @@ namespace BabyButtonMasher
 
                 // Hold the splash for at least 12 s AND until React signals ready —
                 // whichever finishes last wins, so fast machines still see the splash.
-                await Task.WhenAll(Task.Delay(12000), _readyTcs.Task);
+                await Task.WhenAll(Task.Delay(3000), _readyTcs.Task);
 
                 // Signal React to fade out its own startup splash overlay.
                 // The WPF airspace problem means WebView2's Win32 HWND always renders in
