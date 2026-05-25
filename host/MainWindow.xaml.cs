@@ -16,6 +16,10 @@ namespace ToddlerScreenDefender
         private LowLevelKeyboardProc _proc;
         private Task<CoreWebView2Environment>? _webView2EnvTask;
         private readonly TaskCompletionSource _readyTcs = new TaskCompletionSource();
+        // Manual Alt key tracking: set true when we swallow VK_LMENU/VK_RMENU keydown,
+        // false on keyup. GetKeyState is unreliable inside WH_KEYBOARD_LL (state is updated
+        // after CallNextHookEx, not before), so we track it ourselves to detect Alt+F4.
+        private volatile bool _altTracked = false;
 
         // Win32 API Constants
         private const int WH_KEYBOARD_LL = 13;
