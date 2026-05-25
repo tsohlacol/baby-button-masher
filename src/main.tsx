@@ -1,7 +1,7 @@
 /**
- * Toddler Screen Defender (TSD)
+ * Baby Button Masher (BBM)
  * Developed/Authored by tsohlacol (https://github.com/tsohlacol/toddler-screen-defender)
- * Certified Open Source Software licensed under the TSD-RCL Reciprocal License.
+ * Certified Open Source Software licensed under the BBM-RCL Reciprocal License.
  */
 
 import {StrictMode} from 'react';
@@ -15,14 +15,3 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 );
 
-// Signal the WPF host that React has painted and the splash can fade out.
-// Double requestAnimationFrame ensures the signal fires only after the browser
-// has committed the first frame to the GPU, eliminating the black flash caused
-// by signalling before the compositor has rasterized React's initial render.
-requestAnimationFrame(() => {
-  requestAnimationFrame(() => {
-    if ((window as any).chrome?.webview) {
-      (window as any).chrome.webview.postMessage('tsd:ready');
-    }
-  });
-});
