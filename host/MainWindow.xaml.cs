@@ -50,7 +50,7 @@ namespace BabyButtonMasher
         // These accessibility shortcuts can be triggered by a toddler mashing keys (e.g. 5x Shift
         // activates Sticky Keys, which then makes Ctrl "stick" and drops all subsequent input).
         // We disable only the keyboard shortcut that *toggles* each feature; the feature itself
-        // is left in whatever state the user configured outside of TSD.
+        // is left in whatever state the user configured outside of BBM.
         private const uint SPI_GETSTICKYKEYS = 0x003A;
         private const uint SPI_SETSTICKYKEYS = 0x003B;
         private const uint SPI_GETFILTERKEYS = 0x0032;
@@ -234,16 +234,29 @@ namespace BabyButtonMasher
                     WebViewControl.Source = new Uri("https://ais-pre-2ojkzky7dd3ixx5xjcj6g3-457582934602.us-east1.run.app");
                 }
 
-                // Hold the splash for at least 8 s AND until React signals ready —
+                // Hold the splash for at least 12 s AND until React signals ready —
                 // whichever finishes last wins, so fast machines still see the splash.
                 await Task.WhenAll(Task.Delay(12000), _readyTcs.Task);
+
+                // Wake the Chromium compositor before fading the WPF overlay.
+                // While the WPF splash is fully opaque, Windows DWM marks the WebView2 as
+                // occluded and Chromium throttles compositing to ~0 fps. When the overlay
+                // starts fading and the WebView2 becomes visible, Chromium needs to produce
+                // a fresh frame — but that can take several seconds, causing a black gap.
+                // Executing a double RAF inside Chromium (via ExecuteScriptAsync, which awaits
+                // Promises) forces the compositor to produce two frames so the content is
+                // ready the instant the WPF opacity animation reveals it.
+                var wakeTask = WebViewControl.CoreWebView2.ExecuteScriptAsync(
+                    "new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))");
+                await Task.WhenAny(wakeTask, Task.Delay(500));
+
                 HideSplash();
             }
             catch (Exception ex)
             {
                 TsdLog.Write($"ERROR in Window_Loaded: {ex}");
                 HideSplash(); // Always dismiss so the error dialog is reachable
-                MessageBox.Show($"TSD Native WebView2 Boot Error: {ex.Message}\nFalling back to system browser redirect.", "Runtime Warn");
+                MessageBox.Show($"BBM Native WebView2 Boot Error: {ex.Message}\nFalling back to system browser redirect.", "Runtime Warn");
             }
         }
 
