@@ -258,6 +258,12 @@ export default function SpaceExplorerView({
     if (soundEnabled) playSpaceChime(lastEvent.key);
   }, [lastEvent, soundEnabled]);
 
+  // --- "The Planets" background theme ---
+  useEffect(() => {
+    if (soundEnabled) startPlanetsTheme();
+    return () => stopPlanetsTheme();
+  }, [soundEnabled]);
+
   // --- Inject orbit keyframe CSS ---
   useEffect(() => {
     const rules = PLANETS.map((p, i) =>
