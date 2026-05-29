@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { speakToddlerText, playSpaceChime } from "../utils/audio";
+import { speakToddlerText, playSpaceChime, startPlanetsTheme, stopPlanetsTheme } from "../utils/audio";
 
 interface SpaceExplorerProps {
   lastEvent: { key: string; timestamp: number } | null;
