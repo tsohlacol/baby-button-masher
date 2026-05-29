@@ -306,6 +306,81 @@ export function playSpaceChime(key: string) {
   }
 }
 
+// Jupiter (Bringer of Jollity) main theme — simplified in C/G major, loops every ~13 s
+const PLANETS_THEME_NOTES: Array<{ freq: number; dur: number }> = [
+  { freq: 392.00, dur: 0.80 }, // G4
+  { freq: 440.00, dur: 0.40 }, // A4
+  { freq: 392.00, dur: 0.40 }, // G4
+  { freq: 329.63, dur: 0.40 }, // E4
+  { freq: 293.66, dur: 0.40 }, // D4
+  { freq: 261.63, dur: 0.80 }, // C4
+  { freq: 293.66, dur: 0.80 }, // D4
+  { freq: 329.63, dur: 0.40 }, // E4
+  { freq: 349.23, dur: 0.40 }, // F4
+  { freq: 392.00, dur: 1.60 }, // G4 (held)
+  { freq: 523.25, dur: 0.80 }, // C5
+  { freq: 493.88, dur: 0.40 }, // B4
+  { freq: 440.00, dur: 0.40 }, // A4
+  { freq: 392.00, dur: 0.40 }, // G4
+  { freq: 349.23, dur: 0.40 }, // F4
+  { freq: 329.63, dur: 0.80 }, // E4
+  { freq: 293.66, dur: 0.80 }, // D4
+  { freq: 261.63, dur: 0.40 }, // C4
+  { freq: 293.66, dur: 0.40 }, // D4
+  { freq: 329.63, dur: 1.60 }, // E4 (held)
+];
+
+let _planetsActive = false;
+let _planetsTimer: ReturnType<typeof setTimeout> | null = null;
+
+function _schedulePlanetsCycle() {
+  if (!_planetsActive) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const vol = audioVolumeLimit * 0.14;
+  let t = ctx.currentTime + 0.05;
+  let totalDur = 0;
+
+  for (const note of PLANETS_THEME_NOTES) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = note.freq;
+
+    const attack = Math.min(0.12, note.dur * 0.15);
+    const release = Math.min(0.25, note.dur * 0.3);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(vol, t + attack);
+    gain.gain.setValueAtTime(vol, t + note.dur - release);
+    gain.gain.linearRampToValueAtTime(0, t + note.dur);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + note.dur + 0.02);
+
+    t += note.dur;
+    totalDur += note.dur;
+  }
+
+  _planetsTimer = setTimeout(_schedulePlanetsCycle, (totalDur - 0.3) * 1000);
+}
+
+export function startPlanetsTheme() {
+  if (_planetsActive) return;
+  _planetsActive = true;
+  _schedulePlanetsCycle();
+}
+
+export function stopPlanetsTheme() {
+  _planetsActive = false;
+  if (_planetsTimer !== null) {
+    clearTimeout(_planetsTimer);
+    _planetsTimer = null;
+  }
+}
+
 /**
  * Retrieves child-friendly voices, sorted best-first.
  * Priority: Microsoft Online Natural (neural TTS) > any Natural/Neural > Google > Premium > plain English > legacy robotic (Zira/David).
