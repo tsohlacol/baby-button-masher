@@ -392,10 +392,10 @@ namespace BabyButtonMasher
                     _altTracked = isKeyDown;   // true on keydown, false on keyup
                     swallowKeystroke = true;
                 }
-                // Belt-and-suspenders: if GetKeyState already reflects Alt as held (possible when
-                // Alt has been physically down long enough for the state table to catch up), block
-                // any remaining Alt+key combos that slipped past the explicit check above.
-                if (IsModifierKeyDown(VK_LMENU) || IsModifierKeyDown(VK_RMENU))
+                // Belt-and-suspenders: block any Alt+key combo that slipped past the VK_LMENU check
+                // above. _altTracked covers the common case where we swallowed the Alt keydown so
+                // GetKeyState never saw it; IsModifierKeyDown catches late-arriving state updates.
+                if (_altTracked || IsModifierKeyDown(VK_LMENU) || IsModifierKeyDown(VK_RMENU))
                 {
                     swallowKeystroke = true;
                 }
