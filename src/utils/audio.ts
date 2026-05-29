@@ -332,6 +332,7 @@ const PLANETS_THEME_NOTES: Array<{ freq: number; dur: number }> = [
 
 let _planetsActive = false;
 let _planetsTimer: ReturnType<typeof setTimeout> | null = null;
+let _planetsOscillators: OscillatorNode[] = [];
 
 function _schedulePlanetsCycle() {
   if (!_planetsActive) return;
@@ -359,12 +360,16 @@ function _schedulePlanetsCycle() {
     gain.connect(ctx.destination);
     osc.start(t);
     osc.stop(t + note.dur + 0.02);
+    _planetsOscillators.push(osc);
 
     t += note.dur;
     totalDur += note.dur;
   }
 
-  _planetsTimer = setTimeout(_schedulePlanetsCycle, (totalDur - 0.3) * 1000);
+  _planetsTimer = setTimeout(() => {
+    _planetsOscillators = [];
+    _schedulePlanetsCycle();
+  }, (totalDur - 0.3) * 1000);
 }
 
 export function startPlanetsTheme() {
@@ -379,6 +384,8 @@ export function stopPlanetsTheme() {
     clearTimeout(_planetsTimer);
     _planetsTimer = null;
   }
+  _planetsOscillators.forEach(osc => { try { osc.stop(); } catch { /* already stopped */ } });
+  _planetsOscillators = [];
 }
 
 /**
