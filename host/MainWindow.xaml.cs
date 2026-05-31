@@ -19,6 +19,7 @@ namespace BabyButtonMasher
         // false on keyup. GetKeyState is unreliable inside WH_KEYBOARD_LL (state is updated
         // after CallNextHookEx, not before), so we track it ourselves to detect Alt+F4.
         private volatile bool _altTracked = false;
+        private volatile bool _ctrlTracked = false;
 
         // Win32 API Constants
         private const int WH_KEYBOARD_LL = 13;
