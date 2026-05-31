@@ -411,10 +411,17 @@ namespace BabyButtonMasher
                     return (IntPtr)1;
                 }
 
-                // 3. Block Ctrl+Esc (Start menu) and Ctrl+Shift+Esc (Task Manager).
-                // Both sequences end with VK_ESCAPE as the triggering key while Ctrl is held.
-                bool ctrlPressed = IsModifierKeyDown(VK_LCONTROL) || IsModifierKeyDown(VK_RCONTROL);
-                if (ctrlPressed && vkCode == VK_ESCAPE)
+                // 3. Block Ctrl key and ALL Ctrl+key combos.
+                // WebView2 exposes browser shortcuts (Ctrl+F find, Ctrl+T new tab, Ctrl+W close,
+                // Ctrl+R reload, etc.) that let a toddler break out of the sandbox. We swallow
+                // the Ctrl keys themselves and track state so any following keypress is also
+                // swallowed, mirroring the same pattern used for Alt above.
+                if (vkCode == VK_LCONTROL || vkCode == VK_RCONTROL)
+                {
+                    _ctrlTracked = isKeyDown;
+                    swallowKeystroke = true;
+                }
+                if (_ctrlTracked || IsModifierKeyDown(VK_LCONTROL) || IsModifierKeyDown(VK_RCONTROL))
                 {
                     swallowKeystroke = true;
                 }
