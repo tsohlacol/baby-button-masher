@@ -1149,7 +1149,7 @@ export default function App() {
                             });
                             keyEventsRef.current.push(timestamp);
                             if (currentPlayMode === ScreensaverMode.COSMIC_FIREWORKS && settings.soundEffectsEnabled) {
-                              playFireworkSynth();
+                              playFireworkSynth(" ");
                             }
                           }}
                           className="absolute inset-0 block w-full h-full pointer-events-auto z-5 cursor-crosshair opacity-0"
