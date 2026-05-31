@@ -106,37 +106,99 @@ export function playSyntheticPiano(key: string, type: OscillatorType = "sine") {
   }
 }
 
+// Firework sound styles — different keys get different explosion timbres
+const FIREWORK_STYLES = ["boom", "sizzle", "sparkle", "pop", "whoosh"] as const;
+type FireworkStyle = typeof FIREWORK_STYLES[number];
+
+function getFireworkStyle(key: string): FireworkStyle {
+  const code = key.toLowerCase().charCodeAt(0) || 65;
+  return FIREWORK_STYLES[code % FIREWORK_STYLES.length];
+}
+
 /**
- * Plays an explosion firework bloop.
+ * Plays an explosion firework sound that varies by key pressed.
+ * Each key maps to a different pitch and timbre so button mashing sounds musical.
  */
-export function playFireworkSynth() {
+export function playFireworkSynth(key?: string) {
   try {
     const ctx = getAudioContext();
     if (!ctx) return;
-    const osc = ctx.createOscillator();
-    const gainNode = ctx.createGain();
 
-    osc.type = "sawtooth";
-    // Pitch sweep downwards rapidly
-    osc.frequency.setValueAtTime(450, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.6);
-
+    const { freq: baseFreq } = key ? getFrequencyForKey(key) : { freq: 220 };
+    const style: FireworkStyle = key ? getFireworkStyle(key) : "boom";
     const userVolume = audioVolumeLimit;
-    gainNode.gain.setValueAtTime(0.3 * userVolume, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.6);
 
-    // Dynamic bandpass filter for an explosive fizzle
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.setValueAtTime(1000, ctx.currentTime);
-    filter.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.6);
+    if (style === "boom") {
+      // Deep explosive thud — low keys, number row, space
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(baseFreq * 1.5, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.15, ctx.currentTime + 0.6);
+      gain.gain.setValueAtTime(0.35 * userVolume, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.6);
+      const filter = ctx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(1200, ctx.currentTime);
+      filter.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.6);
+      osc.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.6);
 
-    osc.connect(filter);
-    filter.connect(gainNode);
-    gainNode.connect(ctx.destination);
+    } else if (style === "sizzle") {
+      // High fizzy sparkle — mid keys
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "square";
+      osc.frequency.setValueAtTime(baseFreq * 3, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.8, ctx.currentTime + 0.5);
+      gain.gain.setValueAtTime(0.18 * userVolume, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+      const filter = ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(baseFreq * 4, ctx.currentTime);
+      filter.Q.value = 2;
+      osc.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.5);
 
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.6);
+    } else if (style === "sparkle") {
+      // Bright twinkling chime — high keys
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(baseFreq * 4, ctx.currentTime);
+      osc.frequency.setValueAtTime(baseFreq * 5, ctx.currentTime + 0.05);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 2, ctx.currentTime + 0.45);
+      gain.gain.setValueAtTime(0.28 * userVolume, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.45);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.45);
+
+    } else if (style === "pop") {
+      // Short sharp pop — punctuation, symbols
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(baseFreq * 2, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, ctx.currentTime + 0.25);
+      gain.gain.setValueAtTime(0.4 * userVolume, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.25);
+
+    } else {
+      // Whoosh — rising sweep
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(baseFreq * 0.5, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 3, ctx.currentTime + 0.4);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.8, ctx.currentTime + 0.7);
+      gain.gain.setValueAtTime(0.25 * userVolume, ctx.currentTime);
+      gain.gain.setValueAtTime(0.25 * userVolume, ctx.currentTime + 0.4);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.7);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.7);
+    }
   } catch (error) {
     console.warn("Audio synthesis failed:", error);
   }
