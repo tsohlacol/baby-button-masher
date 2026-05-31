@@ -334,7 +334,7 @@ export default function App() {
     keyEventsRef.current.push(timestamp);
     setLastKeystroke({ key: e.key, timestamp });
     if (currentPlayModeRef.current === ScreensaverMode.COSMIC_FIREWORKS && soundEffectsEnabledRef.current) {
-      playFireworkSynth();
+      playFireworkSynth(e.key);
     }
   }, []);
 
