@@ -583,7 +583,7 @@ export default function App() {
               <select
                 value={settings.activeMode}
                 onChange={(e) => setSettings((prev) => ({ ...prev, activeMode: e.target.value as ScreensaverMode }))}
-                className="w-full bg-black/20 border border-slate-500/20 p-2.5 rounded-xl text-sm font-medium shrink-0"
+                className="w-full bg-black/20 border border-slate-500/20 p-2.5 rounded-xl text-sm font-medium shrink-0 text-black"
               >
                 <option value={ScreensaverMode.SPEAK_THE_KEY}>🗣️ Speak the Key</option>
                 <option value={ScreensaverMode.SPACE_ROCKET}>🚀 Space Rocket Blastoff</option>
