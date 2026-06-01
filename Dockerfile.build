@@ -51,7 +51,9 @@ RUN --mount=type=cache,target=/root/.nuget/packages \
 # =========================================================
 # STAGE 3: Windows Installer Creation using Wine & Inno Setup
 # =========================================================
+ARG APP_VERSION=0.0.0
 FROM ubuntu:22.04 AS installer-builder
+ARG APP_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
 ENV WINEDEBUG=-all
 ENV WINEARCH=win32
