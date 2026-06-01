@@ -7,8 +7,9 @@ echo "==> Clearing old builds..."
 rm -rf ./build-output
 mkdir -p ./build-output
 
-echo "==> Building installer in isolated Docker container..."
-docker build -t bbm-pipeline -f Dockerfile.build . 2>&1 | tee logs/build-installer.log
+VERSION=$(node -p "require('./package.json').version")
+echo "==> Building installer v${VERSION} in isolated Docker container..."
+docker build -t bbm-pipeline -f Dockerfile.build --build-arg APP_VERSION="${VERSION}" . 2>&1 | tee logs/build-installer.log
 
 echo "==> Copying final Windows Installer wrapper straight to ./build-output/ ..."
 docker run --rm -v "$(pwd)/build-output:/output-directory" bbm-pipeline 2>&1 | tee -a logs/build-installer.log
