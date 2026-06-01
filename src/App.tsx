@@ -862,7 +862,7 @@ export default function App() {
                   <select
                     value={settings.unlockRequirement}
                     onChange={(e) => setSettings((p) => ({ ...p, unlockRequirement: e.target.value as any }))}
-                    className="w-full bg-black/20 border border-slate-500/20 p-2 rounded-lg text-xs font-medium"
+                    className="w-full bg-black/20 border border-slate-500/20 p-2 rounded-lg text-xs font-medium text-black"
                   >
                     <option value="math">Math Sum (A + B formula)</option>
                     {settings.passcodeUnlockEnabled && (
