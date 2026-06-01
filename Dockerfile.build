@@ -90,6 +90,9 @@ COPY EULA.txt .
 COPY --from=native-builder /publish ./bin/publish/
 COPY --from=frontend-builder /app/host/bbm.ico ./
 
+# Substitute version from build arg into the installer spec
+RUN sed -i "s|^#define MyAppVersion .*|#define MyAppVersion \"${APP_VERSION}\"|" installer.iss
+
 # Compile installer setup.exe using Inno Setup Console Compiler
 RUN wine "C:\\Program Files\\Inno Setup 6\\ISCC.exe" installer.iss
 
