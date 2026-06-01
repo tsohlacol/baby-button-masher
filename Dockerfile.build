@@ -41,6 +41,7 @@ RUN --mount=type=cache,target=/root/.nuget/packages \
 # The cache mount must be repeated here so dotnet can locate the packages.
 COPY host/ ./host/
 COPY --from=frontend-builder /app/dist ./host/assets/react-app/
+COPY --from=frontend-builder /app/host/bbm.ico ./host/
 WORKDIR /src/host
 RUN --mount=type=cache,target=/root/.nuget/packages \
     dotnet publish -c Release -r win-x64 --self-contained true \
