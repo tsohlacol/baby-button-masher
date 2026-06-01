@@ -1,6 +1,8 @@
+#define MyAppVersion "1.0.4"
+
 [Setup]
 AppName=Baby Button Masher
-AppVersion=1.0.4
+AppVersion={#MyAppVersion}
 AppPublisher=tsohlacol
 AppPublisherURL=https://github.com/tsohlacol/toddler-screen-defender
 AppSupportURL=https://github.com/tsohlacol/toddler-screen-defender/issues
@@ -11,7 +13,7 @@ UninstallDisplayIcon={app}\BabyButtonMasher.exe
 ; SetupIconFile brands the installer wizard window and taskbar button during setup.
 SetupIconFile=bbm.ico
 OutputDir=.
-OutputBaseFilename=BBM_Setup_v1.0.4
+OutputBaseFilename=BBM_Setup_v{#MyAppVersion}
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
@@ -25,7 +27,7 @@ SetupLogging=yes
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
-Name: "debugdesktopicon"; Description: "Create debug shortcut (writes diagnostic log to %LOCALAPPDATA%\BabyButtonMasher\bbm-debug.log)"; GroupDescription: "{cm:AdditionalIcons}"
+Name: "debugdesktopicon"; Description: "Create debug shortcut (writes diagnostic log to %LOCALAPPDATA%\BabyButtonMasher\bbm-debug.log)"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
 Source: "bin\publish\BabyButtonMasher.exe"; DestDir: "{app}"; Flags: ignoreversion
