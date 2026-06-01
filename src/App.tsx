@@ -546,7 +546,7 @@ export default function App() {
               <div>
                 <h1 className="text-2xl font-black tracking-tight flex items-center gap-2">
                   <span>Baby Button Masher</span>
-                  <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-semibold border border-indigo-500/10">v1.1</span>
+                  <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-semibold border border-indigo-500/10">v{__APP_VERSION__}</span>
                 </h1>
                 <p className="text-xs opacity-60">Keep your desktop safe while your toddler plays &amp; learns!</p>
               </div>
@@ -1496,7 +1496,7 @@ export default function App() {
             Baby Button Masher
           </p>
           <p style={{ color: '#888', fontSize: '22px', fontFamily: 'Segoe UI, system-ui, sans-serif', marginTop: '16px' }}>
-            by tsohlacol
+            by tsohlacol · v{__APP_VERSION__}
           </p>
         </div>
       )}
