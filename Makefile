@@ -1,6 +1,7 @@
 # Baby Button Masher (BBM) Build, Test, and Security Audit Makefile
 SHELL := /bin/bash
 LOG_DIR := logs
+APP_VERSION := $(shell node -p "require('./package.json').version")
 
 .PHONY: all setup build lint test sast sca dast secrets malware security-audit build-installer run clean help
 
