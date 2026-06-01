@@ -673,7 +673,7 @@ export default function App() {
                         <select
                           value={settings.speechVoiceName}
                           onChange={(e) => setSettings((p) => ({ ...p, speechVoiceName: e.target.value }))}
-                          className="w-full bg-black/20 border border-slate-500/20 p-2 rounded-lg text-xs"
+                          className="w-full bg-black/20 border border-slate-500/20 p-2 rounded-lg text-xs text-black"
                         >
                           {highQuality.length > 0 && (
                             <optgroup label="⭐ High Quality (Neural / Online)">
