@@ -10,11 +10,11 @@ all: setup test build-installer
 	@mkdir -p build-output
 	@EXE_FILE=$$(find build-output -name "*.exe" | head -n 1); \
 	if [ -n "$$EXE_FILE" ]; then \
-		echo "Found installer: $$EXE_FILE. Creating BBM_Setup_v1.0.4.zip..."; \
+		echo "Found installer: $$EXE_FILE. Creating BBM_Setup_v$(APP_VERSION).zip..."; \
 		if command -v zip >/dev/null 2>&1; then \
-			zip -j build-output/BBM_Setup_v1.0.4.zip "$$EXE_FILE"; \
+			zip -j build-output/BBM_Setup_v$(APP_VERSION).zip "$$EXE_FILE"; \
 		elif command -v python3 >/dev/null 2>&1; then \
-			python3 -c "import zipfile, os; z = zipfile.ZipFile('build-output/BBM_Setup_v1.0.4.zip', 'w', zipfile.ZIP_DEFLATED); z.write('$$EXE_FILE', os.path.basename('$$EXE_FILE')); z.close()"; \
+			python3 -c "import zipfile, os; z = zipfile.ZipFile('build-output/BBM_Setup_v$(APP_VERSION).zip', 'w', zipfile.ZIP_DEFLATED); z.write('$$EXE_FILE', os.path.basename('$$EXE_FILE')); z.close()"; \
 		else \
 			echo "Warning: Neither zip nor python3 found in environment. Could not generate zip archive."; \
 		fi; \
