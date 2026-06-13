@@ -34,6 +34,7 @@ import {
 import { ScreensaverMode, ParentSettings } from "./types";
 import { speakToddlerText, playFireworkSynth, getAvailableVoices, setAudioVolumeLimit, cancelSpeech } from "./utils/audio";
 import SpaceExplorerView from "./components/SpaceExplorerView";
+import BinkyCatcherView from "./components/BinkyCatcherView";
 import { getLearnItem } from "./utils/words";
 
 // Importer local components
