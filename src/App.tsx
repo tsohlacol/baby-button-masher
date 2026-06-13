@@ -54,6 +54,7 @@ const PLAY_MODES: ScreensaverMode[] = [
   ScreensaverMode.SPACE_ROCKET,
   ScreensaverMode.MOUSE_DRAWING,
   ScreensaverMode.SPACE_EXPLORER,
+  ScreensaverMode.BINKY_CATCHER,
 ];
 
 const THEME_PRESETS = {
