@@ -1140,6 +1140,12 @@ export default function App() {
                         />
                       )}
 
+                      {currentPlayMode === ScreensaverMode.BINKY_CATCHER && (
+                        <BinkyCatcherView
+                          soundEnabled={settings.soundEffectsEnabled}
+                        />
+                      )}
+
                       {/* BACKGROUND CONTINUOUS MOUSE-CLICK EMITTER LISTENER FOR SANDBOX */}
                       {currentPlayMode !== ScreensaverMode.MOUSE_DRAWING && (
                         <div 
