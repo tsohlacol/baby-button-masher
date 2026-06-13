@@ -14,6 +14,7 @@ export enum ScreensaverMode {
   SPACE_ROCKET = "SPACE_ROCKET",
   MOUSE_DRAWING = "MOUSE_DRAWING",
   SPACE_EXPLORER = "SPACE_EXPLORER",
+  BINKY_CATCHER = "BINKY_CATCHER",
 }
 
 export interface KeystrokeEvent {
