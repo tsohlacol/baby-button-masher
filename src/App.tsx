@@ -594,6 +594,7 @@ export default function App() {
                 <option value={ScreensaverMode.KEYBOARD_PIANO}>🎹 Keyboard Piano</option>
                 <option value={ScreensaverMode.MOUSE_DRAWING}>🎨 Sensory Mouse Drawing</option>
                 <option value={ScreensaverMode.SPACE_EXPLORER}>🌌 Space Explorer</option>
+                <option value={ScreensaverMode.BINKY_CATCHER}>🍼 Binky Catcher</option>
               </select>
 
               {/* Dynamic Switch Rule toggle */}
