@@ -19,6 +19,9 @@
     <AssemblyTitle>Baby Button Masher</AssemblyTitle>
     <Description>Baby Button Masher - Interactive toddler keyboard sandbox</Description>
     <Company>tsohlacol</Company>
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
