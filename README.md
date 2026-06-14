@@ -72,7 +72,7 @@ This single command triggers the full compile queue inside Docker, using:
 - **Node.js** to compile static optimized typescript packages.
 - **.NET 8 SDK CLI** to cross-compile the self-contained WPF binary.
 - **Wine with Inno Setup** to assemble the finished installer, dumping the completed setup files into:
-`./build-output/BBM_Setup_v1.0.exe`
+`./build-output/BBM_Setup_v1.1.0.exe`
 
 ---
 
