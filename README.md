@@ -84,6 +84,20 @@ This single command triggers the full compile queue inside Docker, using:
 
 ---
 
+## Versioning
+
+BBM uses [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`):
+
+| Bump | When | Example |
+|------|------|---------|
+| **Major** | Breaking changes, complete rewrites, or fundamental architecture changes | `1.x.x` -> `2.0.0` |
+| **Minor** | New features, new game modes, new settings, new capabilities | `1.0.x` -> `1.1.0` |
+| **Patch** | Bug fixes, typo corrections, dependency updates, small visual tweaks | `1.0.5` -> `1.0.6` |
+
+Version is set in `package.json` (source of truth) and propagated automatically to the React splash screen via Vite at build time. It is also mirrored in `installer.iss` (controls the installer filename) and `host/BabyButtonMasher.csproj` (embeds into the Windows exe metadata).
+
+---
+
 ## Contribution & Licensing
 
 Baby Button Masher is open source, licensed under our **Baby Button Masher Reciprocal Contribution License (BBM-RCL)** and subject to our **EULA**. 
