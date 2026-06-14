@@ -16,7 +16,7 @@
 To download and run standard installations of Baby Button Masher without compiling the code yourself, follow these steps:
 
 1. Navigate to the projects upstream website at **[github.com/tsohlacol/toddler-screen-defender](https://github.com/tsohlacol/toddler-screen-defender)**.
-2. Under the **Releases** tab on the right sidebar, select the latest version tag (e.g., `v1.1.0`).
+2. Under the **Releases** tab on the right sidebar, select the latest version tag (e.g., `v1.1.1`).
 3. Download the standalone `BBM_Setup.exe` installer file.
 4. Run the installer, accept the **End User License Agreement (EULA)**, and follow the simple setup screens.
 
@@ -72,7 +72,7 @@ This single command triggers the full compile queue inside Docker, using:
 - **Node.js** to compile static optimized typescript packages.
 - **.NET 8 SDK CLI** to cross-compile the self-contained WPF binary.
 - **Wine with Inno Setup** to assemble the finished installer, dumping the completed setup files into:
-`./build-output/BBM_Setup_v1.1.0.exe`
+`./build-output/BBM_Setup_v1.1.1.exe`
 
 ---
 
