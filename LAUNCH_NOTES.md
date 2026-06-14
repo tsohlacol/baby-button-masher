@@ -3,12 +3,10 @@
 ## Where to Post
 
 - https://www.reddit.com/r/Parenting/
+  - messaged the mods to see if the post would break their rules
 - https://www.reddit.com/r/toddlers/
 - https://www.reddit.com/r/beyondthebump/
 - https://www.reddit.com/r/windowsapps/
-- https://www.reddit.com/r/csharp/ (lead with the Win32 keyboard hook angle)
-- https://news.ycombinator.com/submit (Show HN)
-- https://www.producthunt.com/posts/new
 
 ## Draft Reddit Post
 
