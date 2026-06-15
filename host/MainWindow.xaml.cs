@@ -378,86 +378,113 @@ namespace BabyButtonMasher
         {
             if (nCode >= HC_ACTION)
             {
-                int vkCode = Marshal.ReadInt32(lParam);
+                var ks = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
+                int vkCode = (int)ks.vkCode;
+
+                // Skip keystrokes that BBM itself injected via SendInput — they already
+                // have their modifier stripped and should flow straight to WebView2/React.
+                if (ks.dwExtraInfo == (IntPtr)SYNTHETIC_KEY_MAGIC)
+                    return CallNextHookEx(_hookID, nCode, wParam, lParam);
+
                 bool isKeyDown = wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN;
-                bool swallowKeystroke = false;
+                bool swallow = false;
+                bool injectBase = false; // when true, re-inject vkCode without the modifier
 
-                // 1. Block Win keys.
+                // 1. Win keys — swallow silently; no re-injection (these are pure OS shortcuts).
                 if (vkCode == VK_LWIN || vkCode == VK_RWIN)
-                {
-                    swallowKeystroke = true;
-                }
+                    swallow = true;
 
-                // 2. Block Alt key itself and all Alt+key combinations.
+                // 2. Alt key itself and all Alt+key combinations.
                 //
                 // WHY explicit VK_LMENU/VK_RMENU swallow: when Alt first goes down,
                 // GetKeyState(VK_LMENU) returns 0 because the key-state table is updated AFTER
-                // CallNextHookEx, not before. The previous "altPressed && vkCode != VK_F4" check
-                // therefore missed the Alt keydown, letting it reach the OS menu system or tools
-                // like Razer Synapse, which stole WebView2 focus and broke subsequent key input.
-                //
-                // WHY _altTracked for Alt+F4: we track Alt state ourselves (set on keydown,
-                // cleared on keyup) instead of using GetAsyncKeyState, which is not reliably
-                // settled inside a WH_KEYBOARD_LL callback.
+                // CallNextHookEx, not before. Tracking it ourselves (_altTracked) is the only
+                // reliable approach inside WH_KEYBOARD_LL.
                 if (vkCode == VK_LMENU || vkCode == VK_RMENU)
                 {
-                    _altTracked = isKeyDown;   // true on keydown, false on keyup
-                    swallowKeystroke = true;
+                    _altTracked = isKeyDown;
+                    swallow = true;          // Alt itself is always swallowed, never re-injected
                 }
-                // Belt-and-suspenders: block any Alt+key combo that slipped past the VK_LMENU check
-                // above. _altTracked covers the common case where we swallowed the Alt keydown so
-                // GetKeyState never saw it; IsModifierKeyDown catches late-arriving state updates.
                 if (_altTracked || IsModifierKeyDown(VK_LMENU) || IsModifierKeyDown(VK_RMENU))
                 {
-                    swallowKeystroke = true;
+                    swallow = true;
+                    injectBase = true;       // Strip Alt and send the bare key to React
                 }
 
-                // Alt+F4 parent exit — placed after the VK_LMENU block so _altTracked is fresh.
-                // We close via the dispatcher because the OS message queue never saw the Alt
-                // keydown (we swallowed it), so the normal WM_SYSCOMMAND SC_CLOSE path is dead.
+                // Alt+F4 parent exit — checked after _altTracked is set so it is always fresh.
+                // Close via the dispatcher because the OS never saw the Alt keydown (we swallowed
+                // it), so the normal WM_SYSCOMMAND SC_CLOSE path is dead.
                 if (isKeyDown && vkCode == VK_F4 && _altTracked)
                 {
                     Dispatcher.BeginInvoke(() => this.Close());
                     _altTracked = false;
-                    return (IntPtr)1;
+                    return (IntPtr)1;        // Early exit: don't re-inject F4 on exit
                 }
 
-                // 3. Block Ctrl key and ALL Ctrl+key combos.
-                // WebView2 exposes browser shortcuts (Ctrl+F find, Ctrl+T new tab, Ctrl+W close,
-                // Ctrl+R reload, etc.) that let a toddler break out of the sandbox. We swallow
-                // the Ctrl keys themselves and track state so any following keypress is also
-                // swallowed, mirroring the same pattern used for Alt above.
+                // 3. Ctrl key and ALL Ctrl+key combos.
+                // WebView2 exposes browser shortcuts (Ctrl+F find, Ctrl+W close, Ctrl+R reload,
+                // etc.) that can break out of the sandbox. We swallow Ctrl itself and all combos,
+                // but re-inject the bare key so React still sees it as a normal keypress.
                 if (vkCode == VK_LCONTROL || vkCode == VK_RCONTROL)
                 {
                     _ctrlTracked = isKeyDown;
-                    swallowKeystroke = true;
+                    swallow = true;          // Ctrl itself is always swallowed, never re-injected
                 }
                 if (_ctrlTracked || IsModifierKeyDown(VK_LCONTROL) || IsModifierKeyDown(VK_RCONTROL))
                 {
-                    swallowKeystroke = true;
+                    swallow = true;
+                    injectBase = true;       // Strip Ctrl and send the bare key to React
                 }
 
-                // 4. Block F11 to prevent kiosk escape.
-                if (vkCode == VK_F11)
+                // 4. Function keys (F1-F12).
+                // Swallow the OS-level event (preventing F5 refresh, F12 DevTools, etc.) and
+                // re-inject the bare key code so React can still react to function key presses.
+                if (vkCode >= VK_F1 && vkCode <= VK_F12)
                 {
-                    swallowKeystroke = true;
+                    swallow = true;
+                    injectBase = true;
                 }
 
-                // 5. Block Print Screen and the context-menu key.
-                // Print Screen triggers an OS-level screen-capture action that briefly pulls focus
-                // away from WebView2, dropping all subsequent keyboard events until the child
-                // physically taps the screen again.
+                // 5. Print Screen and context-menu key — swallow silently, no re-injection.
                 if (vkCode == VK_SNAPSHOT || vkCode == VK_APPS)
-                {
-                    swallowKeystroke = true;
-                }
+                    swallow = true;
 
-                if (swallowKeystroke)
+                if (swallow)
                 {
+                    // Re-inject the bare key so React sees it, but only when the key itself
+                    // is not a modifier (we never want to send bare Alt/Ctrl/Win/Shift events).
+                    if (injectBase && !IsModifierVk(vkCode))
+                        InjectKey(vkCode, isKeyDown);
                     return (IntPtr)1;
                 }
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
+        }
+
+        private static bool IsModifierVk(int vk) =>
+            vk is VK_LWIN or VK_RWIN
+               or VK_SHIFT or VK_LSHIFT or VK_RSHIFT
+               or VK_CONTROL or VK_LCONTROL or VK_RCONTROL
+               or VK_MENU or VK_LMENU or VK_RMENU;
+
+        private void InjectKey(int vkCode, bool keyDown)
+        {
+            var input = new INPUT
+            {
+                type = INPUT_KEYBOARD,
+                u = new INPUT_UNION
+                {
+                    ki = new KEYBDINPUT
+                    {
+                        wVk = (ushort)vkCode,
+                        wScan = 0,
+                        dwFlags = keyDown ? 0u : KEYEVENTF_KEYUP,
+                        time = 0,
+                        dwExtraInfo = (IntPtr)SYNTHETIC_KEY_MAGIC,
+                    }
+                }
+            };
+            SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
         }
 
         // --- DLL IMPORTS FROM USER32 & KERNEL32 ---
