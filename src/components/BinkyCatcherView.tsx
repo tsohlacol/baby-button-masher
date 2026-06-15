@@ -140,15 +140,15 @@ export default function BinkyCatcherView({ soundEnabled }: BinkyCatcherProps) {
       const speed = 8;
       const w = window.innerWidth;
 
-      // Move player from held keys
-      if (keysHeld.current.has("ArrowLeft")) {
+      // Move player — arrow keys or any left/right zone key
+      if (keysHeld.current.has("ArrowLeft") || leftCount.current > 0) {
         setPlayerX((x) => {
           const next = Math.max(PLAYER_WIDTH / 2, x - speed);
           playerXRef.current = next;
           return next;
         });
       }
-      if (keysHeld.current.has("ArrowRight")) {
+      if (keysHeld.current.has("ArrowRight") || rightCount.current > 0) {
         setPlayerX((x) => {
           const next = Math.min(w - PLAYER_WIDTH / 2, x + speed);
           playerXRef.current = next;
