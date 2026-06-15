@@ -82,15 +82,29 @@ export default function BinkyCatcherView({ soundEnabled }: BinkyCatcherProps) {
     } catch {}
   };
 
-  // Key listeners
+  // Key listeners — arrow keys for older kids, keyboard zones for toddlers.
+  // e.code is the physical key position, so left-side keys always move left
+  // regardless of Caps Lock, language layout, or which character is typed.
   useEffect(() => {
     const onDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      if (e.code === "ArrowLeft") {
         e.preventDefault();
-        keysHeld.current.add(e.key);
+        keysHeld.current.add("ArrowLeft");
+      } else if (e.code === "ArrowRight") {
+        e.preventDefault();
+        keysHeld.current.add("ArrowRight");
+      } else if (LEFT_ZONE.has(e.code)) {
+        leftCount.current++;
+      } else if (RIGHT_ZONE.has(e.code)) {
+        rightCount.current++;
       }
     };
-    const onUp = (e: KeyboardEvent) => keysHeld.current.delete(e.key);
+    const onUp = (e: KeyboardEvent) => {
+      keysHeld.current.delete("ArrowLeft");
+      keysHeld.current.delete("ArrowRight");
+      if (LEFT_ZONE.has(e.code))  leftCount.current  = Math.max(0, leftCount.current  - 1);
+      if (RIGHT_ZONE.has(e.code)) rightCount.current = Math.max(0, rightCount.current - 1);
+    };
     window.addEventListener("keydown", onDown);
     window.addEventListener("keyup", onUp);
     return () => {
