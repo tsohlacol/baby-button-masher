@@ -539,6 +539,47 @@ namespace BabyButtonMasher
         }
 
         private const int MONITORINFOF_PRIMARY = 0x00000001;
+
+        // --- KEYBOARD INJECTION SUPPORT (SendInput + KBDLLHOOKSTRUCT) ---
+
+        // Read dwExtraInfo from the hook's lParam to detect synthetic keystrokes.
+        [StructLayout(LayoutKind.Sequential)]
+        private struct KBDLLHOOKSTRUCT
+        {
+            public uint vkCode;
+            public uint scanCode;
+            public uint flags;
+            public uint time;
+            public IntPtr dwExtraInfo; // ULONG_PTR — IntPtr is the correct managed mapping
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct KEYBDINPUT
+        {
+            public ushort wVk;
+            public ushort wScan;
+            public uint dwFlags;
+            public uint time;
+            public IntPtr dwExtraInfo;
+        }
+
+        // LayoutKind.Explicit with all fields at offset 0 mirrors the Win32 INPUT union.
+        [StructLayout(LayoutKind.Explicit)]
+        private struct INPUT_UNION
+        {
+            [FieldOffset(0)] public KEYBDINPUT ki;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct INPUT
+        {
+            public uint type;
+            public INPUT_UNION u;
+        }
+
+        [DllImport("user32.dll")]
+        private static extern uint SendInput(uint nInputs,
+            [MarshalAs(UnmanagedType.LPArray), In] INPUT[] pInputs, int cbSize);
     }
 
     [ComImport]
