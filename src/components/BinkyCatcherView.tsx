@@ -30,6 +30,24 @@ const PLAYER_WIDTH = 80;
 const PLAYER_Y_OFFSET = 120; // px from bottom
 const CATCH_RADIUS = 60;
 
+// Physical keyboard zones by event.code (position on the keyboard, not the character).
+// Left-zone keys move the player left; right-zone keys move the player right.
+// This lets toddlers play using any key mashing — arrow keys also still work.
+const LEFT_ZONE = new Set([
+  "Backquote","Digit1","Digit2","Digit3","Digit4","Digit5","Digit6",
+  "Tab","KeyQ","KeyW","KeyE","KeyR","KeyT",
+  "CapsLock","KeyA","KeyS","KeyD","KeyF","KeyG",
+  "ShiftLeft","KeyZ","KeyX","KeyC","KeyV","KeyB",
+  "ControlLeft","MetaLeft","AltLeft",
+]);
+const RIGHT_ZONE = new Set([
+  "Digit7","Digit8","Digit9","Digit0","Minus","Equal","Backspace",
+  "KeyY","KeyU","KeyI","KeyO","KeyP","BracketLeft","BracketRight","Backslash",
+  "KeyH","KeyJ","KeyK","KeyL","Semicolon","Quote","Enter",
+  "KeyN","KeyM","Comma","Period","Slash",
+  "ShiftRight","AltRight","ControlRight",
+]);
+
 export default function BinkyCatcherView({ soundEnabled }: BinkyCatcherProps) {
   const [playerX, setPlayerX] = useState(window.innerWidth / 2);
   const [binkies, setBinkies] = useState<Binky[]>([]);
