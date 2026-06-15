@@ -46,6 +46,17 @@ namespace BabyButtonMasher
         private const int VK_SNAPSHOT = 0x2C;  // Print Screen — triggers OS screen capture, steals WebView2 focus
         private const int VK_APPS     = 0x5D;  // Context menu key — can surface OS context menus
 
+        private const int VK_MENU  = 0x12;    // Generic Alt — used in IsModifierVk
+        private const int VK_F1    = 0x70;    // First function key
+        private const int VK_F12   = 0x7B;    // Last function key
+
+        // Embedded in dwExtraInfo of keystrokes injected by BBM via SendInput.
+        // The hook skips re-processing events carrying this marker to prevent
+        // infinite re-injection loops.
+        private const int SYNTHETIC_KEY_MAGIC = 0xBBFF;
+        private const uint INPUT_KEYBOARD = 1;
+        private const uint KEYEVENTF_KEYUP = 0x0002;
+
         // Accessibility hotkey suppression (Sticky Keys, Filter Keys, Toggle Keys).
         // These accessibility shortcuts can be triggered by a toddler mashing keys (e.g. 5x Shift
         // activates Sticky Keys, which then makes Ctrl "stick" and drops all subsequent input).
