@@ -303,7 +303,7 @@ export default function BinkyCatcherView({ soundEnabled }: BinkyCatcherProps) {
 
       {/* Instruction footer */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-center opacity-60 font-mono text-xs text-white font-bold bg-white/5 px-4 py-2 rounded-full border border-white/10 pointer-events-none">
-        Use arrow keys to catch the binkies!
+        Left keys move left · Right keys move right · Catch the binkies!
       </div>
 
     </div>
