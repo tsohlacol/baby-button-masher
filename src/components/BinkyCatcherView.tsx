@@ -56,7 +56,9 @@ export default function BinkyCatcherView({ soundEnabled }: BinkyCatcherProps) {
   const [roadOffset, setRoadOffset] = useState(0);
 
   const playerXRef = useRef(playerX);
-  const keysHeld = useRef<Set<string>>(new Set());
+  const keysHeld = useRef<Set<string>>(new Set());  // tracks ArrowLeft / ArrowRight
+  const leftCount = useRef(0);   // how many left-zone keys are currently held
+  const rightCount = useRef(0);  // how many right-zone keys are currently held
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   useEffect(() => { playerXRef.current = playerX; }, [playerX]);
