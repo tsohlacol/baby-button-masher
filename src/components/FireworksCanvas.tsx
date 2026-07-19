@@ -44,10 +44,57 @@ const THEME_COLORS: Record<string, string[]> = {
   rainbow: ["#ef4444", "#f97316", "#eab308", "#22c55e", "#3b82f6", "#6366f1", "#a855f7"],
 };
 
+interface Seed {
+  id: string;
+  x: number;
+  y: number;
+  color: string;
+  plantedAt: number;
+}
+
+// Radius (px) within which a left-click detonation blooms planted seeds.
+const BLOOM_RADIUS = 260;
+// Radius (px) within which a nearby cursor makes a seed shimmer.
+const SHIMMER_RADIUS = 180;
+
 export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const particlesRef = useRef<Particle[]>([]);
+  const seedsRef = useRef<Seed[]>([]);
+  const mouseRef = useRef<{ x: number; y: number } | null>(null);
   const animationRef = useRef<number | null>(null);
+
+  // Spawns a firework burst of particles at (x, y) in the given color.
+  const spawnBurst = (x: number, y: number, color: string, count?: number) => {
+    const numParticles = count ?? 35 + Math.floor(Math.random() * 25);
+    const newParticles: Particle[] = [];
+
+    // Different explosion styles
+    const styles: Array<"circle" | "star" | "ring"> = ["circle", "star", "ring"];
+    const explosionStyle = styles[Math.floor(Math.random() * styles.length)];
+
+    for (let i = 0; i < numParticles; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 7 + 2;
+      const vx = Math.cos(angle) * speed;
+      const vy = Math.sin(angle) * speed;
+
+      newParticles.push({
+        id: `${Date.now()}-${i}-${Math.random()}`,
+        x,
+        y,
+        vx,
+        vy,
+        color,
+        size: Math.random() * 5 + 3,
+        alpha: 1.0,
+        decay: Math.random() * 0.015 + 0.012,
+        shape: explosionStyle,
+      });
+    }
+
+    particlesRef.current = [...particlesRef.current, ...newParticles].slice(-300); // Caps particle amount for performance
+  };
 
   // Spawns particles on keystrokes
   useEffect(() => {
@@ -69,36 +116,41 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
     const colors = THEME_COLORS[theme] || THEME_COLORS.cosmic;
     const baseColor = colors[Math.floor(Math.random() * colors.length)];
 
-    // Spawn burst
-    const numParticles = 35 + Math.floor(Math.random() * 25);
-    const newParticles: Particle[] = [];
+    spawnBurst(x, y, baseColor);
+  }, [lastEvent, theme]);
 
-    // Different explosion styles
-    const styles: Array<"circle" | "star" | "ring"> = ["circle", "star", "ring"];
-    const explosionStyle = styles[Math.floor(Math.random() * styles.length)];
+  // Plants a glowing seed at the cursor position (right click).
+  const plantSeed = (x: number, y: number) => {
+    const colors = THEME_COLORS[theme] || THEME_COLORS.cosmic;
+    const color = colors[Math.floor(Math.random() * colors.length)];
 
-    for (let i = 0; i < numParticles; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 7 + 2;
-      const vx = Math.cos(angle) * speed;
-      const vy = Math.sin(angle) * speed;
+    seedsRef.current = [
+      ...seedsRef.current,
+      { id: `${Date.now()}-${Math.random()}`, x, y, color, plantedAt: Date.now() },
+    ].slice(-40); // Caps planted seed count
+  };
 
-      newParticles.push({
-        id: `${lastEvent.timestamp}-${i}-${Math.random()}`,
-        x,
-        y,
-        vx,
-        vy,
-        color: baseColor,
-        size: Math.random() * 5 + 3,
-        alpha: 1.0,
-        decay: Math.random() * 0.015 + 0.012,
-        shape: explosionStyle,
-      });
+  // Blooms every seed within BLOOM_RADIUS of (x, y) into its own firework,
+  // staggered slightly so the chain reaction reads as a cascade (left click).
+  const detonate = (x: number, y: number) => {
+    const nearby = seedsRef.current
+      .map((seed) => ({ seed, distance: Math.hypot(seed.x - x, seed.y - y) }))
+      .filter((entry) => entry.distance <= BLOOM_RADIUS)
+      .sort((a, b) => a.distance - b.distance);
+
+    if (nearby.length === 0) {
+      // No charges planted nearby: a small fizzle instead of a full bloom.
+      spawnBurst(x, y, "#94a3b8", 8);
+      return;
     }
 
-    particlesRef.current = [...particlesRef.current, ...newParticles].slice(-300); // Caps particle amount for performance
-  }, [lastEvent, theme]);
+    const bloomingIds = new Set(nearby.map((entry) => entry.seed.id));
+    seedsRef.current = seedsRef.current.filter((seed) => !bloomingIds.has(seed.id));
+
+    nearby.forEach((entry, i) => {
+      setTimeout(() => spawnBurst(entry.seed.x, entry.seed.y, entry.seed.color), i * 90);
+    });
+  };
 
   // Main Canvas updates loop
   useEffect(() => {
