@@ -250,9 +250,30 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
     };
   }, []);
 
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    mouseRef.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button === 2) {
+      plantSeed(e.clientX, e.clientY);
+    } else if (e.button === 0) {
+      detonate(e.clientX, e.clientY);
+    }
+  };
+
+  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
   return (
-    <div className="absolute inset-0 w-full h-full bg-transparent select-none pointer-events-none overflow-hidden z-10">
-      <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full" />
+    <div
+      onPointerMove={handlePointerMove}
+      onPointerDown={handlePointerDown}
+      onContextMenu={handleContextMenu}
+      className="absolute inset-0 w-full h-full bg-transparent select-none touch-none overflow-hidden z-10"
+    >
+      <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full pointer-events-none" />
       <div className="absolute top-8 left-1/2 -translate-x-1/2 text-center pointer-events-none select-none">
         <span className="px-6 py-2 rounded-full text-xs font-mono font-bold tracking-widest text-[#fcbbfd] bg-white/10 backdrop-blur-xl border border-white/20 uppercase shadow-lg">
           💫 Cosmic Fireworks Mode 💫
