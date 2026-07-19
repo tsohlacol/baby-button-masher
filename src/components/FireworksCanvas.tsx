@@ -278,7 +278,7 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
         <span className="px-6 py-2 rounded-full text-xs font-mono font-bold tracking-widest text-[#fcbbfd] bg-white/10 backdrop-blur-xl border border-white/20 uppercase shadow-lg">
           💫 Cosmic Fireworks Mode 💫
         </span>
-        <h2 className="text-white/70 text-sm mt-3 font-semibold drop-shadow-xs">Mash keys to shoot stars & light sky!</h2>
+        <h2 className="text-white/70 text-sm mt-3 font-semibold drop-shadow-xs">Mash keys to shoot stars & light sky! Right-click to plant a firework seed, left-click to bloom them!</h2>
       </div>
     </div>
   );
