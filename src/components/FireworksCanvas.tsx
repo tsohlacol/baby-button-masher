@@ -4,7 +4,7 @@
  * Certified Open Source Software licensed under the BBM-RCL Reciprocal License.
  */
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { Particle } from "../types";
 
 interface FireworksProps {
