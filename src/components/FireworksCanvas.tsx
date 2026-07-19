@@ -219,6 +219,26 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
 
       // Maintain remaining particles
       particlesRef.current = activeParticles;
+
+      // Draw planted seeds, shimmering brighter the closer the cursor gets.
+      const now = Date.now();
+      seedsRef.current.forEach((seed, i) => {
+        const distToMouse = mouseRef.current ? Math.hypot(seed.x - mouseRef.current.x, seed.y - mouseRef.current.y) : Infinity;
+        const proximity = Math.max(0, 1 - distToMouse / SHIMMER_RADIUS); // 0 (far) to 1 (right on top)
+        const pulse = Math.sin(now / 400 + i) * 0.15 + 0.85; // gentle ambient twinkle
+        const shimmer = 1 + proximity * 0.9;
+
+        ctx.save();
+        ctx.globalAlpha = pulse * (0.6 + proximity * 0.4);
+        ctx.fillStyle = seed.color;
+        ctx.shadowColor = seed.color;
+        ctx.shadowBlur = 8 + proximity * 18;
+        ctx.beginPath();
+        ctx.arc(seed.x, seed.y, (4 + proximity * 3) * shimmer, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
       animationRef.current = requestAnimationFrame(render);
     };
 
