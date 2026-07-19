@@ -279,6 +279,53 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
         ctx.restore();
       });
 
+      // Decay the shockwave vector every frame so charge fades once motion stops.
+      waveRef.current = { vx: waveRef.current.vx * WAVE_DECAY, vy: waveRef.current.vy * WAVE_DECAY };
+
+      // Cursor HUD: current wheel-selected color + shockwave charge meter.
+      if (mouseRef.current) {
+        const colors = THEME_COLORS[theme] || THEME_COLORS.cosmic;
+        const currentColor = colors[currentColorIndexRef.current % colors.length];
+        const { x: cx, y: cy } = mouseRef.current;
+        const mag = Math.hypot(waveRef.current.vx, waveRef.current.vy);
+        const charge = Math.min(1, mag / MAX_WAVE_SPEED);
+
+        ctx.save();
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = currentColor;
+        ctx.shadowColor = currentColor;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        if (charge > 0.02) {
+          const waveAngle = Math.atan2(waveRef.current.vy, waveRef.current.vx);
+
+          // Charge ring
+          ctx.save();
+          ctx.globalAlpha = 0.25 + charge * 0.55;
+          ctx.strokeStyle = currentColor;
+          ctx.lineWidth = 2 + charge * 3;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 14 + charge * 26, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+
+          // Direction arrow showing where the comet burst will point
+          ctx.save();
+          ctx.globalAlpha = 0.5 + charge * 0.5;
+          ctx.strokeStyle = currentColor;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(cx + Math.cos(waveAngle) * (20 + charge * 40), cy + Math.sin(waveAngle) * (20 + charge * 40));
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
       animationRef.current = requestAnimationFrame(render);
     };
 
