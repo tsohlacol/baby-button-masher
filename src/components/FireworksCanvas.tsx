@@ -56,16 +56,34 @@ interface Seed {
 const BLOOM_RADIUS = 260;
 // Radius (px) within which a nearby cursor makes a seed shimmer.
 const SHIMMER_RADIUS = 180;
+// Wave (px/frame) magnitude that maps to 100% shockwave charge.
+const MAX_WAVE_SPEED = 42;
+// Per-frame decay of the shockwave vector so charge fades out after motion stops.
+const WAVE_DECAY = 0.93;
+// How fast a new motion sample overrides the smoothed wave vector; high value
+// means a quick flick registers charge almost instantly.
+const WAVE_ATTACK = 0.65;
 
 export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const particlesRef = useRef<Particle[]>([]);
   const seedsRef = useRef<Seed[]>([]);
   const mouseRef = useRef<{ x: number; y: number } | null>(null);
+  const lastMoveRef = useRef<{ x: number; y: number; t: number } | null>(null);
+  const waveRef = useRef<{ vx: number; vy: number }>({ vx: 0, vy: 0 });
+  const currentColorIndexRef = useRef(0);
   const animationRef = useRef<number | null>(null);
 
-  // Spawns a firework burst of particles at (x, y) in the given color.
-  const spawnBurst = (x: number, y: number, color: string, count?: number) => {
+  // Spawns a firework burst of particles at (x, y) in the given color. When a
+  // `wave` (direction + charge) is supplied, particles are biased toward that
+  // direction and sped up, stretching the round burst into a comet shape.
+  const spawnBurst = (
+    x: number,
+    y: number,
+    color: string,
+    count?: number,
+    wave?: { angle: number; charge: number }
+  ) => {
     const numParticles = count ?? 35 + Math.floor(Math.random() * 25);
     const newParticles: Particle[] = [];
 
@@ -74,10 +92,19 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
     const explosionStyle = styles[Math.floor(Math.random() * styles.length)];
 
     for (let i = 0; i < numParticles; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 7 + 2;
+      let angle: number;
+      if (wave && wave.charge > 0.04) {
+        // Narrow the spread cone around the wave direction as charge grows.
+        const spread = Math.PI * 2 * (1 - wave.charge * 0.85);
+        angle = wave.angle + (Math.random() - 0.5) * spread;
+      } else {
+        angle = Math.random() * Math.PI * 2;
+      }
+
+      const speed = Math.random() * 7 + 2 + (wave ? wave.charge * 9 : 0);
       const vx = Math.cos(angle) * speed;
       const vy = Math.sin(angle) * speed;
+      const decay = (Math.random() * 0.015 + 0.012) * (wave ? 1 - wave.charge * 0.3 : 1);
 
       newParticles.push({
         id: `${Date.now()}-${i}-${Math.random()}`,
@@ -88,7 +115,7 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
         color,
         size: Math.random() * 5 + 3,
         alpha: 1.0,
-        decay: Math.random() * 0.015 + 0.012,
+        decay,
         shape: explosionStyle,
       });
     }
