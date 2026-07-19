@@ -338,7 +338,21 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
   }, []);
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const now = performance.now();
+    const prev = lastMoveRef.current;
     mouseRef.current = { x: e.clientX, y: e.clientY };
+
+    if (prev) {
+      const dt = Math.max(now - prev.t, 1);
+      const rawVx = ((e.clientX - prev.x) / dt) * 16; // normalize to px/frame-ish units
+      const rawVy = ((e.clientY - prev.y) / dt) * 16;
+      waveRef.current = {
+        vx: waveRef.current.vx * (1 - WAVE_ATTACK) + rawVx * WAVE_ATTACK,
+        vy: waveRef.current.vy * (1 - WAVE_ATTACK) + rawVy * WAVE_ATTACK,
+      };
+    }
+
+    lastMoveRef.current = { x: e.clientX, y: e.clientY, t: now };
   };
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -351,6 +365,13 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
 
   const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+  };
+
+  // Mouse wheel cycles the color used for newly planted seeds & shockwave bursts.
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    const colors = THEME_COLORS[theme] || THEME_COLORS.cosmic;
+    const dir = e.deltaY > 0 ? 1 : -1;
+    currentColorIndexRef.current = (currentColorIndexRef.current + dir + colors.length) % colors.length;
   };
 
   return (
