@@ -146,10 +146,11 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
     spawnBurst(x, y, baseColor);
   }, [lastEvent, theme]);
 
-  // Plants a glowing seed at the cursor position (right click).
+  // Plants a glowing seed at the cursor position (right click), using the
+  // color currently selected by the mouse wheel.
   const plantSeed = (x: number, y: number) => {
     const colors = THEME_COLORS[theme] || THEME_COLORS.cosmic;
-    const color = colors[Math.floor(Math.random() * colors.length)];
+    const color = colors[currentColorIndexRef.current % colors.length];
 
     seedsRef.current = [
       ...seedsRef.current,
@@ -157,17 +158,29 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
     ].slice(-40); // Caps planted seed count
   };
 
-  // Blooms every seed within BLOOM_RADIUS of (x, y) into its own firework,
-  // staggered slightly so the chain reaction reads as a cascade (left click).
+  // Left click: detonates a shockwave-shaped firework at (x, y), distorted by
+  // whatever motion wave was built up right before the click. Any planted
+  // seeds within BLOOM_RADIUS bloom too, staggered into a cascade, each
+  // stretched along the same wave direction.
   const detonate = (x: number, y: number) => {
+    const wave = waveRef.current;
+    const mag = Math.hypot(wave.vx, wave.vy);
+    const charge = Math.min(1, mag / MAX_WAVE_SPEED);
+    const waveInfo = charge > 0.04 ? { angle: Math.atan2(wave.vy, wave.vx), charge } : undefined;
+    // Spend the charge immediately so a second click doesn't reuse it.
+    waveRef.current = { vx: 0, vy: 0 };
+
+    const colors = THEME_COLORS[theme] || THEME_COLORS.cosmic;
+    const currentColor = colors[currentColorIndexRef.current % colors.length];
+
     const nearby = seedsRef.current
       .map((seed) => ({ seed, distance: Math.hypot(seed.x - x, seed.y - y) }))
       .filter((entry) => entry.distance <= BLOOM_RADIUS)
       .sort((a, b) => a.distance - b.distance);
 
     if (nearby.length === 0) {
-      // No charges planted nearby: a small fizzle instead of a full bloom.
-      spawnBurst(x, y, "#94a3b8", 8);
+      // No planted charges nearby: the shockwave still fires on its own.
+      spawnBurst(x, y, currentColor, undefined, waveInfo);
       return;
     }
 
@@ -175,7 +188,7 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
     seedsRef.current = seedsRef.current.filter((seed) => !bloomingIds.has(seed.id));
 
     nearby.forEach((entry, i) => {
-      setTimeout(() => spawnBurst(entry.seed.x, entry.seed.y, entry.seed.color), i * 90);
+      setTimeout(() => spawnBurst(entry.seed.x, entry.seed.y, entry.seed.color, undefined, waveInfo), i * 90);
     });
   };
 
