@@ -6,6 +6,7 @@
 
 import React, { useEffect, useRef } from "react";
 import { Particle } from "../types";
+import { themePalette } from "../constants/themes";
 
 interface FireworksProps {
   lastEvent: { key: string; timestamp: number } | null;
