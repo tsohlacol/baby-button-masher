@@ -165,26 +165,6 @@ export default function App() {
     return () => clearInterval(timer);
   }, [appState]);
 
-  // Physical keyboard bypass listener when passcode popup is open
-  useEffect(() => {
-    if (!isPasscodeOverlayOpen) return;
-
-    const handlePasscodeKeyboardInput = (e: KeyboardEvent) => {
-      if (e.key >= "0" && e.key <= "9") {
-        handlePasscodeDigitPress(e.key);
-      } else if (e.key === "Backspace") {
-        setEnteredPasscode((prev) => prev.slice(0, -1));
-      } else if (e.key === "Escape") {
-        setIsPasscodeOverlayOpen(false);
-      }
-    };
-
-    window.addEventListener("keydown", handlePasscodeKeyboardInput);
-    return () => {
-      window.removeEventListener("keydown", handlePasscodeKeyboardInput);
-    };
-  }, [isPasscodeOverlayOpen, settings.parentPin]);
-
   // Welcome speech on sandbox entry
   useEffect(() => {
     if (appState !== "sandbox") return;
