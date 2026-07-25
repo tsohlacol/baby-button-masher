@@ -46,7 +46,7 @@ function clampNum(v: unknown, lo: number, hi: number, fallback: number): number 
  * hand-edited localStorage (e.g. a volumeLimit above the hearing-safety cap, or a
  * non-numeric PIN) so the app can never run with out-of-contract settings.
  */
-function sanitizeSettings(s: ParentSettings): ParentSettings {
+export function sanitizeSettings(s: ParentSettings): ParentSettings {
   const themes: ParentSettings["theme"][] = ["cosmic", "pastel", "forest", "rainbow"];
   const unlocks: ParentSettings["unlockRequirement"][] = ["click", "long_press", "passcode", "math"];
   const strategies: ParentSettings["multiMonitorStrategy"][] = ["blackout", "mirror", "independent"];
