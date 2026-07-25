@@ -106,22 +106,8 @@ export default function App() {
     return () => clearTimeout(t);
   }, [splashRevealing]);
 
-  // Persist settings to localStorage whenever they change
-  useEffect(() => {
-    try { localStorage.setItem(SETTINGS_SLOT, JSON.stringify(settings)); } catch { /* quota / private-mode */ } // sast-ignore — stores only UI config, no credentials
-  }, [settings]);
-
-  // Synchronize audio.ts master volume with parent settings volume limit
-  useEffect(() => {
-    setAudioVolumeLimit(settings.volumeLimit);
-  }, [settings.volumeLimit]);
-
   // Current active toddler playroom mode
   const [currentPlayMode, setCurrentPlayMode] = useState<ScreensaverMode>(ScreensaverMode.SPEAK_THE_KEY);
-
-  // Keystroke frequency tracking
-  const [mashingSpeed, setMashingSpeed] = useState<number>(0);
-  const [lastKeystroke, setLastKeystroke] = useState<{ key: string; timestamp: number } | null>(null);
 
   // Security Lock Overlay State
   const [isExitOverlayOpen, setIsExitOverlayOpen] = useState(false);
