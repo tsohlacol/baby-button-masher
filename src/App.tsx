@@ -276,9 +276,7 @@ export default function App() {
     // Lock preset initial playroom mode
     setCurrentPlayMode(settings.activeMode);
     setAppState("sandbox");
-    keyEventsRef.current = [];
-    setMashingSpeed(0);
-    setLastKeystroke(null);
+    resetKeystrokes();
   };
 
   // Test custom voice button handler
