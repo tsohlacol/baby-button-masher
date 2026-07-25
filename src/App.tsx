@@ -109,18 +109,18 @@ export default function App() {
   // Current active toddler playroom mode
   const [currentPlayMode, setCurrentPlayMode] = useState<ScreensaverMode>(ScreensaverMode.SPEAK_THE_KEY);
 
-  // Security Lock Overlay State
-  const [isExitOverlayOpen, setIsExitOverlayOpen] = useState(false);
-  const [mathSum, setMathSum] = useState<{ a: number; b: number; operation: string; answer: number }>({ a: 0, b: 0, operation: "+", answer: 0 });
-  const [parentAnswerInput, setParentAnswerInput] = useState("");
-  const [mathErrorMessage, setMathErrorMessage] = useState("");
-  const [longPressProgress, setLongPressProgress] = useState(0);
+  // Exit / passcode unlock challenges (state, verification, keyboard handling)
+  const unlock = useUnlockChallenge({
+    parentPin: settings.parentPin,
+    onUnlock: () => {
+      setAppState("dashboard");
+      cancelSpeech();
+    },
+  });
+  const { isExitOverlayOpen, isPasscodeOverlayOpen, startMathUnlockChallenge, startPasscodeUnlockChallenge } = unlock;
 
-  // Parent Passcode Lock Overlay State
-  const [isPasscodeOverlayOpen, setIsPasscodeOverlayOpen] = useState(false);
-  const [enteredPasscode, setEnteredPasscode] = useState("");
-  const [passcodeErrorMessage, setPasscodeErrorMessage] = useState("");
-  const [passcodeShake, setPasscodeShake] = useState(false);
+  // Sandbox exit long-press meter (only used by the long_press unlock mode)
+  const [longPressProgress, setLongPressProgress] = useState(0);
 
   // Sandbox keyboard pipeline: keystroke capture, mashing speed, tempo-based auto mode switch
   const { lastKeystroke, mashingSpeed, emitKeystroke, resetKeystrokes } = useSandboxKeystrokes({
