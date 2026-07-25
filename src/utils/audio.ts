@@ -338,6 +338,31 @@ export function cancelSpeech() {
 }
 
 /**
+ * Plays a rising "catch" chirp for the Binky Catcher mode.
+ * Uses the shared audio context (not a second one) and respects the master volume cap.
+ */
+export function playCatchChime() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const userVolume = audioVolumeLimit;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(523, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1047, ctx.currentTime + 0.15);
+    gain.gain.setValueAtTime(0.3 * userVolume, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.3);
+  } catch (err) {
+    console.warn("Catch chime failed:", err);
+  }
+}
+
+/**
  * Plays a shimmery space-chime tone for the Space Explorer mode.
  */
 export function playSpaceChime(key: string) {
