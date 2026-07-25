@@ -41,29 +41,7 @@ import { useUnlockChallenge } from "./unlock/useUnlockChallenge";
 import ExitMathOverlay from "./unlock/ExitMathOverlay";
 import ExitPasscodeOverlay from "./unlock/ExitPasscodeOverlay";
 import Sandbox from "./screens/Sandbox";
-import SpaceExplorerView from "./components/SpaceExplorerView";
-import BinkyCatcherView from "./components/BinkyCatcherView";
 import { getLearnItem } from "./utils/words";
-
-// Importer local components
-import FireworksCanvas from "./components/FireworksCanvas";
-import AnimalParadeView from "./components/AnimalParadeView";
-import SpeakKeyView from "./components/SpeakKeyView";
-import KeyboardPianoView from "./components/KeyboardPianoView";
-import SpaceRocketView from "./components/SpaceRocketView";
-import MouseDrawingView from "./components/MouseDrawingView";
-
-// Ordered list used for manual mode cycling via the status pill
-const PLAY_MODES: ScreensaverMode[] = [
-  ScreensaverMode.SPEAK_THE_KEY,
-  ScreensaverMode.ANIMAL_PARADE,
-  ScreensaverMode.COSMIC_FIREWORKS,
-  ScreensaverMode.KEYBOARD_PIANO,
-  ScreensaverMode.SPACE_ROCKET,
-  ScreensaverMode.MOUSE_DRAWING,
-  ScreensaverMode.SPACE_EXPLORER,
-  ScreensaverMode.BINKY_CATCHER,
-];
 
 export default function App() {
   // Page states: "dashboard" | "locked_screensaver" | "sandbox"
