@@ -100,9 +100,6 @@ export default function App() {
   });
   const { isExitOverlayOpen, isPasscodeOverlayOpen, startMathUnlockChallenge, startPasscodeUnlockChallenge } = unlock;
 
-  // Sandbox exit long-press meter (only used by the long_press unlock mode)
-  const [longPressProgress, setLongPressProgress] = useState(0);
-
   // Sandbox keyboard pipeline: keystroke capture, mashing speed, tempo-based auto mode switch
   const { lastKeystroke, mashingSpeed, emitKeystroke, resetKeystrokes } = useSandboxKeystrokes({
     appState,
