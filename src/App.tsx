@@ -7,31 +7,8 @@
  */
 
 import { useState, useEffect, useMemo } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import {
-  Lock,
-  Volume2,
-  VolumeX,
-  Sparkles,
-  Music,
-  Tv,
-  Users,
-  Moon,
-  Sun,
-  Settings,
-  X,
-  Layers,
-  HelpCircle,
-  Rocket,
-  Paintbrush,
-  Heart,
-  Github,
-  Plus,
-  Trash2,
-} from "lucide-react";
 
 import { ScreensaverMode, ParentSettings } from "./types";
-import { THEME_PRESETS } from "./constants/themes";
 import { speakToddlerText, cancelSpeech } from "./utils/audio";
 import { useParentSettings } from "./hooks/useParentSettings";
 import { useVoices } from "./hooks/useVoices";
@@ -40,6 +17,8 @@ import { useUnlockChallenge } from "./unlock/useUnlockChallenge";
 import ExitMathOverlay from "./unlock/ExitMathOverlay";
 import ExitPasscodeOverlay from "./unlock/ExitPasscodeOverlay";
 import Sandbox from "./screens/Sandbox";
+import Dashboard from "./screens/Dashboard";
+import DictionaryScreen from "./screens/DictionaryScreen";
 import { getLearnItem } from "./utils/words";
 
 export default function App() {
