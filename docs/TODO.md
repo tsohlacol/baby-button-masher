@@ -19,6 +19,10 @@ This document lists the completed items and remaining development tasks for **Ba
   - Responsive visual rocket booster and throttle gauge simulation triggered by rapid key taps.
 - [x] **"Sensory Drawing" Playroom Mode (`MOUSE_DRAWING`)**
   - Renders fading visual drag trails for smooth touch-tablet drawing.
+- [x] **"Space Explorer" Playroom Mode (`SPACE_EXPLORER`)**
+  - Educational space scene that names planets/constellations via speech synthesis on key input.
+- [x] **"Binky Catcher" Playroom Mode (`BINKY_CATCHER`)**
+  - Keyboard-zone catch game with its own catch-sound synthesis.
 - [x] **Dynamic Roll Mashing Tracker**
   - Fully tracks keystrokes-per-minute (KPM) average, dynamically updating active playroom games according to toddler speed rhythm behavior.
 - [x] **Hearing Safety Master Volume Guard**
