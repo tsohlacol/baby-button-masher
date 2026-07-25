@@ -225,7 +225,7 @@ React's multi-monitor strategy:
 
 ### Customizing Themes
 
-Edit `THEME_PRESETS` object in `App.tsx`. Each theme has:
+Edit the `THEME_PRESETS` object in `src/constants/themes.ts` (and `themePalette` in the same file for canvas hex colors used by the fireworks renderer). Each theme has:
 - `bg`: Background + text color
 - `cardBg`: Card/panel styling
 - `accent`: Button/highlight color
