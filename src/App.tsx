@@ -123,7 +123,7 @@ export default function App() {
   const [passcodeShake, setPasscodeShake] = useState(false);
 
   // Sandbox keyboard pipeline: keystroke capture, mashing speed, tempo-based auto mode switch
-  const { lastKeystroke, mashingSpeed, resetKeystrokes } = useSandboxKeystrokes({
+  const { lastKeystroke, mashingSpeed, emitKeystroke, resetKeystrokes } = useSandboxKeystrokes({
     appState,
     autoModeSwitchEnabled: settings.autoModeSwitchEnabled,
     soundEffectsEnabled: settings.soundEffectsEnabled,
