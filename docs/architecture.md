@@ -109,3 +109,32 @@ To ensure your baby cannot click out or discover gaps to the background desktop:
   }
   ```
 * **Dual Monitor Shielding**: In standard mode, the app detects all active screen bounds (`Screen.AllScreens` or `MonitorFromWindow`) and spans matching black overlay screens over side-monitors, preventing the child from moving the mouse to an unprotected display.
+
+---
+
+## 4. Codebase Layout & Native↔React Bridge
+
+The concepts above map to these files.
+
+### Native host (`host/`, C# WPF, partial `MainWindow`)
+- `MainWindow.xaml.cs` — window lifecycle + WebView2 orchestration (env creation, navigation, splash coordination).
+- `MainWindow.KeyboardHook.cs` — the `WH_KEYBOARD_LL` hook: swallows Win/Alt/Ctrl combos, F1-F12, PrintScreen, context-menu key; re-injects the bare key; Alt+F4 = parent exit.
+- `MainWindow.Accessibility.cs` — suppress/restore Sticky/Filter/Toggle key hotkeys.
+- `MainWindow.Monitors.cs` — `EnumDisplayMonitors` + DPI-scaled logical coordinates → `BBM_MONITORS` JSON.
+- `MainWindow.VirtualDesktop.cs` — pin the window to all virtual desktops (COM shell interfaces).
+
+### Frontend (`src/`, React)
+- `App.tsx` — thin router over `appState` (dashboard / dictionary / sandbox).
+- `hooks/` — `useParentSettings`, `useVoices`, `useSandboxKeystrokes`.
+- `unlock/` — `useUnlockChallenge` + math/PIN exit overlays.
+- `screens/` — `Dashboard`, `DictionaryScreen`, `Sandbox`.
+- `components/` — the eight playroom mode views.
+- `constants/themes.ts`, `utils/audio.ts`, `utils/words.ts`.
+
+### Native → React bridge (injected before first paint)
+- `window.BBM_MONITORS` — array of `{ left, top, width, height, isPrimary }` (logical px).
+- `window.BBM_DEBUG` — boolean; enables React-side diagnostics and console forwarding.
+
+### React → Native bridge (`window.chrome.webview.postMessage`)
+- `"tsd:ready"` — React signals first paint; host holds the splash until this (or a timeout) then calls `window.__bbmReveal()` to fade the React splash out.
+- In debug mode, forwarded `console.log/warn/error` strings are logged by the host.
