@@ -234,7 +234,7 @@ Edit the `THEME_PRESETS` object in `src/constants/themes.ts` (and `themePalette`
 
 ### Modifying the Win32 Hook
 
-In `host/MainWindow.xaml.cs`, the `HookCallback` method filters keycodes:
+In `host/MainWindow.KeyboardHook.cs`, the `HookCallback` method filters keycodes:
 - Add new blocked keys by checking their `vkCode` against constants.
 - Blocked keys return `(IntPtr)1` to swallow the keystroke.
 - Passed keys call `CallNextHookEx` to allow normal processing.
