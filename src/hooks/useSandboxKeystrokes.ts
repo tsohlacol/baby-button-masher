@@ -34,6 +34,9 @@ interface UseSandboxKeystrokesArgs {
 export interface SandboxKeystrokes {
   lastKeystroke: LastKeyEvent | null;
   mashingSpeed: number;
+  /** Register a play pulse for `key` (used by the keydown handler and by faux
+   *  click-to-play). Records the timestamp and fires the fireworks synth when active. */
+  emitKeystroke: (key: string) => void;
   /** Clears rolling keystroke history — call when entering the sandbox. */
   resetKeystrokes: () => void;
 }
