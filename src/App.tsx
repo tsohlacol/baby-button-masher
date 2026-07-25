@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 
 import { ScreensaverMode, ParentSettings } from "./types";
+import { THEME_PRESETS } from "./constants/themes";
 import { speakToddlerText, playFireworkSynth, getAvailableVoices, setAudioVolumeLimit, cancelSpeech } from "./utils/audio";
 import SpaceExplorerView from "./components/SpaceExplorerView";
 import BinkyCatcherView from "./components/BinkyCatcherView";
