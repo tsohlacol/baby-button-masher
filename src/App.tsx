@@ -33,7 +33,10 @@ import {
 
 import { ScreensaverMode, ParentSettings } from "./types";
 import { THEME_PRESETS } from "./constants/themes";
-import { speakToddlerText, playFireworkSynth, getAvailableVoices, setAudioVolumeLimit, cancelSpeech } from "./utils/audio";
+import { speakToddlerText, cancelSpeech } from "./utils/audio";
+import { useParentSettings } from "./hooks/useParentSettings";
+import { useVoices } from "./hooks/useVoices";
+import { useSandboxKeystrokes } from "./hooks/useSandboxKeystrokes";
 import SpaceExplorerView from "./components/SpaceExplorerView";
 import BinkyCatcherView from "./components/BinkyCatcherView";
 import { getLearnItem } from "./utils/words";
