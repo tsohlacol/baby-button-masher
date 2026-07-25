@@ -60,27 +60,11 @@ export default function BinkyCatcherView({ soundEnabled }: BinkyCatcherProps) {
   const keysHeld = useRef<Set<string>>(new Set());  // tracks ArrowLeft / ArrowRight
   const leftCount = useRef(0);   // how many left-zone keys are currently held
   const rightCount = useRef(0);  // how many right-zone keys are currently held
-  const audioCtxRef = useRef<AudioContext | null>(null);
-
   useEffect(() => { playerXRef.current = playerX; }, [playerX]);
 
   const playCatchSound = () => {
     if (!soundEnabled) return;
-    try {
-      if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
-      const ctx = audioCtxRef.current;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(523, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(1047, ctx.currentTime + 0.15);
-      gain.gain.setValueAtTime(0.3, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.3);
-    } catch {}
+    playCatchChime();
   };
 
   // Key listeners — arrow keys for older kids, keyboard zones for toddlers.
