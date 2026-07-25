@@ -117,6 +117,17 @@ export function useSandboxKeystrokes({
     return () => clearInterval(interval);
   }, [appState, autoModeSwitchEnabled, currentPlayMode, setCurrentPlayMode]);
 
+  // Records a play pulse for a key. Reads current mode/sound via refs so callers
+  // don't need to re-subscribe. Shared by the keydown handler and faux click-to-play.
+  const emitKeystroke = useCallback((key: string) => {
+    const timestamp = Date.now();
+    keyEventsRef.current.push(timestamp);
+    setLastKeystroke({ key, timestamp });
+    if (currentPlayModeRef.current === ScreensaverMode.COSMIC_FIREWORKS && soundEffectsEnabledRef.current) {
+      playFireworkSynth(key);
+    }
+  }, []);
+
   // Handler for all toddler play room keystrokes. Uses refs to read current state so the listener
   // does not need to be re-registered on every settings or mode change.
   const handleSandboxKeystroke = useCallback((e: KeyboardEvent) => {
@@ -128,13 +139,8 @@ export function useSandboxKeystrokes({
     }
     e.preventDefault();
     e.stopPropagation();
-    const timestamp = Date.now();
-    keyEventsRef.current.push(timestamp);
-    setLastKeystroke({ key: e.key, timestamp });
-    if (currentPlayModeRef.current === ScreensaverMode.COSMIC_FIREWORKS && soundEffectsEnabledRef.current) {
-      playFireworkSynth(e.key);
-    }
-  }, []);
+    emitKeystroke(e.key);
+  }, [emitKeystroke]);
 
   // Register keyboard and context-menu intercepts for the active sandbox
   useEffect(() => {
