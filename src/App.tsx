@@ -65,11 +65,11 @@ export default function App() {
   // Page states: "dashboard" | "locked_screensaver" | "sandbox"
   const [appState, setAppState] = useState<"dashboard" | "sandbox" | "dictionary">("dashboard");
 
-  // Voice list loaded state
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  // Settings state — load/persist/volume-sync handled by the hook
+  const { settings, setSettings } = useParentSettings();
 
-  // Settings state — initialised from localStorage, persisted on every change
-  const [settings, setSettings] = useState<ParentSettings>(loadSettings);
+  // Voice list (browser speech synthesis), sorted best-first
+  const voices = useVoices();
 
   // Startup splash overlay — mirrors the WPF SplashOverlay so the transition is seamless.
   // The WPF airspace problem means WebView2's Win32 HWND always renders in front of WPF
