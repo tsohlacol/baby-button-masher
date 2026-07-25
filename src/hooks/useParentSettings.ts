@@ -35,13 +35,50 @@ const DEFAULT_SETTINGS: ParentSettings = {
   passcodeUnlockEnabled: false,
 };
 
+/** Clamp a numeric field into range, falling back to a default for NaN/non-number input. */
+function clampNum(v: unknown, lo: number, hi: number, fallback: number): number {
+  const n = typeof v === "number" && Number.isFinite(v) ? v : fallback;
+  return Math.max(lo, Math.min(hi, n));
+}
+
+/**
+ * Coerce a settings object into valid, in-range values. Guards against corrupted or
+ * hand-edited localStorage (e.g. a volumeLimit above the hearing-safety cap, or a
+ * non-numeric PIN) so the app can never run with out-of-contract settings.
+ */
+function sanitizeSettings(s: ParentSettings): ParentSettings {
+  const themes: ParentSettings["theme"][] = ["cosmic", "pastel", "forest", "rainbow"];
+  const unlocks: ParentSettings["unlockRequirement"][] = ["click", "long_press", "passcode", "math"];
+  const strategies: ParentSettings["multiMonitorStrategy"][] = ["blackout", "mirror", "independent"];
+
+  const customWords: Record<string, string> = {};
+  for (const [k, v] of Object.entries(s.customWords ?? {})) {
+    const key = k.toUpperCase();
+    if (/^[A-Z]$/.test(key) && typeof v === "string") customWords[key] = v;
+  }
+
+  return {
+    ...s,
+    volumeLimit: clampNum(s.volumeLimit, 0.1, 1.0, DEFAULT_SETTINGS.volumeLimit),
+    speechRate: clampNum(s.speechRate, 0.5, 2, DEFAULT_SETTINGS.speechRate),
+    speechPitch: clampNum(s.speechPitch, 0.5, 2, DEFAULT_SETTINGS.speechPitch),
+    theme: themes.includes(s.theme) ? s.theme : DEFAULT_SETTINGS.theme,
+    unlockRequirement: unlocks.includes(s.unlockRequirement) ? s.unlockRequirement : DEFAULT_SETTINGS.unlockRequirement,
+    multiMonitorStrategy: strategies.includes(s.multiMonitorStrategy) ? s.multiMonitorStrategy : DEFAULT_SETTINGS.multiMonitorStrategy,
+    activeMode: Object.values(ScreensaverMode).includes(s.activeMode) ? s.activeMode : DEFAULT_SETTINGS.activeMode,
+    parentPin: typeof s.parentPin === "string" && /^\d{4}$/.test(s.parentPin) ? s.parentPin : DEFAULT_SETTINGS.parentPin,
+    customWords,
+  };
+}
+
 /** Load persisted settings from localStorage, falling back to defaults for any missing keys. */
 function loadSettings(): ParentSettings {
   try {
     const raw = localStorage.getItem(SETTINGS_SLOT); // sast-ignore — stores only UI config, no credentials
     if (!raw) return DEFAULT_SETTINGS;
-    // Shallow-merge so fields added in future versions always have their defaults.
-    return { ...DEFAULT_SETTINGS, ...(JSON.parse(raw) as Partial<ParentSettings>) };
+    // Shallow-merge so fields added in future versions always have their defaults,
+    // then clamp/validate so corrupted or tampered persistence can't apply bad values.
+    return sanitizeSettings({ ...DEFAULT_SETTINGS, ...(JSON.parse(raw) as Partial<ParentSettings>) });
   } catch {
     return DEFAULT_SETTINGS;
   }
