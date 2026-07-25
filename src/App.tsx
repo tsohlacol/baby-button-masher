@@ -140,31 +140,8 @@ export default function App() {
   // Time logging
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Refs for tracking pressed timestamps
-  const keyEventsRef = useRef<number[]>([]);
+  // Ref for the exit-button long-press timer
   const longPressTimerRef = useRef<any>(null);
-
-  // Refs so the keydown handler reads current values without needing to re-register on every state change
-  const isExitOverlayOpenRef = useRef(false);
-  const isPasscodeOverlayOpenRef = useRef(false);
-  const currentPlayModeRef = useRef(currentPlayMode);
-  const soundEffectsEnabledRef = useRef(settings.soundEffectsEnabled);
-  useEffect(() => { isExitOverlayOpenRef.current = isExitOverlayOpen; }, [isExitOverlayOpen]);
-  useEffect(() => { isPasscodeOverlayOpenRef.current = isPasscodeOverlayOpen; }, [isPasscodeOverlayOpen]);
-  useEffect(() => { currentPlayModeRef.current = currentPlayMode; }, [currentPlayMode]);
-  useEffect(() => { soundEffectsEnabledRef.current = settings.soundEffectsEnabled; }, [settings.soundEffectsEnabled]);
-
-  // Load browser voices once on mount; re-run whenever the browser voice list updates
-  useEffect(() => {
-    const loadVoices = () => setVoices(getAvailableVoices());
-    loadVoices();
-    if (window.speechSynthesis) {
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-    }
-    return () => {
-      if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = null;
-    };
-  }, []);
 
   // Once the browser voice list loads, ensure a valid voice is selected.
   // getAvailableVoices() sorts neural/online voices first, so voices[0] is the
