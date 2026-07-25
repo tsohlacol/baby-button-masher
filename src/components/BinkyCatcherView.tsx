@@ -5,6 +5,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { playCatchChime } from "../utils/audio";
 
 interface BinkyCatcherProps {
   soundEnabled: boolean;
