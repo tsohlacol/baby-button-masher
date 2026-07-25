@@ -177,9 +177,9 @@ The Win32 hook in `MainWindow.xaml.cs` intercepts *before* React sees them, so s
 - **Volume Limiting:** Master gain is clamped to `parentSettings.volumeLimit` (0.1–1.0) across all oscillators and speech utterances.
 - **Text-to-Speech:** Queries available `SpeechSynthesisVoice` objects, bubbles neural voices to the top.
 
-### 3. Parent Settings Persistence (App.tsx)
+### 3. Parent Settings Persistence (src/hooks/useParentSettings.ts)
 
-Settings are stored in React state (not localStorage) and passed as props down to components. Each setting is validated/clamped:
+Settings live in the `useParentSettings` hook, which persists them to `localStorage` (slot `tsd-parent-settings`) on every change and mirrors `volumeLimit` into the audio core. They are passed as props down to screens. Each setting is validated/clamped:
 - `volumeLimit`: Clamped to [0.1, 1.0]
 - `unlockRequirement`: Either "math" (default) or "passcode"
 - `theme`: One of `cosmic`, `pastel`, `forest`, `rainbow`
