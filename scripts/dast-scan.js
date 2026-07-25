@@ -56,27 +56,37 @@ try {
   console.log(`  [WARN] metadata.json read error: ${err.message}`);
 }
 
-// 3. Audit client-side safety measures for lock-jacking inputs
+// 3. Audit client-side safety measures for lock-jacking inputs.
+// The sandbox keystroke trap lives in the useSandboxKeystrokes hook and the randomized
+// exit-solver in the useUnlockChallenge hook (both extracted from App.tsx in the module
+// refactor), so audit those files directly.
 console.log("\nAuditing keyboard security hooks and anti-tamper overlays...");
 try {
-  const appTsx = fs.readFileSync('./src/App.tsx', 'utf8');
-  
+  const keystrokeSrc = fs.readFileSync('./src/hooks/useSandboxKeystrokes.ts', 'utf8');
+
   // Inspect if system-blocking event listeners prevent toddler leakages correctly
-  if (appTsx.includes("preventDefault") && appTsx.includes("stopPropagation")) {
+  if (keystrokeSrc.includes("preventDefault") && keystrokeSrc.includes("stopPropagation")) {
     console.log(`  [PASS] Custom child lock events properly trap keys using preventDefault and stopPropagation overrides.`);
   } else {
     dastFailures++;
     console.log(`  [FAIL] Keyboard interception routines do not safely call override preventDefault loops.`);
   }
+} catch (err) {
+  dastFailures++;
+  console.log(`  [FAIL] useSandboxKeystrokes.ts read error: ${err.message}`);
+}
+
+try {
+  const unlockSrc = fs.readFileSync('./src/unlock/useUnlockChallenge.ts', 'utf8');
 
   // Inspect that math calculations rely on random generation correctly rather than predictable constants
-  if (appTsx.includes("Math.random")) {
+  if (unlockSrc.includes("Math.random")) {
     console.log(`  [PASS] Dynamic security math values randomized correctly on each click cycle.`);
   } else {
     console.log(`  [WARN] Predictable parameters detected inside exit solver algorithms.`);
   }
 } catch (err) {
-  console.log(`  [WARN] App.tsx read error: ${err.message}`);
+  console.log(`  [WARN] useUnlockChallenge.ts read error: ${err.message}`);
 }
 
 console.log(`${BOLD}${CYAN}=====================================================${RESET}`);
