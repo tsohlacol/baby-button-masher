@@ -38,13 +38,6 @@ const KEY_POSITIONS: Record<string, [number, number]> = {
   " ": [0.50, 0.92],
 };
 
-const THEME_COLORS: Record<string, string[]> = {
-  cosmic: ["#a855f7", "#3b82f6", "#06b6d4", "#ec4899", "#f43f5e", "#e11d48"],
-  pastel: ["#fbcfe8", "#c084fc", "#93c5fd", "#a7f3d0", "#fef08a", "#fda4af"],
-  forest: ["#4ade80", "#22c55e", "#10b981", "#14b8a6", "#84cc16", "#a3e635"],
-  rainbow: ["#ef4444", "#f97316", "#eab308", "#22c55e", "#3b82f6", "#6366f1", "#a855f7"],
-};
-
 interface Seed {
   id: string;
   x: number;
