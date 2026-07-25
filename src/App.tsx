@@ -122,6 +122,17 @@ export default function App() {
   const [passcodeErrorMessage, setPasscodeErrorMessage] = useState("");
   const [passcodeShake, setPasscodeShake] = useState(false);
 
+  // Sandbox keyboard pipeline: keystroke capture, mashing speed, tempo-based auto mode switch
+  const { lastKeystroke, mashingSpeed, resetKeystrokes } = useSandboxKeystrokes({
+    appState,
+    autoModeSwitchEnabled: settings.autoModeSwitchEnabled,
+    soundEffectsEnabled: settings.soundEffectsEnabled,
+    currentPlayMode,
+    setCurrentPlayMode,
+    isExitOverlayOpen,
+    isPasscodeOverlayOpen,
+  });
+
   // Dynamic custom word creator states
   const [newWordChar, setNewWordChar] = useState("B");
   const [newWordValue, setNewWordValue] = useState("");
