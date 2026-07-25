@@ -9,6 +9,7 @@
 import { useState, useEffect, useMemo } from "react";
 
 import { ScreensaverMode, ParentSettings } from "./types";
+import { THEME_PRESETS } from "./constants/themes";
 import { speakToddlerText, cancelSpeech } from "./utils/audio";
 import { useParentSettings } from "./hooks/useParentSettings";
 import { useVoices } from "./hooks/useVoices";
