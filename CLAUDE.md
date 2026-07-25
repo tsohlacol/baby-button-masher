@@ -198,8 +198,8 @@ React's multi-monitor strategy:
 
 ### 5. Security Layering
 
-1. **Native Hook Layer** (MainWindow.xaml.cs): Blocks Win key, Alt+Tab, Alt+F4, Ctrl+Esc, F11.
-2. **React Layer** (App.tsx):
+1. **Native Hook Layer** (MainWindow.KeyboardHook.cs): Swallows Win keys, all Alt+ combos, all Ctrl+ combos, F1-F12, PrintScreen, and the context-menu key; re-injects the bare key so React still sees it. Alt+F4 triggers the parent exit.
+2. **React Layer** (src/hooks/useSandboxKeystrokes.ts):
    - Disables context menus (`onContextMenu: preventDefault`)
    - Prevents text selection (`select-none` class)
    - Blocks drag-and-drop
