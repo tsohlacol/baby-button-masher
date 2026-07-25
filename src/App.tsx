@@ -61,41 +61,6 @@ const PLAY_MODES: ScreensaverMode[] = [
   ScreensaverMode.BINKY_CATCHER,
 ];
 
-const SETTINGS_SLOT = "tsd-parent-settings";
-
-const DEFAULT_SETTINGS: ParentSettings = {
-  speechEnabled: true,
-  speechVoiceName: "",
-  speechRate: 0.85,
-  speechPitch: 1.3,
-  soundEffectsEnabled: true,
-  autoModeSwitchEnabled: true,
-  activeMode: ScreensaverMode.SPEAK_THE_KEY,
-  unlockRequirement: "math",
-  theme: "cosmic",
-  customWords: {
-    A: "Alice 💖",
-    M: "Mommy Bear 🐻",
-    D: "Daddy Shark 🦈",
-  },
-  volumeLimit: 0.3,
-  multiMonitorStrategy: "mirror",
-  parentPin: "1234",
-  passcodeUnlockEnabled: false,
-};
-
-/** Load persisted settings from localStorage, falling back to defaults for any missing keys. */
-function loadSettings(): ParentSettings {
-  try {
-    const raw = localStorage.getItem(SETTINGS_SLOT); // sast-ignore — stores only UI config, no credentials
-    if (!raw) return DEFAULT_SETTINGS;
-    // Shallow-merge so fields added in future versions always have their defaults.
-    return { ...DEFAULT_SETTINGS, ...(JSON.parse(raw) as Partial<ParentSettings>) };
-  } catch {
-    return DEFAULT_SETTINGS;
-  }
-}
-
 export default function App() {
   // Page states: "dashboard" | "locked_screensaver" | "sandbox"
   const [appState, setAppState] = useState<"dashboard" | "sandbox" | "dictionary">("dashboard");
