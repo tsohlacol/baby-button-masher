@@ -978,15 +978,7 @@ export default function App() {
                         <div 
                           onClick={() => {
                             // Spawns a faux keystroke space trigger if keys are blocked so standard clicks also animate beautifully
-                            const timestamp = Date.now();
-                            setLastKeystroke({
-                              key: " ",
-                              timestamp,
-                            });
-                            keyEventsRef.current.push(timestamp);
-                            if (currentPlayMode === ScreensaverMode.COSMIC_FIREWORKS && settings.soundEffectsEnabled) {
-                              playFireworkSynth(" ");
-                            }
+                            emitKeystroke(" ");
                           }}
                           className="absolute inset-0 block w-full h-full pointer-events-auto z-5 cursor-crosshair opacity-0"
                         />
