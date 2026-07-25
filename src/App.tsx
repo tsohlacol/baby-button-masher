@@ -118,9 +118,6 @@ export default function App() {
   // Time logging
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Ref for the exit-button long-press timer
-  const longPressTimerRef = useRef<any>(null);
-
   // Once the browser voice list loads, ensure a valid voice is selected.
   // getAvailableVoices() sorts neural/online voices first, so voices[0] is the
   // best available. If the persisted name is gone (OS reinstall, etc.), re-pick.
