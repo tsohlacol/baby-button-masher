@@ -212,10 +212,10 @@ React's multi-monitor strategy:
 
 ### Adding a New Playroom Mode
 
-1. Create a new component in `src/components/NewModeView.tsx` accepting `{ onKeystroke, settings, ...}` props.
-2. Add the mode to `ScreensaverMode` enum in `src/types.ts`.
-3. Import and render the component in `App.tsx` based on `currentPlayMode`.
-4. Add a radio button in the settings panel to select the mode.
+1. Create a new component in `src/components/NewModeView.tsx` accepting `{ lastEvent, settings, ...}` props.
+2. Add the mode to the `ScreensaverMode` enum in `src/types.ts`.
+3. Import and render the component in `src/screens/Sandbox.tsx` based on `currentPlayMode`, and add it to the `PLAY_MODES` cycle array there.
+4. Add a selector in `src/screens/Dashboard.tsx` to pick the mode.
 
 ### Adjusting Audio (Pitch, Timing, Volume)
 
