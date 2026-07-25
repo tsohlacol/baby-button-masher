@@ -18,7 +18,7 @@ The application is distributed as a Windows installer (`BBM_Setup_v*.exe`) compi
 
 1. **Frontend Layer (React/Vite/WebView2)**
    - Offline single-page application (SPA) served from `file://` protocol
-   - Six interactive playroom modes: Speak-The-Key, Animal Parade, Cosmic Fireworks, Keyboard Piano, Space Rocket, Mouse Drawing
+   - Eight interactive playroom modes: Speak-The-Key, Animal Parade, Cosmic Fireworks, Keyboard Piano, Space Rocket, Mouse Drawing, Space Explorer, Binky Catcher
    - Parent settings panel with math/PIN unlock challenges
    - Master volume cap, multi-monitor strategies, custom word vocabularies
 
