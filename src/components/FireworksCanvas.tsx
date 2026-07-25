@@ -134,7 +134,7 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
       ? keyPos[1] * canvas.height
       : Math.random() * (canvas.height - 200) + 100;
 
-    const colors = THEME_COLORS[theme] || THEME_COLORS.cosmic;
+    const colors = themePalette[theme] || themePalette.cosmic;
     const baseColor = colors[Math.floor(Math.random() * colors.length)];
 
     spawnBurst(x, y, baseColor);
@@ -143,7 +143,7 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
   // Plants a glowing seed at the cursor position (right click), using the
   // color currently selected by the mouse wheel.
   const plantSeed = (x: number, y: number) => {
-    const colors = THEME_COLORS[theme] || THEME_COLORS.cosmic;
+    const colors = themePalette[theme] || themePalette.cosmic;
     const color = colors[currentColorIndexRef.current % colors.length];
 
     seedsRef.current = [
@@ -164,7 +164,7 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
     // Spend the charge immediately so a second click doesn't reuse it.
     waveRef.current = { vx: 0, vy: 0 };
 
-    const colors = THEME_COLORS[theme] || THEME_COLORS.cosmic;
+    const colors = themePalette[theme] || themePalette.cosmic;
     const currentColor = colors[currentColorIndexRef.current % colors.length];
 
     const nearby = seedsRef.current
@@ -278,7 +278,7 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
 
       // Cursor HUD: current wheel-selected color + shockwave charge meter.
       if (mouseRef.current) {
-        const colors = THEME_COLORS[theme] || THEME_COLORS.cosmic;
+        const colors = themePalette[theme] || themePalette.cosmic;
         const currentColor = colors[currentColorIndexRef.current % colors.length];
         const { x: cx, y: cy } = mouseRef.current;
         const mag = Math.hypot(waveRef.current.vx, waveRef.current.vy);
@@ -363,7 +363,7 @@ export default function FireworksCanvas({ lastEvent, theme }: FireworksProps) {
 
   // Mouse wheel cycles the color used for newly planted seeds & shockwave bursts.
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    const colors = THEME_COLORS[theme] || THEME_COLORS.cosmic;
+    const colors = themePalette[theme] || themePalette.cosmic;
     const dir = e.deltaY > 0 ? 1 : -1;
     currentColorIndexRef.current = (currentColorIndexRef.current + dir + colors.length) % colors.length;
   };
