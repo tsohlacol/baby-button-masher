@@ -194,19 +194,6 @@ export default function App() {
     }
   }, [appState]);
 
-  // Register keyboard and context-menu intercepts for the active sandbox
-  useEffect(() => {
-    const handleContextMenu = (e: MouseEvent) => { e.preventDefault(); };
-    if (appState === "sandbox") {
-      window.addEventListener("keydown", handleSandboxKeystroke, { passive: false });
-      window.addEventListener("contextmenu", handleContextMenu, { capture: true });
-    }
-    return () => {
-      window.removeEventListener("keydown", handleSandboxKeystroke);
-      window.removeEventListener("contextmenu", handleContextMenu, { capture: true });
-    };
-  }, [appState, handleSandboxKeystroke]);
-
   // Formulates math sum for exit control challenge (add, subtract, or multiply two single digit numbers)
   const startMathUnlockChallenge = () => {
     const ops = ["+", "-", "*"] as const;
