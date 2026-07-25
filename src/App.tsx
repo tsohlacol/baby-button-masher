@@ -1048,161 +1048,26 @@ export default function App() {
 
       {/* 3. SECURITY POPUP COMPONENT (MATH FORMULA) */}
       {isExitOverlayOpen && (
-        <div className="fixed inset-0 w-screen h-screen flex justify-center items-center backdrop-blur-3xl bg-black/40 z-100 pointer-events-auto select-auto">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="w-full max-w-md p-8 rounded-3xl bg-white/10 dark:bg-black/45 backdrop-blur-2xl border border-white/20 text-white shadow-[0_25px_60px_rgba(0,0,0,0.4)] relative"
-          >
-            <button
-               onClick={() => setIsExitOverlayOpen(false)}
-               className="absolute top-4 right-4 p-1.5 rounded-full bg-white/10 hover:bg-white/25 text-white/70 transition-all cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            <div className="flex items-center gap-3 text-pink-300 mb-4 animate-bounce">
-              <Lock className="w-6 h-6" />
-              <h2 className="text-xl font-bold font-sans">Verification Required</h2>
-            </div>
-            <p className="text-xs text-white/70 leading-relaxed mb-6">
-              Prove that you are not the infant mashing keys! Please enter the math solution below to exit the screensaver play area.
-            </p>
-
-            <div className="text-center bg-white/5 border border-white/10 py-4 px-6 rounded-2xl mb-6">
-              <span className="text-[10px] uppercase text-white/50 tracking-wider font-mono">Solve This Equation</span>
-              <div className="text-3xl font-black font-mono tracking-wider text-pink-300 mt-1">
-                {mathSum.a} {mathSum.operation} {mathSum.b} = ?
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <input
-                type="number"
-                value={parentAnswerInput}
-                onChange={(e) => setParentAnswerInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") verifyMathUnlock();
-                }}
-                placeholder="Enter parent equation solution..."
-                autoFocus
-                className="w-full bg-black/40 border border-white/20 p-3 rounded-xl text-center text-lg font-bold font-mono text-pink-300 focus:outline-hidden focus:border-pink-400 backdrop-blur-md"
-              />
-
-              {mathErrorMessage && (
-                <p className="text-[11px] text-red-300 leading-relaxed text-center font-semibold bg-red-500/10 p-2.5 rounded-xl border border-red-500/20">{mathErrorMessage}</p>
-              )}
-
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => setIsExitOverlayOpen(false)}
-                  className="flex-1 py-3 bg-white/10 hover:bg-white/20 border border-white/10 font-bold rounded-xl text-xs transition-all uppercase cursor-pointer"
-                >
-                  Back to Sandbox
-                </button>
-                <button
-                  onClick={verifyMathUnlock}
-                  className="flex-1 py-3 bg-pink-500 hover:bg-pink-400 font-bold rounded-xl text-xs text-white transition-all uppercase cursor-pointer shadow-lg active:scale-95"
-                >
-                  Submit & Unlock
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        </div>
+        <ExitMathOverlay
+          mathSum={unlock.mathSum}
+          answerInput={unlock.parentAnswerInput}
+          setAnswerInput={unlock.setParentAnswerInput}
+          errorMessage={unlock.mathErrorMessage}
+          onSubmit={unlock.verifyMathUnlock}
+          onClose={() => unlock.setIsExitOverlayOpen(false)}
+        />
       )}
 
       {/* 4. Parent PIN Overlay Modal */}
       {isPasscodeOverlayOpen && (
-        <div className="fixed inset-0 w-screen h-screen flex justify-center items-center backdrop-blur-3xl bg-black/50 z-100 pointer-events-auto select-auto">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={passcodeShake ? { x: [-10, 10, -8, 8, -5, 5, 0], scale: 1, opacity: 1 } : { x: 0, scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            className="w-full max-w-sm p-8 rounded-3xl bg-slate-900/90 dark:bg-black/80 backdrop-blur-2xl border border-blue-500/20 text-white shadow-[0_25px_60px_rgba(0,0,0,0.6)] relative"
-          >
-            <button
-              onClick={() => setIsPasscodeOverlayOpen(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-full bg-white/15 hover:bg-white/25 text-white/70 transition-all cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            <div className="flex flex-col items-center text-center">
-              <div className="p-3 bg-blue-500/10 rounded-full text-blue-400 mb-3 animate-pulse">
-                <Lock className="w-6 h-6" />
-              </div>
-              <h2 className="text-xl font-bold font-sans tracking-tight">Parent Verification</h2>
-              <p className="text-xs text-slate-400 leading-relaxed mt-1 mb-6">
-                Enter your 4-digit PIN to exit the child lockdown sandbox.
-              </p>
-
-              {/* Passcode indicators */}
-              <div className="flex gap-4 mb-6">
-                {Array.from({ length: 4 }).map((_, index) => {
-                  const hasDigit = enteredPasscode.length > index;
-                  return (
-                    <div
-                      key={index}
-                      className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
-                        hasDigit
-                          ? "bg-blue-400 border-blue-400 scale-110 shadow-[0_0_8px_rgba(96,165,250,0.8)]"
-                          : "border-slate-500 bg-slate-800"
-                      }`}
-                    />
-                  );
-                })}
-              </div>
-
-              {/* Error statement feedback */}
-              <div className="h-6 mb-4 flex items-center justify-center">
-                {passcodeErrorMessage ? (
-                  <p className="text-xs text-red-500 font-medium tracking-tight bg-red-950/40 px-3 py-1 rounded-full border border-red-500/20">
-                    {passcodeErrorMessage}
-                  </p>
-                ) : (
-                  <p className="text-[10px] text-slate-500 font-mono uppercase tracking-widest">
-                    Enter your parent PIN
-                  </p>
-                )}
-              </div>
-
-              {/* Grid 3x4 PIN Pad */}
-              <div className="grid grid-cols-3 gap-3 w-full max-w-[280px]">
-                {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit) => (
-                  <button
-                    key={digit}
-                    onClick={() => handlePasscodeDigitPress(digit)}
-                    className="aspect-square flex items-center justify-center text-xl font-semibold font-mono rounded-2xl bg-white/5 hover:bg-white/10 active:bg-blue-500/20 border border-white/5 hover:border-slate-700 dynamic-pin-btn transition-all duration-100 cursor-pointer text-slate-200"
-                  >
-                    {digit}
-                  </button>
-                ))}
-                {/* Clear */}
-                <button
-                  onClick={() => setEnteredPasscode("")}
-                  className="aspect-square flex items-center justify-center text-xs font-bold uppercase rounded-2xl bg-slate-800/40 hover:bg-slate-700/60 active:bg-red-500/20 border border-white/5 transition-all cursor-pointer text-slate-450 hover:text-red-300"
-                >
-                  Clear
-                </button>
-                {/* 0 */}
-                <button
-                  onClick={() => handlePasscodeDigitPress("0")}
-                  className="aspect-square flex items-center justify-center text-xl font-semibold font-mono rounded-2xl bg-white/5 hover:bg-white/10 active:bg-blue-500/20 border border-white/5 hover:border-slate-700 transition-all duration-100 cursor-pointer text-slate-200"
-                >
-                  0
-                </button>
-                {/* Cancel */}
-                <button
-                  onClick={() => setIsPasscodeOverlayOpen(false)}
-                  className="aspect-square flex items-center justify-center text-xs font-bold uppercase rounded-2xl bg-slate-800/40 hover:bg-slate-700/60 active:bg-blue-500/10 border border-white/5 transition-all cursor-pointer text-slate-455 hover:text-slate-200"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        </div>
+        <ExitPasscodeOverlay
+          enteredPasscode={unlock.enteredPasscode}
+          errorMessage={unlock.passcodeErrorMessage}
+          shake={unlock.passcodeShake}
+          onDigitPress={unlock.handlePasscodeDigitPress}
+          onClear={() => unlock.setEnteredPasscode("")}
+          onClose={() => unlock.setIsPasscodeOverlayOpen(false)}
+        />
       )}
 
       {/* Startup splash overlay — covers the WebView2 HWND black background until
