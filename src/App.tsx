@@ -184,8 +184,6 @@ export default function App() {
     });
   };
 
-  const activeTheme = THEME_PRESETS[settings.theme] || THEME_PRESETS.cosmic;
-
   // Monitor layout is static after launch — compute once and memoize
   const parsedMonitors = useMemo(() => {
     const list = (window as any).BBM_MONITORS?.length > 0
