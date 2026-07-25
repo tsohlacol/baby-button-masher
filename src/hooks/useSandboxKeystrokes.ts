@@ -161,5 +161,5 @@ export function useSandboxKeystrokes({
     setLastKeystroke(null);
   }, []);
 
-  return { lastKeystroke, mashingSpeed, resetKeystrokes };
+  return { lastKeystroke, mashingSpeed, emitKeystroke, resetKeystrokes };
 }
