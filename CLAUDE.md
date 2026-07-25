@@ -148,7 +148,19 @@ The `--debug` flag is parsed in `host/App.xaml.cs` `OnStartup`; the logger lives
 
 ## Key Concepts & Code Patterns
 
-### 1. Keystroke Event Handling (App.tsx)
+### Frontend module layout (post-refactor)
+
+`App.tsx` is a thin ~330-line router over `appState` ("dashboard" | "dictionary" | "sandbox") that owns cross-screen state and wires it into hooks/screens. The former god-component was decomposed into:
+
+- `src/constants/themes.ts` — single source for `THEME_PRESETS` (Tailwind classes) and `themePalette` (canvas hex).
+- `src/hooks/` — `useParentSettings` (load/persist/volume-sync), `useVoices`, `useSandboxKeystrokes` (keydown listener + mashing-speed + auto mode switch + `emitKeystroke`).
+- `src/unlock/` — `useUnlockChallenge` (math + PIN logic and overlay state) plus the `ExitMathOverlay` / `ExitPasscodeOverlay` presentational components.
+- `src/screens/` — `Dashboard` (parent settings), `DictionaryScreen` (custom words), `Sandbox` (per-monitor mode dispatch + exit control; owns its long-press state and `PLAY_MODES`).
+- `src/components/` — the eight mode views, unchanged.
+
+The C# host's `MainWindow` is split into partial-class files by concern: `MainWindow.xaml.cs` (WPF lifecycle + WebView2), `MainWindow.KeyboardHook.cs`, `MainWindow.Accessibility.cs`, `MainWindow.Monitors.cs`, `MainWindow.VirtualDesktop.cs`.
+
+### 1. Keystroke Event Handling (src/hooks/useSandboxKeystrokes.ts)
 
 React captures `keydown` and `keyup` events. Unlike the native host hook, the React layer handles:
 - Audio playback (speech, piano notes, firework chords)
